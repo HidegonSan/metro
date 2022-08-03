@@ -1,3 +1,4 @@
+import enum
 import os
 import sys
 import glob
@@ -11,19 +12,23 @@ def error(msg):
 def trim_with_comma(com, line):
   return line[len(com):].split(',')
 
+# ------------------------------
+#  checker
+# ------------------------------
 def main() -> int:
   COM_CHECK_DUPLICATE     = '-dup.'
   COM_LINE_COUNT          = '-lcount.'
 
   try:
-    i = 1
-    argv_len = len(sys.argv)
+    for i, arg in enumerate(sys.argv):
+      if i == 0:
+        continue
 
-    while i < argv_len:
-      arg = sys.argv[i]
-
+      # check duplication of file name
       if arg.startswith(COM_CHECK_DUPLICATE):
         com_check_duplicate(trim_with_comma(COM_CHECK_DUPLICATE, arg))
+
+      # line counter
       elif arg.startswith(COM_LINE_COUNT):
         trimmed = trim_with_comma(COM_LINE_COUNT, arg)
         extlist = [ ]
@@ -35,14 +40,13 @@ def main() -> int:
           error('expected extensions list at first of arguments')
 
         com_line_count(trimmed, extlist)
+
       else:
         print(f'unknown argument: {arg}')
-
-      i += 1
   except:
     print('invalid arguments')
     return 1
-  
+
   return 0
 
 if __name__ == "__main__":
