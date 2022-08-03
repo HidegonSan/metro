@@ -14,30 +14,36 @@ def error(msg):
 def trim_with_comma(com, line):
   return line[len(com):].split(',')
 
-try:
-  i = 1
-  argv_len = len(sys.argv)
+def main() -> int:
+  try:
+    i = 1
+    argv_len = len(sys.argv)
 
-  while i < argv_len:
-    arg = sys.argv[i]
+    while i < argv_len:
+      arg = sys.argv[i]
 
-    if arg.startswith(COM_CHECK_DUPLICATE):
-      com_check_duplicate(trim_with_comma(COM_CHECK_DUPLICATE, arg))
-    elif arg.startswith(COM_LINE_COUNT):
-      trimmed = trim_with_comma(COM_LINE_COUNT, arg)
-      extlist = [ ]
+      if arg.startswith(COM_CHECK_DUPLICATE):
+        com_check_duplicate(trim_with_comma(COM_CHECK_DUPLICATE, arg))
+      elif arg.startswith(COM_LINE_COUNT):
+        trimmed = trim_with_comma(COM_LINE_COUNT, arg)
+        extlist = [ ]
 
-      if trimmed[0].startswith('ext='):
-        extlist = trimmed[0][4:].split('.')
-        trimmed = trimmed[1:]
+        if trimmed[0].startswith('ext='):
+          extlist = trimmed[0][4:].split('.')
+          trimmed = trimmed[1:]
+        else:
+          error('expected extensions list at first of arguments')
+
+        com_line_count(trimmed, extlist)
       else:
-        error('expected extensions list at first of arguments')
+        print(f'unknown argument: {arg}')
 
-      com_line_count(trimmed, extlist)
-    else:
-      print(f'unknown argument: {arg}')
+      i += 1
+  except:
+    print('invalid arguments')
+    return 1
+  
+  return 0
 
-    i += 1
-except:
-  print('invalid arguments')
-  exit(1)
+if __name__ == "__main__":
+  main()
