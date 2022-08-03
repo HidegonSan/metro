@@ -29,7 +29,8 @@ namespace Metro {
     TooFewArguments,
     TooManyArguments,
     InvalidArguments,
-    StackOverflow
+    StackOverflow,
+    EmptyStruct
   };
 
   struct ErrorContext {

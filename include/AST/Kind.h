@@ -5,6 +5,7 @@ namespace Metro::AST {
     None,
     Type,
     Argument,
+    Member,
     
     Boolean,
     Value,
@@ -26,5 +27,6 @@ namespace Metro::AST {
     Scope,
 
     Function,
+    Struct,
   };
 }

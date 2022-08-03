@@ -17,7 +17,7 @@ namespace Metro {
     AST::Base* expr();
     AST::Base* stmt();
 
-    AST::Base* func();
+    AST::Base* toplevel();
 
     AST::Base* parse();
 

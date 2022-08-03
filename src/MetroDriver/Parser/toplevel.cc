@@ -3,7 +3,7 @@
 #include "Error.h"
 
 namespace Metro {
-  AST::Base* Parser::func() {
+  AST::Base* Parser::toplevel() {
     if( eat("fn") ) {
       auto ast = new AST::Function(cur);
 
@@ -37,6 +37,37 @@ namespace Metro {
       ast->code = expect_scope();
 
       return ast;
+    }
+
+    if( eat("struct") ) {
+      auto x = new AST::Struct(ate);
+
+      expect_ident();
+      x->name = cur->str;
+
+      next();
+      expect("{");
+
+      if( cur->str == "}" ) {
+        Error::add_error(ErrorKind::EmptyStruct, cur, "empty struct is not valid");
+        Error::exit_app();
+      }
+
+      do {
+        expect_ident();
+
+        auto& member = x->members.emplace_back(cur);
+        member.name = cur->str;
+
+        next();
+        expect(":"); // TODO: add template type if didnt eat
+
+        member.type = expect_type();
+      } while( eat(",") );
+
+      expect("}");
+
+      return x;
     }
 
     return expr();

@@ -99,6 +99,12 @@ namespace Metro::Semantics {
         break;
       }
 
+      case ASTKind::Struct: {
+        TODO_IMPL
+
+        break;
+      }
+
       default: {
         auto x = (AST::Expr*)ast;
 
