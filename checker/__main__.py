@@ -4,9 +4,6 @@ import glob
 from duplicate_checker import *
 from line_counter import *
 
-COM_CHECK_DUPLICATE     = '-dup.'
-COM_LINE_COUNT          = '-lcount.'
-
 def error(msg):
   print(msg)
   os._exit(1)
@@ -15,6 +12,9 @@ def trim_with_comma(com, line):
   return line[len(com):].split(',')
 
 def main() -> int:
+  COM_CHECK_DUPLICATE     = '-dup.'
+  COM_LINE_COUNT          = '-lcount.'
+
   try:
     i = 1
     argv_len = len(sys.argv)
