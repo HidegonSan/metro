@@ -52,8 +52,15 @@ namespace Metro::Semantics {
       AST::Base*  ast;
       std::vector<VarInfo> var_list;
       std::vector<Scope> scopes;
+      size_t index;
 
-      Scope() { }
+      Scope()
+        : owner(nullptr),
+          ast(nullptr),
+          index(0)
+      {
+      }
+
       Scope(Scope&&) = delete;
       Scope(Scope const&) = delete;
     };
@@ -116,8 +123,14 @@ namespace Metro::Semantics {
 
             return { true, infer(ast) };
           };
-          
+
           get_last_nodes(lastnodes, x->code);
+
+          for( auto&& nd : lastnodes ) {
+            auto [res, t] = fun(nd);
+
+            lastnode_types.emplace_back(nd, res, t);
+          }
 
           func_ctx_list.pop_front();
 
@@ -216,6 +229,18 @@ namespace Metro::Semantics {
 
           find_return(out, x->if_true);
           find_return(out, x->if_false);
+
+          break;
+        }
+
+        case AST::Kind::Scope: {
+          auto x = (AST::Scope*)ast;
+
+          for( auto&& nd : x->elems ) {
+            find_return(out, nd);
+          }
+
+          break;
         }
       }
     }
