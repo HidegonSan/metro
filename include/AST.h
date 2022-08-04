@@ -18,6 +18,7 @@
 #include "AST/Compare.h"
 #include "AST/Expr.h"
 
+#include "AST/Return.h"
 #include "AST/If.h"
 #include "AST/Let.h"
 #include "AST/Scope.h"

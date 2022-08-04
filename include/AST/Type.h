@@ -7,10 +7,13 @@ namespace Metro::AST {
     bool  is_reference;
     bool  is_constant;
 
+    AST::Struct* userdef;
+
     Type(Token* tok)
       : Base(Kind::Type, tok),
         is_reference(false),
-        is_constant(false)
+        is_constant(false),
+        userdef(nullptr)
     {
     }
   };

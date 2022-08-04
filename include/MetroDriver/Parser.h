@@ -9,6 +9,7 @@ namespace Metro {
     explicit Parser(Token* token);
 
     AST::Base* factor();
+    AST::Base* member();
     AST::Base* mul();
     AST::Base* add();
     AST::Base* compare();

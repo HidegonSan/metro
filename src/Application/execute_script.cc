@@ -4,7 +4,8 @@
 #include "Types.h"
 #include "MetroDriver/Lexer.h"
 #include "MetroDriver/Parser.h"
-#include "MetroDriver/Semantics/Analyzer.h"
+//#include "MetroDriver/Semantics/Analyzer.h"
+#include "MetroDriver/Semantics/sema_3.h"
 #include "MetroDriver/Evaluator.h"
 #include "Application.h"
 #include "Error.h"
@@ -56,9 +57,10 @@ namespace Metro {
     Error::check();
 
     Semantics::Analyzer analyzer;
-    
-    analyzer.walk(ast);
-    analyzer.analyze();
+
+    // analyzer.walk(ast);
+    // analyzer.analyze();
+    analyzer.infer(ast);
 
     Error::check();
 

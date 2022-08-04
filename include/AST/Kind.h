@@ -12,6 +12,7 @@ namespace Metro::AST {
     Variable,
     Callfunc,
 
+    MemberAccess,
     Mul,
     Div,
     Add,
@@ -19,6 +20,7 @@ namespace Metro::AST {
     Compare,
     Assign,
 
+    Return,
     If,
     Let,
     For,

@@ -14,6 +14,8 @@ namespace Metro {
 
     switch( ast->kind ) {
       case Kind::None:
+      case Kind::Function:
+      case Kind::Struct:
         break;
 
       case Kind::Boolean: {
@@ -23,9 +25,6 @@ namespace Metro {
 
         break;
       }
-
-      case Kind::Function:
-        break;
 
       case Kind::Value: {
         ret = ((AST::Value*)ast)->object;
@@ -147,7 +146,12 @@ namespace Metro {
         auto x = (AST::Let*)ast;
 
         if( !x->init ) {
-          break;
+          if( x->type ) {
+            
+          }
+          else {
+            break;
+          }
         }
 
         auto val = eval(x->init);

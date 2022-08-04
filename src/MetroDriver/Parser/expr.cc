@@ -55,12 +55,22 @@ namespace Metro {
     Error::exit_app();
   }
 
-  AST::Base* Parser::mul() {
+  AST::Base* Parser::member() {
     auto x = factor();
 
+    while( check() && eat(".") ) {
+      x = new AST::Expr(AST::Kind::MemberAccess, x, factor(), ate);
+    }
+
+    return x;
+  }
+
+  AST::Base* Parser::mul() {
+    auto x = member();
+
     while( check() ) {
-      if( eat("*") ) x = new AST::Expr(AST::Kind::Mul, x, factor(), ate);
-      else if( eat("/") ) x = new AST::Expr(AST::Kind::Div, x, factor(), ate);
+      if( eat("*") ) x = new AST::Expr(AST::Kind::Mul, x, member(), ate);
+      else if( eat("/") ) x = new AST::Expr(AST::Kind::Div, x, member(), ate);
       else break;
     }
 
