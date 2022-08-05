@@ -19,8 +19,8 @@ build {
   }
 
   flags {
-    opti  = -O2
-    c     = $opti -Wno-switch -Wimplicit-fallthrough
+    opt   = -O2
+    c     = $opt -Wimplicit-fallthrough
     cpp   = $c -std=c++20
     link  = -Wl,--gc-sections
   }

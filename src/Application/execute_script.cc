@@ -56,11 +56,13 @@ namespace Metro {
 
     Error::check();
 
-    Semantics::Analyzer analyzer{ ast };
+    //Semantics::Analyzer analyzer{ ast };
 
     // analyzer.walk(ast);
     // analyzer.analyze();
-    analyzer.infer(ast);
+    //analyzer.infer(ast);
+
+    
 
 
     return nullptr;
