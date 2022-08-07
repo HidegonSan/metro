@@ -1,6 +1,7 @@
 #pragma once
 
 #include <vector>
+#include <list>
 #include <map>
 #include "AST.h"
 
@@ -17,6 +18,12 @@ namespace Metro::Semantics {
       ValueType   type;
     };
 
+    struct ScopeContext {
+      AST::Scope*  scope=nullptr;
+      AST::Base* cur_ast=nullptr;
+      size_t  cur_index = 0;
+    };
+
   public:
 
     // initialize Sema
@@ -24,6 +31,10 @@ namespace Metro::Semantics {
 
     // == walk ==
     ValueType walk(AST::Base* ast);
+
+
+    // TODO: impl
+    ValueType analyze_func_return_type(AST::Function* ast);
 
 
     // return 式を探して out に追加する
@@ -50,11 +61,14 @@ namespace Metro::Semantics {
     AST::Scope* root;
 
     // informations of function that current walking ; cfn = current-function //
-    AST::Base* cfn_ast;
+    AST::Function* cfn_ast;
     std::vector<ReturnTypeElement>* cfn_ret_list;
 
     // all functions in root
     std::vector<AST::Function*> functions;
+
+    // scope-list
+    std::list<ScopeContext> scopelist;
 
     // caches
     std::map<AST::Base*, ValueType> walked;

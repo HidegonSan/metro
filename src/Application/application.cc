@@ -1,10 +1,9 @@
 #include <iostream>
 #include <fstream>
 #include "Utils.h"
-#include "MetroDriver/Lexer.h"
-#include "MetroDriver/Parser.h"
-#include "MetroDriver/Semantics/Analyzer.h"
-#include "MetroDriver/Evaluator.h"
+// #include "MetroDriver/Lexer.h"
+// #include "MetroDriver/Parser.h"
+// #include "MetroDriver/Evaluator.h"
 #include "Application.h"
 
 #include "Types.h"

@@ -1,4 +1,4 @@
-#include "Types.h"
+#include "AST.h"
 #include "MetroDriver/Evaluator.h"
 #include "Sema/Sema.h"
 #include "Error.h"
@@ -61,6 +61,37 @@ namespace Metro::Semantics {
         break;
       }
 
+      case ASTKind::Variable: {
+
+        auto var = (AST::Variable*)ast;
+
+        for(auto&&ctx:scopelist){
+          for(int64_t i=ctx.cur_index;i>=0; i-- ){
+            auto& x = ctx.scope->elems[i];
+
+            if( x->kind == ASTKind::Let && ((AST::Let*)x)->name == var->name ) {
+              var->defined = x;
+              ret = walk(x);
+              goto __var_done;
+            }
+          }
+        }
+
+        if(cfn_ast!=nullptr){
+          for(auto&&arg:cfn_ast->args){
+            if(arg.name== var->name){
+              ret = walk(arg.type);
+              goto __var_done;
+            }
+          }
+        }
+
+        Error::add_error(ErrorKind::Undefined, ast->token, "undefined variable name");
+
+      __var_done:
+        break;
+      }
+
       case ASTKind::Callfunc: {
         auto callfunc = (AST::CallFunc*)ast;
 
@@ -82,6 +113,10 @@ namespace Metro::Semantics {
         Error::exit_app();
 
       found:
+
+        alert;
+        alertios("callfunc: " << callfunc->name << ": " << ret.to_string());
+
         break;
       }
 
@@ -120,15 +155,14 @@ namespace Metro::Semantics {
 
           for(size_t ix = 0; auto&& last :lastexpr_list){
             alert;
-            std::cout<<last->to_string()<<std::endl;
-
-            ValueType tmp;
 
             // selfcall
             if( (last->is_expr || last->kind == ASTKind::Callfunc) && contains_callfunc_in_expr(func->name, last) ) {
               
             }
             else {
+              auto tmp = walk(last);
+              
               if(!flag1){
                 rettype=tmp;
                 flag1= 1;
@@ -154,8 +188,14 @@ namespace Metro::Semantics {
           Error::check();
         }
 
+        ret = rettype;
+
+        alertios("function " << func->name << ": return-type = " << ret.to_string());
+
         // code
         walk(func->code);
+
+        cfn_ast = nullptr;
         
         break;
       }
@@ -183,14 +223,38 @@ namespace Metro::Semantics {
           break;
         }
 
+        auto& context = scopelist.emplace_front();
+        
+        context.scope = scope;
+
         auto iter = scope->elems.begin();
         auto last = scope->elems.end() - 1;
 
         for( ; iter != last; iter++ ) {
+          context.cur_ast = *iter;
           walk(*iter);
+
+          context.cur_index++;
         }
 
+        context.cur_ast=*last;
         ret = walk(*last);
+
+        scopelist.pop_front();
+
+        break;
+      }
+
+      case ASTKind::Compare: {
+        auto cmp = (AST::Compare*)ast;
+
+        walk(cmp->first);
+
+        for(auto&&item:cmp->list){
+          walk(item.ast);
+        }
+
+        ret = ValueType::Kind::Bool;
         break;
       }
 
