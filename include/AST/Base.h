@@ -9,6 +9,10 @@ namespace Metro::AST {
     //bool    is_retval = false;
     bool    is_expr = false;
 
+    bool is_empty_array() const {
+      return kind == Kind::Array && ((AST::Array*)this)->elements.empty();
+    }
+
     virtual std::pair<size_t, size_t> get_range_on_source() {
       return { token->pos, token->pos + token->str.length() };
     }

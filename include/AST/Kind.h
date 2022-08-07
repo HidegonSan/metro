@@ -6,13 +6,16 @@ namespace Metro::AST {
     Type,
     Argument,
     Member,
-    
+
     Boolean,
     Value,
+    Array,
+
     Variable,
     Callfunc,
 
     MemberAccess,
+
     Mul,
     Div,
     Add,

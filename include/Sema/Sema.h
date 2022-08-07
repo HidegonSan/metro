@@ -89,7 +89,7 @@ namespace Metro::Semantics {
 
     AST::Scope* root;
 
-    AST::Variable* arrow_unini;
+    AST::Variable* arrow_unini = nullptr;
 
     // current walking function
     AST::Function* cfn_ast;

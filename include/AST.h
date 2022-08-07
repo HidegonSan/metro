@@ -9,10 +9,13 @@
 #include "AST/Base.h"
 #include "AST/None.h"
 #include "AST/Type.h"
-#include "AST/Member.h"
 
 #include "AST/Boolean.h"
 #include "AST/Value.h"
+#include "AST/Array.h"
+
+#include "AST/Member.h"
+
 #include "AST/Variable.h"
 #include "AST/Callfunc.h"
 #include "AST/Compare.h"

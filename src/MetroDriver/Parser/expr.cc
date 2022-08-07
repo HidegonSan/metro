@@ -15,6 +15,19 @@ namespace Metro {
       return expect_scope();
     }
 
+    if( eat("[") ) {
+      auto ast = new AST::Array(ate);
+
+      if( !eat("]") ) {
+        do {
+          ast->elements.emplace_back(expr());
+        } while( eat(",") );
+        expect("]");
+      }
+
+      return ast;
+    }
+
     if( eat("true") || eat("false") ) {
       return new AST::Boolean(ate);
     }

@@ -117,7 +117,7 @@ namespace Metro::Semantics {
       case ASTKind::Assign: {
         auto expr = (AST::Expr*)ast;
 
-        auto rhs = walk(expr->rhs);
+        // auto rhs = walk(expr->rhs);
 
         // TODO: get lhs_final (example: index-ref)
 
@@ -128,11 +128,20 @@ namespace Metro::Semantics {
 
           arrow_unini = var;
           walk(expr->lhs);
-          
+
+          if( std::find(root->elems.begin(), root->elems.end(), var->defined) != root->elems.end() ) {
+            if( !find_var_context(var->defined)->was_type_analyzed ) {
+              Error::add_error(ErrorKind::UninitializedValue, var->token, "uninitialized value");
+              Error::exit_app();
+            }
+          }
+
           auto context = find_var_context(var->defined);
 
           alert;
           assert(context != nullptr);
+
+          auto rhs = walk(expr->rhs);
 
           if( context->was_type_analyzed ) {
             if( !context->type.equals(rhs) ) {
@@ -140,11 +149,15 @@ namespace Metro::Semantics {
             }
           }
           else {
+            
+
             context->type = rhs;
             context->was_type_analyzed = true;
           }
         }
 
+
+        arrow_unini = nullptr;
         break;
       }
 
