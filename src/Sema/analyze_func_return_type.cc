@@ -21,7 +21,7 @@ namespace Metro::Semantics {
 
           if( !assignmented ) {
             out = tmp;
-            assignmented= 1;
+            assignmented = true;
           }
           else if( !out.equals(tmp) ) {
             Error::add_error(ErrorKind::TypeMismatch, last, "type mismatch 0fh3glk1");
