@@ -25,7 +25,7 @@ namespace Metro::Semantics {
 
     // sema-parts
     ValueType sema_callfunc(AST::CallFunc* ast);
-    ValueType sema_controls(AST::CallFunc* ast);
+    ValueType sema_controls(AST::Base* ast);
 
 
     //

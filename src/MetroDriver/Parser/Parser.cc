@@ -10,10 +10,6 @@ namespace Metro {
   }
 
   AST::Base* Parser::parse() {
-    // return expr();
-
-    // ----- //
-
     auto scope = new AST::Scope(nullptr);
 
     while( check() ) {

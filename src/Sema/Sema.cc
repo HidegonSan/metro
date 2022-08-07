@@ -75,67 +75,30 @@ namespace Metro::Semantics {
       }
 
       case ASTKind::Callfunc: {
-        auto call = (AST::CallFunc*)ast;
+        ret = sema_callfunc((AST::CallFunc*)ast);
 
-        // TODO: check argument types
-
-        for( auto&& arg : call->args ) {
-          walk(arg);
-        }
-
-        if( (call->callee = find_func(call->name)) == nullptr ) {
-          if( (call->callee_builtin = find_builtin_func(call->name)) == nullptr ) {
-            Error::add_error(ErrorKind::Undefined, ast->token, "undefined function name");
-            Error::exit_app();
-          }
-        }
-        else {
-          ret = walk(call->callee);
-        }
-
-        alertios("callfunc " << call->name << ": " << ret.to_string());
+        alertios("callfunc " << ((AST::CallFunc*)ast)->name << ": " << ret.to_string());
 
         break;
       }
 
-      // ------------------- //
-      // ------------------- //
-      case ASTKind::Function: {
-        auto func = (AST::Function*)ast;
+      case ASTKind::Compare: {
+        auto cmp = (AST::Compare*)ast;
 
-        cfn_ast = func;
+        walk(cmp->first);
 
-        // arguments
-        for(auto&&x:func->args){
-          walk(&x);
+        for(auto&&item:cmp->list){
+          walk(item.ast);
         }
 
-        // return-type
-        analyze_func_return_type(ret, func);
-
-        // code
-        walk(func->code);
-
-        cfn_ast = nullptr;
-        
+        ret = ValueType::Kind::Bool;
         break;
       }
-      
-      case ASTKind::If: {
-        auto if_x = (AST::If*)ast;
 
-        if(!walk(if_x->cond).equals(ValueType::Kind::Bool)){
-          Error::add_error(ErrorKind::TypeMismatch, if_x->cond, "condision must be boolean");
-        }
-
-        ret = walk(if_x->if_true);
-
-        if(if_x->if_false&&!ret.equals(walk(if_x->if_false))){
-          Error::add_error(ErrorKind::TypeMismatch,if_x,"if-expr type mismatch");
-        }
-
+      case ASTKind::If:
+      case ASTKind::For:
+        ret = sema_controls(ast);
         break;
-      }
 
       case ASTKind::Scope: {
         auto scope = (AST::Scope*)ast;
@@ -166,16 +129,24 @@ namespace Metro::Semantics {
         break;
       }
 
-      case ASTKind::Compare: {
-        auto cmp = (AST::Compare*)ast;
+      case ASTKind::Function: {
+        auto func = (AST::Function*)ast;
 
-        walk(cmp->first);
+        cfn_ast = func;
 
-        for(auto&&item:cmp->list){
-          walk(item.ast);
+        // arguments
+        for(auto&&x:func->args){
+          walk(&x);
         }
 
-        ret = ValueType::Kind::Bool;
+        // return-type
+        analyze_func_return_type(ret, func);
+
+        // code
+        walk(func->code);
+
+        cfn_ast = nullptr;
+        
         break;
       }
 

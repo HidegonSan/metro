@@ -13,8 +13,6 @@ namespace Metro::Semantics {
 
     // Analyze return-type
     if( func->return_type == nullptr ) {
-      alert;
-
       bool assignmented = false;
 
       for( auto&& last : lastexpr_list ){
