@@ -10,7 +10,7 @@ namespace Metro {
   }
 
   AST::Base* Parser::parse() {
-    return expr();
+    // return expr();
 
     // ----- //
 

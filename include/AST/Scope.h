@@ -18,6 +18,10 @@ namespace Metro::AST {
       return elems.emplace_back(ast);
     }
 
+    std::string to_string() const {
+      return "<Scope>";
+    }
+
     Scope(Token* tok)
       : Base(Kind::Scope, tok)
     {

@@ -37,6 +37,9 @@ namespace Metro::AST {
       return list.emplace_back(kind, token, ast);
     }
 
+    std::string to_string() const {
+    }
+
     explicit Compare(Base* first)
       : Base(Kind::Compare, first->token),
         first(first)

@@ -12,6 +12,9 @@ namespace Metro::AST {
     Function*           callee;
     BuiltinFunc const*  callee_builtin;
 
+    std::string to_string() const {
+    }
+
     CallFunc(Token* token)
       : Base(Kind::Callfunc, token),
         callee(nullptr),

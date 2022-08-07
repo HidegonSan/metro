@@ -9,6 +9,10 @@ namespace Metro::AST {
 
     AST::Struct* userdef;
 
+    std::string to_string() const {
+      return "<Type>";
+    }
+
     Type(Token* tok)
       : Base(Kind::Type, tok),
         is_reference(false),

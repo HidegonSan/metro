@@ -1,5 +1,7 @@
 #pragma once
 
+#include "Utils.h"
+
 namespace Metro::AST {
   struct Base {
     Kind    kind;
@@ -8,6 +10,10 @@ namespace Metro::AST {
 
     virtual std::pair<size_t, size_t> get_range_on_source() {
       return { token->pos, token->pos + token->str.length() };
+    }
+
+    virtual std::string to_string() const {
+      return Utils::format("<AST::Base at %p>", this);
     }
 
   protected:

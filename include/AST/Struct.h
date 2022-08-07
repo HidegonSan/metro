@@ -6,6 +6,10 @@ namespace Metro::AST {
     std::string_view name;
     std::vector<Member> members;
 
+    std::string to_string() const {
+      return "<Struct>";
+    }
+
     Struct(Token* tok)
       : Base(Kind::Struct, tok)
     {

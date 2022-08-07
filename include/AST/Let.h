@@ -12,6 +12,10 @@ namespace Metro::AST {
     Base*             init;
     Object*           value;
 
+    std::string to_string() const {
+      return "<Let>";
+    }
+
     Let(Token* token)
       : Base(Kind::Let, token),
         type(nullptr),

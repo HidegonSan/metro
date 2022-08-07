@@ -9,15 +9,18 @@ namespace Metro::AST {
     bool closed_with_else() const {
       auto x = if_false;
 
-      if( !x ) {
-        return false;
-      }
+      // if( !x ) {
+      //   return false;
+      // }
 
       while( x && x->kind == Kind::If ) {
         x = ((AST::If*)x)->if_false;
       }
 
       return x != nullptr;
+    }
+
+    std::string to_string() const {
     }
 
     If(Token* tok)
