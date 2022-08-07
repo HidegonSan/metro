@@ -26,6 +26,18 @@ namespace Metro::Semantics {
     return nullptr;
   }
 
+  Sema::VariableContext* Sema::find_var_context(AST::Base* defined) {
+    for( auto&& ctx : scopelist ) {
+      for( auto&& pair : ctx.var_context ) {
+        if( pair.second.defined == defined ) {
+          return &pair.second;
+        }
+      }
+    }
+
+    return nullptr;
+  }
+
   AST::Function* Sema::find_func(std::string_view name) {
     for( auto&& func : functions) {
       if( func->name == name ) {

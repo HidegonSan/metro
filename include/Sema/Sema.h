@@ -10,10 +10,10 @@ namespace Metro::Semantics {
     using ASTKind = AST::Kind;
 
     struct VariableContext {
-      AST::Base*  ast;
-      AST::Base*  defined;
+      AST::Let*  defined;
 
       bool was_type_analyzed = false;
+      ValueType type;
 
     };
 
@@ -37,10 +37,15 @@ namespace Metro::Semantics {
     ValueType sema_callfunc(AST::CallFunc* ast);
     ValueType sema_controls(AST::Base* ast);
 
+    
 
     //
     // 名前から変数の定義場所を探す
     AST::Base* find_var_defined(std::string_view name);
+
+    //
+    // find variable context
+    VariableContext* find_var_context(AST::Base* defined);
 
     //
     // 名前から関数を探す

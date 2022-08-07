@@ -73,6 +73,7 @@ namespace Metro::Semantics {
 
         if( (var->defined = find_var_defined(var->name)) == nullptr ) {
           Error::add_error(ErrorKind::Undefined, ast->token, "undefined variable name");
+          Error::exit_app();
         }
 
         ret = walk(var->defined);
@@ -100,12 +101,37 @@ namespace Metro::Semantics {
         break;
       }
 
+      //
+      // assignment
       case ASTKind::Assign: {
         auto expr = (AST::Expr*)ast;
 
-        if( expr->lhs->kind == ASTKind::Variable ) {
+        auto rhs = walk(expr->rhs);
 
+        // TODO: get lhs_final (example: index-ref)
+
+        // left is variable
+        if( expr->lhs->kind == ASTKind::Variable ) {
+          walk(expr->lhs);
+
+          auto var = (AST::Variable*)expr->lhs;
+          auto context = find_var_context(var->defined);
+
+          alert;
+          assert(context != nullptr);
+
+          if( context->was_type_analyzed ) {
+            if( !context->type.equals(rhs) ) {
+              Error::add_error(ErrorKind::TypeMismatch, expr->token, "type mismatch");
+            }
+          }
+          else {
+            context->type = rhs;
+            context->was_type_analyzed = true;
+          }
         }
+
+
 
         break;
       }
@@ -121,8 +147,15 @@ namespace Metro::Semantics {
 
         auto& context = scope.var_context[let->name];
 
+        context.defined = let;
+
         if( let->type != nullptr ) {
-          
+          context.was_type_analyzed = true;
+          context.type = walk(let->type);
+        }
+        else if( let->init != nullptr ) {
+          context.was_type_analyzed = true;
+          context.type = walk(let->init);
         }
 
         break;
@@ -179,7 +212,7 @@ namespace Metro::Semantics {
         walk(func->code);
 
         cfn_ast = nullptr;
-        
+
         break;
       }
 
