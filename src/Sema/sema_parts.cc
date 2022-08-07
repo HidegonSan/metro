@@ -6,12 +6,11 @@
 
 namespace Metro::Semantics {
   ValueType Sema::sema_callfunc(AST::CallFunc* ast) {
-    // TODO: check argument types
-
+    bool is_builtin = false;
     std::vector<ValueType> arg_types;
 
     for( auto&& arg : ast->args ) {
-      walk(arg);
+      arg_types.emplace_back(walk(arg));
     }
 
     if( (ast->callee = find_func(ast->name)) == nullptr ) {
@@ -20,10 +19,40 @@ namespace Metro::Semantics {
         Error::exit_app();
       }
 
-      return ast->callee_builtin->ret_type;
+      is_builtin = true;
     }
 
-    return walk(ast->callee);
+    auto arg = arg_types.begin();
+    size_t max = is_builtin ? ast->callee_builtin->arg_types.size() : ast->callee->args.size();
+
+    for( size_t i = 0;; i++, arg++ ) {
+      if( i == max ) {
+        if( i != ast->args.size() ) {
+          Error::add_error(ErrorKind::TooManyArguments, ast->token, "too many arguments");
+        }
+
+        break;
+      }
+
+      auto&& func_arg_type = is_builtin ? ast->callee_builtin->arg_types[i] : walk(ast->callee->args[i].type);
+
+      if( func_arg_type.equals_kind(ValueType::Kind::Args) ) {
+        break;
+      }
+
+      if( i == ast->args.size() ) {
+        Error::add_error(ErrorKind::TooFewArguments, ast->token, "too few arguments");
+        break;
+      }
+
+      auto arg_ast = ast->args[i];
+
+      if( !func_arg_type.equals(*arg) ) {
+        Error::add_error(ErrorKind::TypeMismatch, arg_ast, "type mismatch");
+      }
+    }
+
+    return is_builtin ? ast->callee_builtin->ret_type : walk(ast->callee);
   }
 
   ValueType Sema::sema_controls(AST::Base* ast) {

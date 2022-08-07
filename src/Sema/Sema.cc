@@ -45,6 +45,8 @@ namespace Metro::Semantics {
 
         // TODO: find struct
 
+        Error::add_error(ErrorKind::Undefined, ast->token, "undefined type name");
+
       _found_type:
         break;
       }
@@ -73,6 +75,7 @@ namespace Metro::Semantics {
           Error::add_error(ErrorKind::Undefined, ast->token, "undefined variable name");
         }
 
+        ret = walk(var->defined);
         break;
       }
 
@@ -137,8 +140,8 @@ namespace Metro::Semantics {
         cfn_ast = func;
 
         // arguments
-        for(auto&&x:func->args){
-          walk(&x);
+        for( auto&& arg : func->args ) {
+          walk(&arg);
         }
 
         // return-type
@@ -167,4 +170,4 @@ namespace Metro::Semantics {
 
     return ret;
   }
-  }
+}

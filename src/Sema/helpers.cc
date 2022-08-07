@@ -144,6 +144,10 @@ namespace Metro::Semantics {
       case TokenKind::String: {
         obj->type = ValueType::Kind::String;
         obj->v_str = Utils::Strings::to_u16string(std::string(token->str));
+
+        obj->v_str.erase(obj->v_str.begin());
+        obj->v_str.pop_back();
+
         break;
       }
 
