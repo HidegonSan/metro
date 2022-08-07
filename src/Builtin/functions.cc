@@ -40,12 +40,12 @@ namespace Metro {
   // -------------------------- //
   std::vector<BuiltinFunc> const BuiltinFunc::builtin_functions {
     // print
-    make_bifun(print, Int, { ValueType::Kind::Array },
+    make_bifun(print, Int, { ValueType::Kind::Args },
       _bifun_print
     ),
 
     // println
-    make_bifun_code(println, Int, { ValueType::Kind::Array },
+    make_bifun_code(println, Int, { ValueType::Kind::Args },
       auto&& ret = _bifun_print(args);
 
       std::cout << std::endl;

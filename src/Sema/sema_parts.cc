@@ -8,6 +8,8 @@ namespace Metro::Semantics {
   ValueType Sema::sema_callfunc(AST::CallFunc* ast) {
     // TODO: check argument types
 
+    std::vector<ValueType> arg_types;
+
     for( auto&& arg : ast->args ) {
       walk(arg);
     }
@@ -17,6 +19,8 @@ namespace Metro::Semantics {
         Error::add_error(ErrorKind::Undefined, ast->token, "undefined function name");
         Error::exit_app();
       }
+
+      return ast->callee_builtin->ret_type;
     }
 
     return walk(ast->callee);
