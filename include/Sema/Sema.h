@@ -24,7 +24,7 @@ namespace Metro::Semantics {
 
     // == walk ==
     ValueType walk(AST::Base* ast);
-    
+
 
     // return 式を探して out に追加する
     void find_return(std::vector<AST::Base*>& out, AST::Base* ast);
@@ -37,8 +37,11 @@ namespace Metro::Semantics {
     //  last-expr と return どっちも追加される
     void get_lastval_full(std::vector<AST::Base*>& out, AST::Base* ast);
 
-    // pass AST::Expr !!
+    // 式の中に name と同名の関数呼び出しが含まれているかどうか確認
+    //  !!! ast には AST::Expr を渡すこと !!!
+    //  !!! 'ast' must AST::Expr !!!
     bool contains_callfunc_in_expr(std::string_view name, AST::Base* ast);
+
 
     static Object* create_obj(Token* token);
 

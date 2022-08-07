@@ -64,8 +64,24 @@ namespace Metro::Semantics {
       case ASTKind::Callfunc: {
         auto callfunc = (AST::CallFunc*)ast;
 
+        // TODO: check equality of arguments
 
+        for(auto&&arg:callfunc->args){
+          walk(arg);
+        }
 
+        for(auto&&func:functions){
+          if(func->name==callfunc->name){
+            callfunc->callee = func;
+            ret = walk(func);
+            goto found;
+          }
+        }
+
+        Error::add_error(ErrorKind::Undefined, ast->token, "undefined function name");
+        Error::exit_app();
+
+      found:
         break;
       }
 
@@ -89,24 +105,53 @@ namespace Metro::Semantics {
 
         // return type
         auto rettype = walk(func->return_type);
+        bool have_rettype_ast = func->return_type != nullptr;
 
+        // get last expressions
         get_lastval_full(lastexpr_list, func->code);
 
         alert;
 
         // Analyze return-type
-        for(size_t ix = 0; auto&& last :lastexpr_list){
-          std::cout<<last->to_string()<<std::endl;
+        if( !have_rettype_ast){
+          bool flag1 = 0;
 
-          ValueType tmp;
+          std::vector<ValueType> tmptmp;
 
-          // Expr and contain selfcall
-          if( last->is_expr && contains_callfunc_in_expr(func->name, last) ) {
-            
+          for(size_t ix = 0; auto&& last :lastexpr_list){
+            alert;
+            std::cout<<last->to_string()<<std::endl;
+
+            ValueType tmp;
+
+            // selfcall
+            if( (last->is_expr || last->kind == ASTKind::Callfunc) && contains_callfunc_in_expr(func->name, last) ) {
+              
+            }
+            else {
+              if(!flag1){
+                rettype=tmp;
+                flag1= 1;
+              }
+              else if(!rettype.equals(tmp)){
+                Error::add_error(ErrorKind::TypeMismatch, last, "type mismatch 0fh3glk1");
+              }
+            }
           }
-          else {
-            tmp = walk(last);
+
+          if(!flag1){
+            Error::add_error(ErrorKind::CannotInfer, func->token, "failed to infer return type of function");
+            Error::exit_app();
           }
+        }
+        else{ // already specified return type
+          for(auto&& last :lastexpr_list){
+            if(!rettype.equals(walk(last)) ){
+              Error::add_error(ErrorKind::TypeMismatch, last, "type mismatch 0b91nxd0");
+            }
+          }
+
+          Error::check();
         }
 
         // code
@@ -115,6 +160,22 @@ namespace Metro::Semantics {
         break;
       }
       
+      case ASTKind::If: {
+        auto if_x = (AST::If*)ast;
+
+        if(!walk(if_x->cond).equals(ValueType::Kind::Bool)){
+          Error::add_error(ErrorKind::TypeMismatch, if_x->cond, "condision must be boolean");
+        }
+
+        ret=walk(if_x->if_true);
+
+        if(if_x->if_false&&!ret.equals(walk(if_x->if_false))){
+          Error::add_error(ErrorKind::TypeMismatch,if_x,"if-expr type mismatch");
+        }
+
+        break;
+      }
+
       case ASTKind::Scope: {
         auto scope = (AST::Scope*)ast;
 
@@ -134,7 +195,15 @@ namespace Metro::Semantics {
       }
 
       default: {
-        TODO_IMPL
+        auto expr = (AST::Expr*)ast;
+
+        auto lhs = walk(expr->lhs);
+        auto rhs = walk(expr->rhs);
+
+        // check operator
+
+        ret = lhs;
+        break;
       }
     }
 

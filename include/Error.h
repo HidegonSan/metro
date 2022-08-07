@@ -22,7 +22,7 @@ namespace Metro {
     MultipleDefinition,
     IndefiniteType,
     UnknownTypeName,
-    CannotRefer,
+    CannotInfer,
     MayNotbeEvaluated,
     ValueType,
     TypeMismatch,
