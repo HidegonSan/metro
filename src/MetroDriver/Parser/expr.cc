@@ -11,6 +11,10 @@ namespace Metro {
       return stmt_ast;
     }
 
+    if( cur->str == "{" ) {
+      return expect_scope();
+    }
+
     if( eat("true") || eat("false") ) {
       return new AST::Boolean(ate);
     }

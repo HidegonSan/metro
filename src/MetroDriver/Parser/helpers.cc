@@ -86,6 +86,7 @@ namespace Metro {
       case Kind::If:
       case Kind::Function:
       case Kind::Struct:
+      case Kind::Scope:
         return false;
     }
 

@@ -31,6 +31,9 @@ namespace Metro::Semantics {
     auto& ret = walked[ast];
 
     switch( ast->kind ) {
+      case ASTKind::None:
+        break;
+
       case ASTKind::Type: {
         auto type = (AST::Type*)ast;
 
@@ -75,6 +78,14 @@ namespace Metro::Semantics {
           Error::add_error(ErrorKind::Undefined, ast->token, "undefined variable name");
           Error::exit_app();
         }
+        else if( arrow_unini != var && var->defined->kind == ASTKind::Let ) {
+          if( auto ctx = find_var_context(var->defined); !ctx->was_type_analyzed ) {
+            alertios(ctx);
+
+            Error::add_error(ErrorKind::UninitializedValue, ast->token, "uninitialized value");
+            Error::exit_app();
+          }
+        }
 
         ret = walk(var->defined);
         break;
@@ -112,9 +123,12 @@ namespace Metro::Semantics {
 
         // left is variable
         if( expr->lhs->kind == ASTKind::Variable ) {
-          walk(expr->lhs);
 
           auto var = (AST::Variable*)expr->lhs;
+
+          arrow_unini = var;
+          walk(expr->lhs);
+          
           auto context = find_var_context(var->defined);
 
           alert;
@@ -130,8 +144,6 @@ namespace Metro::Semantics {
             context->was_type_analyzed = true;
           }
         }
-
-
 
         break;
       }
