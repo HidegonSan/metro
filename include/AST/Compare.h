@@ -38,6 +38,7 @@ namespace Metro::AST {
     }
 
     std::string to_string() const {
+      return "<Compare>";
     }
 
     explicit Compare(Base* first)

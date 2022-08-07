@@ -1,6 +1,7 @@
 #pragma once
 
 namespace Metro::AST {
+  struct Struct;
   struct Type : Base {
     std::string_view    name;
     std::vector<Type*>  elems;

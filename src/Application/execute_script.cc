@@ -1,5 +1,6 @@
 #include <iostream>
 #include <fstream>
+#include <cassert>
 #include "Utils.h"
 #include "Types.h"
 #include "MetroDriver/Lexer.h"
@@ -63,7 +64,9 @@ namespace Metro {
 
     Semantics::Sema sema;
 
-    sema.init(ast);
+    assert(ast->kind == AST::Kind::Scope);
+
+    sema.init((AST::Scope*)ast);
     sema.walk(ast);
 
 

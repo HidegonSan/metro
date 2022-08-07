@@ -6,7 +6,7 @@ namespace Metro::AST {
     Base*             defined;
 
     std::string to_string() const {
-      return "<Variable>";
+      return "<Variable '" + std::string(name) + "'>";
     }
 
     Variable(Token* tok)

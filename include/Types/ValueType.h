@@ -15,6 +15,7 @@ namespace Metro {
       String,
       Tuple,
       Array,
+      UserDef,
       None
     };
 

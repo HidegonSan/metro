@@ -6,7 +6,8 @@ namespace Metro::AST {
   struct Base {
     Kind    kind;
     Token*  token;
-    bool    is_retval = false;
+    //bool    is_retval = false;
+    bool    is_expr = false;
 
     virtual std::pair<size_t, size_t> get_range_on_source() {
       return { token->pos, token->pos + token->str.length() };

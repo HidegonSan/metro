@@ -13,6 +13,13 @@ namespace Metro::AST {
     BuiltinFunc const*  callee_builtin;
 
     std::string to_string() const {
+      auto ret = "<Callfunc '" + std::string(name) + "'";
+
+      if( !args.empty() ) {
+        ret += " " + Utils::join<AST::Base*>(", ", args, [](auto x){return x->to_string();}) + ">";
+      }
+
+      return ret;
     }
 
     CallFunc(Token* token)

@@ -81,8 +81,10 @@ namespace Metro {
     auto x = mul();
 
     while( check() ) {
-      if( eat("+") ) x = new AST::Expr(AST::Kind::Add, x, mul(), ate);
-      else if( eat("-") ) x = new AST::Expr(AST::Kind::Sub, x, mul(), ate);
+      auto tok = cur;
+
+      if( eat("+") ) x = new AST::Expr(AST::Kind::Add, x, mul(), tok);
+      else if( eat("-") ) x = new AST::Expr(AST::Kind::Sub, x, mul(), tok);
       else break;
     }
 

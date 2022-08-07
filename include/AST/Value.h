@@ -9,7 +9,7 @@ namespace Metro::AST {
     Object*   object;
     
     std::string to_string() const {
-      return "<Value>";
+      return "<Value '" + std::string(token->str) + "' >";
     }
 
     Value(Token* tok)

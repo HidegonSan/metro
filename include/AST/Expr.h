@@ -16,6 +16,7 @@ namespace Metro::AST {
     {
       this->kind = kind;
       this->token = tok;
+      this->is_expr = true;
     }
   };
 }

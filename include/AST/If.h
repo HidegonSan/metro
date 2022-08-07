@@ -21,6 +21,7 @@ namespace Metro::AST {
     }
 
     std::string to_string() const {
+      return "<If>";
     }
 
     If(Token* tok)
