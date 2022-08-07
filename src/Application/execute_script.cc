@@ -56,21 +56,12 @@ namespace Metro {
 
     Error::check();
 
-    //Semantics::Analyzer analyzer{ ast };
-
-    // analyzer.walk(ast);
-    // analyzer.analyze();
-    //analyzer.infer(ast);
-
     Semantics::Sema sema;
 
     assert(ast->kind == AST::Kind::Scope);
 
     sema.init((AST::Scope*)ast);
     sema.walk(ast);
-
-
-    return nullptr;
 
     Error::check();
 

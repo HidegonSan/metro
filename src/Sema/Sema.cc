@@ -82,6 +82,7 @@ namespace Metro::Semantics {
         if(cfn_ast!=nullptr){
           for(auto&&arg:cfn_ast->args){
             if(arg.name== var->name){
+              var->defined = &arg;
               ret = walk(arg.type);
               goto __var_done;
             }
@@ -125,15 +126,9 @@ namespace Metro::Semantics {
       // ------------------- //
       // ------------------- //
       case ASTKind::Function: {
-
         auto func = (AST::Function*)ast;
 
-        std::vector<ReturnTypeElement> ret_elems;
-
-        std::vector<AST::Base*> lastexpr_list;
-
         cfn_ast = func;
-        cfn_ret_list = &ret_elems;
 
         // arguments
         for(auto&&x:func->args){
@@ -158,7 +153,7 @@ namespace Metro::Semantics {
           Error::add_error(ErrorKind::TypeMismatch, if_x->cond, "condision must be boolean");
         }
 
-        ret=walk(if_x->if_true);
+        ret = walk(if_x->if_true);
 
         if(if_x->if_false&&!ret.equals(walk(if_x->if_false))){
           Error::add_error(ErrorKind::TypeMismatch,if_x,"if-expr type mismatch");
@@ -215,7 +210,7 @@ namespace Metro::Semantics {
         auto lhs = walk(expr->lhs);
         auto rhs = walk(expr->rhs);
 
-        // check operator
+        // TODO: check operator
 
         ret = lhs;
         break;
@@ -224,127 +219,4 @@ namespace Metro::Semantics {
 
     return ret;
   }
-
-  // return 式を探して out に追加する
-  void Sema::find_return(std::vector<AST::Base*>& out, AST::Base* ast) {
-    switch( ast->kind ) {
-      case AST::Kind::Return: {
-        out.emplace_back(ast);
-        break;
-      }
-
-      case AST::Kind::Scope: {
-        auto ast_scope = (AST::Scope*)ast;
-
-        for( auto&& x : ast_scope->elems ) {
-          find_return(out, x);
-        }
-
-        break;
-      }
-
-      case AST::Kind::Function: {
-        auto ast_func = (AST::Function*)ast;
-
-        find_return(out, ast_func->code);
-
-        break;
-      }
-    }
   }
-
-  // 式もしくは結果になりうる全ての式を out に追加する
-  void Sema::get_lastvalues(std::vector<AST::Base*>& out, AST::Base* ast) {
-    if( !ast ) {
-      return;
-    }
-
-    switch( ast->kind ) {
-      case AST::Kind::Function:
-        break;
-
-      case AST::Kind::If: {
-        auto if_ast = (AST::If*)ast;
-
-        get_lastvalues(out, if_ast->if_true);
-        get_lastvalues(out, if_ast->if_false);
-
-        break;
-      }
-
-      case AST::Kind::Scope: {
-        auto ast_scope = (AST::Scope*)ast;
-
-        if( ast_scope->elems.empty() ) {
-          out.emplace_back(ast);
-          break;
-        }
-
-        //out.emplace_back(*ast_scope->elems.rbegin());
-        get_lastvalues(out, *ast_scope->elems.rbegin());
-        break;
-      }
-
-      default:
-        out.emplace_back(ast);
-        break;
-    }
-  }
-
-  void Sema::get_lastval_full(std::vector<AST::Base*>& out, AST::Base* ast) {
-    find_return(out, ast);
-    get_lastvalues(out, ast);
-
-    std::map<AST::Base*, int> tmp;
-    
-    for( auto&& x : out ) {
-      tmp[x] = 0;
-    }
-
-    out.clear();
-
-    for( auto&& x : tmp ) {
-      out.emplace_back(x.first);
-    }
-  }
-
-  // pass AST::Expr !!
-  bool Sema::contains_callfunc_in_expr(std::string_view name, AST::Base* ast) {
-    if( ast->kind == ASTKind::Callfunc ) {
-      return ((AST::CallFunc*)ast)->name == name;
-    }
-
-    if( !ast->is_expr ) {
-      return false;
-    }
-
-    auto x = (AST::Expr*)ast;
-
-    return contains_callfunc_in_expr(name, x->lhs)
-      && contains_callfunc_in_expr(name, x->rhs);
-  }
-
-  Object* Sema::create_obj(Token* token) {
-    auto obj = new Object;
-
-    switch( token->kind ) {
-      case TokenKind::Int: {
-        obj->type = ValueType::Kind::Int;
-        obj->v_int = atoi(token->str.data());
-        break;
-      }
-
-      case TokenKind::String: {
-        obj->type = ValueType::Kind::String;
-        obj->v_str = Utils::Strings::to_u16string(std::string(token->str));
-        break;
-      }
-
-      default:
-        crash;
-    }
-
-    return obj;
-  }
-
-}

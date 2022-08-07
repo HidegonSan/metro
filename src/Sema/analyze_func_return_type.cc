@@ -6,10 +6,7 @@
 
 namespace Metro::Semantics {
   void Sema::analyze_func_return_type(ValueType& out, AST::Function* func) {
-
     std::vector<AST::Base*> lastexpr_list;
-
-    cfn_ast = func;
 
     // get last expressions
     get_lastval_full(lastexpr_list, func->code);
