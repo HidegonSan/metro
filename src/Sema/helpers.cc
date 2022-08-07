@@ -113,17 +113,7 @@ namespace Metro::Semantics {
     find_return(out, ast);
     get_lastvalues(out, ast);
 
-    std::map<AST::Base*, int> tmp;
-
-    for( auto&& x : out ) {
-      tmp[x] = 0;
-    }
-
-    out.clear();
-
-    for( auto&& x : tmp ) {
-      out.emplace_back(x.first);
-    }
+    out.erase(std::unique(out.begin(), out.end()), out.end());
   }
 
   bool Sema::contains_callfunc_in_expr(std::string_view name, AST::Base* ast) {

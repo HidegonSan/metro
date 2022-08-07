@@ -19,6 +19,8 @@ namespace Metro::Semantics {
         if( !contains_callfunc_in_expr(func->name, last) ) {
           auto&& tmp = walk(last);
 
+          alertios("last-expr of " << func->name << ": '" << tmp.to_string() << "' from " << last->to_string());
+
           if( !assignmented ) {
             out = tmp;
             assignmented = true;
