@@ -4,6 +4,28 @@
 #include "Utils.h"
 
 namespace Metro::Semantics {
+  AST::Base* Sema::find_var_defined(std::string_view name) {
+    for( auto&& ctx : scopelist ) {
+      for( int64_t i = ctx.cur_index; i >= 0; i-- ) {
+        auto& x = ctx.scope->elems[i];
+
+        if( x->kind == ASTKind::Let && ((AST::Let*)x)->name == name ) {
+          return x;
+        }
+      }
+    }
+
+    if( cfn_ast != nullptr ) {
+      for( auto&& arg : cfn_ast->args ) {
+        if( arg.name == name ) {
+          return &arg;
+        }
+      }
+    }
+
+    return nullptr;
+  }
+
   AST::Function* Sema::find_func(std::string_view name) {
     for( auto&& func : functions) {
       if( func->name == name ) {

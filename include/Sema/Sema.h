@@ -25,7 +25,12 @@ namespace Metro::Semantics {
 
     // sema-parts
     ValueType sema_callfunc(AST::CallFunc* ast);
+    ValueType sema_controls(AST::CallFunc* ast);
 
+
+    //
+    // 名前から変数の定義場所を探す
+    AST::Base* find_var_defined(std::string_view name);
 
     //
     // 名前から関数を探す

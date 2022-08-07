@@ -65,34 +65,12 @@ namespace Metro::Semantics {
       }
 
       case ASTKind::Variable: {
-
         auto var = (AST::Variable*)ast;
 
-        for(auto&&ctx:scopelist){
-          for(int64_t i=ctx.cur_index;i>=0; i-- ){
-            auto& x = ctx.scope->elems[i];
-
-            if( x->kind == ASTKind::Let && ((AST::Let*)x)->name == var->name ) {
-              var->defined = x;
-              ret = walk(x);
-              goto __var_done;
-            }
-          }
+        if( (var->defined = find_var_defined(var->name)) == nullptr ) {
+          Error::add_error(ErrorKind::Undefined, ast->token, "undefined variable name");
         }
 
-        if(cfn_ast!=nullptr){
-          for(auto&&arg:cfn_ast->args){
-            if(arg.name== var->name){
-              var->defined = &arg;
-              ret = walk(arg.type);
-              goto __var_done;
-            }
-          }
-        }
-
-        Error::add_error(ErrorKind::Undefined, ast->token, "undefined variable name");
-
-      __var_done:
         break;
       }
 
