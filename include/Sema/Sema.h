@@ -19,8 +19,8 @@ namespace Metro::Semantics {
     };
 
     struct ScopeContext {
-      AST::Scope*  scope=nullptr;
-      AST::Base* cur_ast=nullptr;
+      AST::Scope*  scope = nullptr;
+      AST::Base* cur_ast = nullptr;
       size_t  cur_index = 0;
     };
 
@@ -33,9 +33,8 @@ namespace Metro::Semantics {
     ValueType walk(AST::Base* ast);
 
 
-    // TODO: impl
+    // 関数の戻り値の型を解析する
     ValueType analyze_func_return_type(AST::Function* ast);
-
 
     // return 式を探して out に追加する
     void find_return(std::vector<AST::Base*>& out, AST::Base* ast);

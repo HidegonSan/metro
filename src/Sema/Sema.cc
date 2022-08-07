@@ -1,5 +1,4 @@
 #include "AST.h"
-#include "MetroDriver/Evaluator.h"
 #include "Sema/Sema.h"
 #include "Error.h"
 #include "Debug.h"
@@ -138,59 +137,8 @@ namespace Metro::Semantics {
           walk(&x);
         }
 
-        // return type
-        auto rettype = walk(func->return_type);
-        bool have_rettype_ast = func->return_type != nullptr;
-
-        // get last expressions
-        get_lastval_full(lastexpr_list, func->code);
-
-        alert;
-
-        // Analyze return-type
-        if( !have_rettype_ast){
-          bool flag1 = 0;
-
-          std::vector<ValueType> tmptmp;
-
-          for(size_t ix = 0; auto&& last :lastexpr_list){
-            alert;
-
-            // selfcall
-            if( (last->is_expr || last->kind == ASTKind::Callfunc) && contains_callfunc_in_expr(func->name, last) ) {
-              
-            }
-            else {
-              auto tmp = walk(last);
-              
-              if(!flag1){
-                rettype=tmp;
-                flag1= 1;
-              }
-              else if(!rettype.equals(tmp)){
-                Error::add_error(ErrorKind::TypeMismatch, last, "type mismatch 0fh3glk1");
-              }
-            }
-          }
-
-          if(!flag1){
-            Error::add_error(ErrorKind::CannotInfer, func->token, "failed to infer return type of function");
-            Error::exit_app();
-          }
-        }
-        else{ // already specified return type
-          for(auto&& last :lastexpr_list){
-            if(!rettype.equals(walk(last)) ){
-              Error::add_error(ErrorKind::TypeMismatch, last, "type mismatch 0b91nxd0");
-            }
-          }
-
-          Error::check();
-        }
-
-        ret = rettype;
-
-        alertios("function " << func->name << ": return-type = " << ret.to_string());
+        // return-type
+        ret = analyze_func_return_type(func);
 
         // code
         walk(func->code);
@@ -359,9 +307,12 @@ namespace Metro::Semantics {
 
   // pass AST::Expr !!
   bool Sema::contains_callfunc_in_expr(std::string_view name, AST::Base* ast) {
-    
     if( ast->kind == ASTKind::Callfunc ) {
       return ((AST::CallFunc*)ast)->name == name;
+    }
+
+    if( !ast->is_expr ) {
+      return false;
     }
 
     auto x = (AST::Expr*)ast;
