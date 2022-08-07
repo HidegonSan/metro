@@ -16,6 +16,15 @@ namespace Utils {
     return buf;
   }
 
+  template <class... Args>
+  std::string linkstr(Args&&... args) {
+    std::stringstream ss;
+
+    (ss << ... << args);
+
+    return ss.str();
+  }
+
   template <class T, class _E = std::remove_all_extents_t<T>, class F = std::string(*)(_E)>
   std::string join(std::string s, std::vector<T> const& vec, F conv = std::to_string) {
     std::string ret;

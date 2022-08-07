@@ -24,7 +24,9 @@ namespace Metro::Semantics {
             assignmented = true;
           }
           else if( !out.equals(tmp) ) {
-            Error::add_error(ErrorKind::TypeMismatch, last, "type mismatch 0fh3glk1");
+            Error::add_error(ErrorKind::TypeMismatch, last,
+              Utils::linkstr("expected '", out.to_string(), "', buf found '", tmp.to_string(), "'")
+            );
           }
         }
       }
@@ -38,8 +40,12 @@ namespace Metro::Semantics {
       out = walk(func->return_type);
 
       for( auto&& last : lastexpr_list ) {
-        if( !out.equals(walk(last)) ) {
-          Error::add_error(ErrorKind::TypeMismatch, last, "type mismatch 0b91nxd0");
+        auto&& tmp = walk(last);
+
+        if( !out.equals(tmp) ) {
+          Error::add_error(ErrorKind::TypeMismatch, last,
+            Utils::linkstr("expected '", out.to_string(), "', buf found '", tmp.to_string(), "'")
+          );
         }
       }
 

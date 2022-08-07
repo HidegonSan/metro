@@ -21,6 +21,10 @@ namespace Metro {
         ret = "int";
         break;
 
+      case Kind::String:
+        ret = "string";
+        break;
+
       case Kind::None:
         ret = "none";
         break;
