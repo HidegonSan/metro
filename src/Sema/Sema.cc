@@ -36,14 +36,16 @@ namespace Metro::Semantics {
 
         alertios("type->name = " << type->name);
 
-        if( type->name == "int" ) {
-          alert;
-          ret = ValueType::Kind::Int;
-        }
-        else {
-          TODO_IMPL
+        for( auto&& pair : ValueType::name_table ) {
+          if( type->name == pair.first ) {
+            ret = pair.second;
+            goto _found_type;
+          }
         }
 
+        // TODO: find struct
+
+      _found_type:
         break;
       }
 

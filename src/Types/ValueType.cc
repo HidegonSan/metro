@@ -44,4 +44,13 @@ namespace Metro {
 
     return ret;
   }
+
+  std::vector<std::pair<char const*, ValueType::Kind>> const ValueType::name_table {
+    { "int", Kind::Int },
+    { "float", Kind::Float },
+    { "char", Kind::Char },
+    { "string", Kind::String },
+    { "none", Kind::None },
+  };
+
 }
