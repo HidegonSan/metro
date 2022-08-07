@@ -1,21 +1,22 @@
 #pragma once
 
 /* -------------------- //
-  BuiltinFunc
-
-
+  builtin-function
 // --------------------- */
 
 #include <vector>
-#include "Object.h"
+#include "ValueType.h"
 
 namespace Metro {
+  struct Object;
   struct BuiltinFunc {
-    using FuncPointer = Object*(*)(std::vector<Object*> const& args);
+    using FuncPointer = Object*(* const)(std::vector<Object*> const& args);
 
     char const*             name;
     ValueType               ret_type;
     std::vector<ValueType>  arg_types;
-    FuncPointer const       func;
+    FuncPointer             func;
+
+    static std::vector<BuiltinFunc> const builtin_functions;
   };
 }

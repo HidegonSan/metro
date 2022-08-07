@@ -1,11 +1,29 @@
 #include "AST.h"
 #include "Sema/Sema.h"
-#include "Error.h"
 #include "Debug.h"
 #include "Utils.h"
 
 namespace Metro::Semantics {
-  // return 式を探して out に追加する
+  AST::Function* Sema::find_func(std::string_view name) {
+    for( auto&& func : functions) {
+      if( func->name == name ) {
+        return func;
+      }
+    }
+
+    return nullptr;
+  }
+
+  BuiltinFunc const* Sema::find_builtin_func(std::string_view name) {
+    for( auto&& bifun : BuiltinFunc::builtin_functions ) {
+      if( bifun.name == name ) {
+        return &bifun;
+      }
+    }
+
+    return nullptr;
+  }
+
   void Sema::find_return(std::vector<AST::Base*>& out, AST::Base* ast) {
     switch( ast->kind ) {
       case AST::Kind::Return: {
@@ -33,7 +51,6 @@ namespace Metro::Semantics {
     }
   }
 
-  // 式もしくは結果になりうる全ての式を out に追加する
   void Sema::get_lastvalues(std::vector<AST::Base*>& out, AST::Base* ast) {
     if( !ast ) {
       return;
@@ -87,7 +104,6 @@ namespace Metro::Semantics {
     }
   }
 
-  // pass AST::Expr !!
   bool Sema::contains_callfunc_in_expr(std::string_view name, AST::Base* ast) {
     if( ast->kind == ASTKind::Callfunc ) {
       return ((AST::CallFunc*)ast)->name == name;

@@ -23,6 +23,17 @@ namespace Metro::Semantics {
     // == walk ==
     ValueType walk(AST::Base* ast);
 
+    // sema-parts
+    ValueType sema_callfunc(AST::CallFunc* ast);
+
+
+    //
+    // 名前から関数を探す
+    AST::Function* find_func(std::string_view name);
+
+    //
+    // 名前から組み込み関数を探す
+    BuiltinFunc const* find_builtin_func(std::string_view name);
 
     //
     // 関数の戻り値の型を解析する

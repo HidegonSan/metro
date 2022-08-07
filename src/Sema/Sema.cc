@@ -3,6 +3,7 @@
 #include "Error.h"
 #include "Debug.h"
 #include "Utils.h"
+#include "MetroDriver/Evaluator.h"
 
 namespace Metro::Semantics {
 
@@ -96,29 +97,25 @@ namespace Metro::Semantics {
       }
 
       case ASTKind::Callfunc: {
-        auto callfunc = (AST::CallFunc*)ast;
+        auto call = (AST::CallFunc*)ast;
 
-        // TODO: check equality of arguments
+        // TODO: check argument types
 
-        for(auto&&arg:callfunc->args){
+        for( auto&& arg : call->args ) {
           walk(arg);
         }
 
-        for(auto&&func:functions){
-          if(func->name==callfunc->name){
-            callfunc->callee = func;
-            ret = walk(func);
-            goto found;
+        if( (call->callee = find_func(call->name)) == nullptr ) {
+          if( (call->callee_builtin = find_builtin_func(call->name)) == nullptr ) {
+            Error::add_error(ErrorKind::Undefined, ast->token, "undefined function name");
+            Error::exit_app();
           }
         }
+        else {
+          ret = walk(call->callee);
+        }
 
-        Error::add_error(ErrorKind::Undefined, ast->token, "undefined function name");
-        Error::exit_app();
-
-      found:
-
-        alert;
-        alertios("callfunc: " << callfunc->name << ": " << ret.to_string());
+        alertios("callfunc " << call->name << ": " << ret.to_string());
 
         break;
       }

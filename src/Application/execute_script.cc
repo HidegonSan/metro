@@ -69,10 +69,7 @@ namespace Metro {
 
     auto obj = evaluator.eval(ast);
 
-    debug(
-      alert;
-      std::cout << obj->to_string() << std::endl;
-    )
+    alertios("evaluated result: " << obj->to_string());
 
     running_script.pop_front();
 

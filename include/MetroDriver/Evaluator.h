@@ -15,9 +15,5 @@ namespace Metro {
 
     Object* construct_from_type(AST::Type* type);
 
-    static std::vector<BuiltinFunc> const& get_builtin_functions();
-
-  private:
-    static std::vector<BuiltinFunc> const builtin_funcs;
   };
 }
