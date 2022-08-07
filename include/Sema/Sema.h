@@ -6,14 +6,24 @@
 #include "AST.h"
 
 namespace Metro::Semantics {
-  struct ScopeContext {
-    AST::Scope*  scope = nullptr;
-    AST::Base* cur_ast = nullptr;
-    size_t  cur_index = 0;
-  };
-
   class Sema {
     using ASTKind = AST::Kind;
+
+    struct VariableContext {
+      AST::Base*  ast;
+      AST::Base*  defined;
+
+      bool was_type_analyzed = false;
+
+    };
+
+    struct ScopeContext {
+      AST::Scope*  scope = nullptr;
+      AST::Base* cur_ast = nullptr;
+      size_t  cur_index = 0;
+
+      std::map<std::string_view, VariableContext> var_context;
+    };
 
   public:
 
@@ -70,6 +80,8 @@ namespace Metro::Semantics {
 
   private:
 
+    ScopeContext& get_cur_scope();
+
     AST::Scope* root;
 
     // current walking function
@@ -80,6 +92,9 @@ namespace Metro::Semantics {
 
     // scope-list
     std::list<ScopeContext> scopelist;
+
+    // variable
+    // std::map<AST::Base*, VariableContext> var_ctx;
 
     // caches
     std::map<AST::Base*, ValueType> walked;

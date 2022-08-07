@@ -158,4 +158,8 @@ namespace Metro::Semantics {
     return obj;
   }
 
+  Sema::ScopeContext& Sema::get_cur_scope() {
+    return *scopelist.begin();
+  }
+
 }

@@ -100,6 +100,34 @@ namespace Metro::Semantics {
         break;
       }
 
+      case ASTKind::Assign: {
+        auto expr = (AST::Expr*)ast;
+
+        if( expr->lhs->kind == ASTKind::Variable ) {
+
+        }
+
+        break;
+      }
+
+      case ASTKind::Let: {
+        auto let = (AST::Let*)ast;
+        auto& scope = get_cur_scope();
+
+        // shadowing
+        if( scope.var_context.contains(let->name) ) {
+          TODO_IMPL
+        }
+
+        auto& context = scope.var_context[let->name];
+
+        if( let->type != nullptr ) {
+          
+        }
+
+        break;
+      }
+
       case ASTKind::If:
       case ASTKind::For:
         ret = sema_controls(ast);
@@ -113,7 +141,7 @@ namespace Metro::Semantics {
         }
 
         auto& context = scopelist.emplace_front();
-        
+
         context.scope = scope;
 
         auto iter = scope->elems.begin();
