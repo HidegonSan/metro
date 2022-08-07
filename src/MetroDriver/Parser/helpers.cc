@@ -69,10 +69,9 @@ namespace Metro {
   }
 
   AST::Type* Parser::expect_type() {
-    expect_ident();
-
     auto ast = new AST::Type(cur);
 
+    expect_ident();
     ast->name = cur->str;
 
     next();

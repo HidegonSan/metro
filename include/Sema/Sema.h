@@ -34,7 +34,7 @@ namespace Metro::Semantics {
 
 
     // 関数の戻り値の型を解析する
-    ValueType analyze_func_return_type(AST::Function* ast);
+    void analyze_func_return_type(ValueType& out, AST::Function* ast);
 
     // return 式を探して out に追加する
     void find_return(std::vector<AST::Base*>& out, AST::Base* ast);

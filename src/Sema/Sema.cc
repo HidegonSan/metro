@@ -33,7 +33,10 @@ namespace Metro::Semantics {
       case ASTKind::Type: {
         auto type = (AST::Type*)ast;
 
+        alertios("type->name = " << type->name);
+
         if( type->name == "int" ) {
+          alert;
           ret = ValueType::Kind::Int;
         }
         else {
@@ -138,7 +141,7 @@ namespace Metro::Semantics {
         }
 
         // return-type
-        ret = analyze_func_return_type(func);
+        analyze_func_return_type(ret, func);
 
         // code
         walk(func->code);
