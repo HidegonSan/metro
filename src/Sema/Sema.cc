@@ -139,13 +139,13 @@ namespace Metro::Semantics {
           alert;
           assert(context != nullptr);
 
-          context->type = vartype;
+          //context->type = vartype;
 
           auto rhs = walk(expr->rhs);
 
           if( context->was_type_analyzed ) {
-            if( !context->type.equals(rhs) ) {
-              Error::add_error(ErrorKind::TypeMismatch, expr->token, "type mismatch");
+            if( !vartype.equals(rhs) ) {
+              Error::add_error(ErrorKind::TypeMismatch, expr->token, "assignment type mismatch");
             }
           }
           else {
@@ -180,6 +180,7 @@ namespace Metro::Semantics {
           context.type = walk(let->init);
         }
 
+        ret = context.type;
         break;
       }
 

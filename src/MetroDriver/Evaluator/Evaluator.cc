@@ -145,6 +145,12 @@ namespace Metro {
       case Kind::For: {
         auto x = (AST::For*)ast;
 
+        eval(x->init);
+
+        while( eval(x->cond)->v_bool ) {
+          eval(x->code);
+          eval(x->counter);
+        }
 
         break;
       }
