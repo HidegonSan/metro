@@ -117,8 +117,6 @@ namespace Metro::Semantics {
       case ASTKind::Assign: {
         auto expr = (AST::Expr*)ast;
 
-        // auto rhs = walk(expr->rhs);
-
         // TODO: get lhs_final (example: index-ref)
 
         // left is variable
@@ -127,7 +125,7 @@ namespace Metro::Semantics {
           auto var = (AST::Variable*)expr->lhs;
 
           arrow_unini = var;
-          walk(expr->lhs);
+          auto&& vartype = walk(expr->lhs);
 
           if( std::find(root->elems.begin(), root->elems.end(), var->defined) != root->elems.end() ) {
             if( !find_var_context(var->defined)->was_type_analyzed ) {
@@ -141,6 +139,8 @@ namespace Metro::Semantics {
           alert;
           assert(context != nullptr);
 
+          context->type = vartype;
+
           auto rhs = walk(expr->rhs);
 
           if( context->was_type_analyzed ) {
@@ -149,13 +149,10 @@ namespace Metro::Semantics {
             }
           }
           else {
-            
-
             context->type = rhs;
             context->was_type_analyzed = true;
           }
         }
-
 
         arrow_unini = nullptr;
         break;

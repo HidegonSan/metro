@@ -142,6 +142,13 @@ namespace Metro {
         break;
       }
 
+      case Kind::For: {
+        auto x = (AST::For*)ast;
+
+
+        break;
+      }
+
       case Kind::Let: {
         auto x = (AST::Let*)ast;
 
