@@ -9,8 +9,8 @@ build {
   .no_overwrite = copy_folder
 
   compiler {
-    c   = clang
-    cpp = clang++
+    c   = gcc-11
+    cpp = g++-11
   }
 
   extensions {
@@ -20,7 +20,7 @@ build {
 
   flags {
     opt   = -O2
-    c     = $opt -Wimplicit-fallthrough
+    c     = $opt -Wimplicit-fallthrough -Wall -Wextra
     cpp   = $c -std=c++20
     link  = -Wl,--gc-sections
   }

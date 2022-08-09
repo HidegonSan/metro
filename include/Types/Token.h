@@ -1,6 +1,7 @@
 #pragma once
 
 #include <string>
+#include <vector>
 
 namespace Metro {
   enum class TokenKind {
@@ -13,8 +14,40 @@ namespace Metro {
     End
   };
 
+  enum class PunctuatorKind {
+    Add,
+    Sub,
+    Mul,
+    Mod,
+    Div,
+    
+    Assign, // =
+
+    Equal,
+    BiggerLeft,
+    BiggerRight,
+    BigOrEqualLeft,
+    BigOrEqualRight,
+    ShiftLeft,
+    ShiftRight,
+
+    Colon,
+    Semicolon,
+
+    RoundBracketOpen,     // (
+    RoundBracketClone,    // )
+    CurlyBracketOpen,     // {
+    CurlyBracketClone,    // }
+    SquareBracketOpen,    // [
+    SquareBracketClone,   // ]
+    AngleBracketOpen,     // <
+    AngleBracketClone,    // >
+    
+  };
+
   struct Token {
     TokenKind kind;
+    PunctuatorKind pu_kind;
     Token* prev;
     Token* next;
     std::string_view str;
@@ -36,5 +69,7 @@ namespace Metro {
 
       if( prev ) prev->next = this;
     }
+
+    static std::vector<std::pair<char const*, PunctuatorKind>> const punctuator_strtable;
   };
 }

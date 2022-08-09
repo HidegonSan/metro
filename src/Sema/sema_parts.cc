@@ -62,13 +62,13 @@ namespace Metro::Semantics {
       case ASTKind::If: {
         auto if_x = (AST::If*)ast;
 
-        if(!walk(if_x->cond).equals(ValueType::Kind::Bool)){
+        if( !walk(if_x->cond).equals(ValueType::Kind::Bool) ) {
           Error::add_error(ErrorKind::TypeMismatch, if_x->cond, "condision must be boolean");
         }
 
         ret = walk(if_x->if_true);
 
-        if(if_x->if_false&&!ret.equals(walk(if_x->if_false))){
+        if( if_x->if_false&&!ret.equals(walk(if_x->if_false)) ) {
           Error::add_error(ErrorKind::TypeMismatch,if_x,"if-expr type mismatch");
         }
 

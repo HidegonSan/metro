@@ -34,7 +34,7 @@ namespace Metro::AST {
     static Compare* create(Base*& ast);
 
     Item& append(Item::Kind kind, Token* tok, Base* ast) {
-      return list.emplace_back(kind, token, ast);
+      return list.emplace_back(kind, tok, ast);
     }
 
     std::string to_string() const {

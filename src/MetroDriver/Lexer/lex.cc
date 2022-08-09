@@ -79,27 +79,19 @@ namespace Metro {
       else {
         cur->kind = TokenKind::Punctuator;
 
-        for( std::string_view s : long_punctuaters ) {
-          if( match(s) ) {
-            position += s.length();
-            cur->str = s;
-            goto found_op;
-          }
-        }
-
-        for( char const& c : punctuaters ) {
-          if( ch == c ) {
-            position++;
-            cur->str = { &c, 1 };
+        for( auto&& pair : Token::punctuator_strtable ) {
+          if( match(pair.first) ) {
+            str = pair.first;
+            cur->pu_kind = pair.second;
+            position += strlen(pair.first);
             goto found_op;
           }
         }
 
         Error::add_error(ErrorKind::InvalidToken, position, "invalid token");
+        Error::exit_app();
 
-      found_op:
-        pass_space();
-        continue;
+      found_op:;
       }
 
       cur->str = { str, position - pos };

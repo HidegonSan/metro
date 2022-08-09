@@ -32,6 +32,10 @@ namespace Metro {
       return new AST::Boolean(ate);
     }
 
+    if( eat("none") ) {
+      return AST::None::val;
+    }
+
     switch( cur->kind ) {
       case TokenKind::Int:
       case TokenKind::Float:

@@ -9,9 +9,16 @@ namespace Metro {
   ErrorContext& Error::add_error(ErrorKind kind, size_t pos, std::string const& msg) {
     auto& ctx = contexts.emplace_back();
 
+    auto script = Application::get_running_script();
+
     ctx.kind = kind;
     ctx.err_pos = pos;
     ctx.message = msg;
+
+    ctx.script = script;
+    ctx.err_begin = pos;
+    ctx.err_end = pos;
+    ctx.err_underline_length = 1;
 
     return ctx;
   }

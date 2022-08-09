@@ -36,7 +36,9 @@
     "crashed at %s:%d\nPlease tell to developer.\n" COL_DEFAULT,__FILE__,__LINE__);exit(1);}
 #endif
 
-#define  TODO_IMPL  { alert; fprintf(stderr,"\n\n# Not implemented error.\n"); exit(1); }
+#define  TODO_IMPL  \
+  {fprintf(stderr,COL_RED "\n\n# Not implemented error at " \
+  COL_YELLOW "%s:%d\n" COL_DEFAULT,__FILE__,__LINE__);exit(1);}
 
 namespace Metro {
   namespace Debug {

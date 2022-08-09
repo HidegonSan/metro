@@ -34,6 +34,9 @@ namespace Metro {
   }
 
   int Application::main(int argc, char** argv) {
+    ctx.argc = argc;
+    ctx.argv = argv;
+
     try {
       for( auto&& script : ctx.scripts ) {
         if( !ctx.no_print_filenames && ctx.scripts.size() > 1 ) {

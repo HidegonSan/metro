@@ -164,7 +164,7 @@ namespace Metro::Semantics {
       }
 
       default:
-        crash;
+        TODO_IMPL
     }
 
     return obj;

@@ -104,7 +104,7 @@ namespace Metro::Semantics {
 
         walk(cmp->first);
 
-        for(auto&&item:cmp->list){
+        for( auto&& item : cmp->list ) {
           walk(item.ast);
         }
 
