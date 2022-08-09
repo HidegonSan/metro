@@ -5,11 +5,16 @@ namespace Metro::AST {
     None,
     Type,
     Argument,
-    
+    Member,
+
     Boolean,
     Value,
+    Array,
+
     Variable,
     Callfunc,
+
+    MemberAccess,
 
     Mul,
     Div,
@@ -18,6 +23,7 @@ namespace Metro::AST {
     Compare,
     Assign,
 
+    Return,
     If,
     Let,
     For,
@@ -26,5 +32,6 @@ namespace Metro::AST {
     Scope,
 
     Function,
+    Struct,
   };
 }

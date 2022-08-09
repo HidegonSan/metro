@@ -22,14 +22,15 @@ namespace Metro {
     MultipleDefinition,
     IndefiniteType,
     UnknownTypeName,
-    CannotRefer,
+    CannotInfer,
     MayNotbeEvaluated,
     ValueType,
     TypeMismatch,
     TooFewArguments,
     TooManyArguments,
     InvalidArguments,
-    StackOverflow
+    StackOverflow,
+    EmptyStruct
   };
 
   struct ErrorContext {

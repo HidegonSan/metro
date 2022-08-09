@@ -1,11 +1,12 @@
 #include <iostream>
 #include <fstream>
+#include <cassert>
 #include "Utils.h"
 #include "Types.h"
 #include "MetroDriver/Lexer.h"
 #include "MetroDriver/Parser.h"
-#include "MetroDriver/Semantics/Analyzer.h"
 #include "MetroDriver/Evaluator.h"
+#include "Sema/Sema.h"
 #include "Application.h"
 #include "Error.h"
 #include "Debug.h"
@@ -55,10 +56,12 @@ namespace Metro {
 
     Error::check();
 
-    Semantics::Analyzer analyzer;
-    
-    analyzer.walk(ast);
-    analyzer.analyze();
+    Semantics::Sema sema;
+
+    assert(ast->kind == AST::Kind::Scope);
+
+    sema.init((AST::Scope*)ast);
+    sema.walk(ast);
 
     Error::check();
 
@@ -66,10 +69,7 @@ namespace Metro {
 
     auto obj = evaluator.eval(ast);
 
-    debug(
-      alert;
-      std::cout << obj->to_string() << std::endl;
-    )
+    alertios("evaluated result: " << obj->to_string());
 
     running_script.pop_front();
 

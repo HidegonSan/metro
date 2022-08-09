@@ -7,6 +7,10 @@ namespace Metro::AST {
     Type*                   return_type;
     Scope*                  code;
 
+    std::string to_string() const {
+      return "<Function>";
+    }
+
     Function(Token* token)
       : Base(Kind::Function, token),
         return_type(nullptr),

@@ -13,9 +13,7 @@ namespace Metro {
     Object* eval(AST::Base* ast);
     Object** eval_lvalue(AST::Base* ast);
 
-    static std::vector<BuiltinFunc> const& get_builtin_functions();
+    Object* construct_from_type(AST::Type* type);
 
-  private:
-    static std::vector<BuiltinFunc> const builtin_funcs;
   };
 }

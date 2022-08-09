@@ -1,12 +1,15 @@
 #pragma once
 
+#include <cassert>
 #include <iostream>
 #include "colors.h"
+
+#define METRO_DEBUG  1
 
 // color in message area
 #define  COL_ALERTMSG  COL_WHITE
 
-#if METRO_DEBUG_USE_ALERT
+#if METRO_DEBUG
   #include "Debuggers/alert.h"
 #else
   #define  alert              0
@@ -17,14 +20,14 @@
   #define  alertdtor(__x)     0
 #endif
 
-#if METRO_DEBUG_USE_DEBUGSCOPE
+#if METRO_DEBUG
   #define  debug(e...) \
     { e }
 #else
   #define  debug(...)  { }
 #endif
 
-#if METRO_DEBUG_USE_CRASH
+#if METRO_DEBUG
   #define  crash \
     {alert;fprintf(stderr,"\n#crashed at " __FILE__ ":%d\n",__LINE__);exit(1);}
 #else
@@ -33,7 +36,9 @@
     "crashed at %s:%d\nPlease tell to developer.\n" COL_DEFAULT,__FILE__,__LINE__);exit(1);}
 #endif
 
-#define  TODO_IMPL  { alert; fprintf(stderr,"\n\n# Not implemented error.\n"); exit(1); }
+#define  TODO_IMPL  \
+  {fprintf(stderr,COL_RED "\n\n# Not implemented error at " \
+  COL_YELLOW "%s:%d\n" COL_DEFAULT,__FILE__,__LINE__);exit(1);}
 
 namespace Metro {
   namespace Debug {

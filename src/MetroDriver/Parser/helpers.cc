@@ -69,10 +69,9 @@ namespace Metro {
   }
 
   AST::Type* Parser::expect_type() {
-    expect_ident();
-
     auto ast = new AST::Type(cur);
 
+    expect_ident();
     ast->name = cur->str;
 
     next();
@@ -86,6 +85,8 @@ namespace Metro {
     switch( ast->kind ) {
       case Kind::If:
       case Kind::Function:
+      case Kind::Struct:
+      case Kind::Scope:
         return false;
     }
 

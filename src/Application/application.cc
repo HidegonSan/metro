@@ -1,10 +1,6 @@
 #include <iostream>
 #include <fstream>
 #include "Utils.h"
-#include "MetroDriver/Lexer.h"
-#include "MetroDriver/Parser.h"
-#include "MetroDriver/Semantics/Analyzer.h"
-#include "MetroDriver/Evaluator.h"
 #include "Application.h"
 
 #include "Types.h"
@@ -38,6 +34,9 @@ namespace Metro {
   }
 
   int Application::main(int argc, char** argv) {
+    ctx.argc = argc;
+    ctx.argv = argv;
+
     try {
       for( auto&& script : ctx.scripts ) {
         if( !ctx.no_print_filenames && ctx.scripts.size() > 1 ) {

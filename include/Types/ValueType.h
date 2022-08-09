@@ -14,7 +14,8 @@ namespace Metro {
       Char,
       String,
       Tuple,
-      Array,
+      UserDef,
+      Args,
       None
     };
 
@@ -29,11 +30,13 @@ namespace Metro {
 
     Kind        kind;
     uint8_t     attr;
+    size_t      arr_depth;
     std::vector<ValueType>   elems;
 
     ValueType(Kind kind = Kind::None)
       : kind(kind),
-        attr(ATTR_NONE)
+        attr(ATTR_NONE),
+        arr_depth(0)
     {
     }
 
@@ -49,5 +52,7 @@ namespace Metro {
     bool equals(ValueType const& type) const;
 
     std::string to_string() const;
+
+    static std::vector<std::pair<char const*, Kind>> const name_table;
   };
 }
