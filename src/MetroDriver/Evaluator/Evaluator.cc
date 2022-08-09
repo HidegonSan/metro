@@ -194,34 +194,7 @@ namespace Metro {
       default: {
         auto x = (AST::Expr*)ast;
 
-        ret = eval(x->lhs)->clone();
-        Object const* rhs = eval(x->rhs);
-
-        switch( x->kind ) {
-          case Kind::Add:
-            switch( ret->type.kind ) {
-              case ValueType::Kind::Int:
-                ret->v_int += rhs->v_int;
-                break;
-            }
-            break;
-
-          case Kind::Sub:
-            switch( ret->type.kind ) {
-              case ValueType::Kind::Int:
-                ret->v_int -= rhs->v_int;
-                break;
-            }
-            break;
-
-          case Kind::Mul:
-            switch( ret->type.kind ) {
-              case ValueType::Kind::Int:
-                ret->v_int *= rhs->v_int;
-                break;
-            }
-            break;
-        }
+        ret = eval_operator(x->kind, eval(x->lhs)->clone(), eval(x->rhs));
 
         break;
       }
