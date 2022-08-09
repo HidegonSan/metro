@@ -75,6 +75,21 @@ namespace Metro::Semantics {
         break;
       }
 
+      case ASTKind::For: {
+        auto for_x = (AST::For*)ast;
+
+        walk(for_x->init);
+
+        if( !walk(for_x->cond).equals(ValueType::Kind::Bool) ) {
+          Error::add_error(ErrorKind::TypeMismatch, for_x->cond, "condision must be boolean");
+        }
+
+        walk(for_x->counter);
+        walk(for_x->code);
+
+        break;
+      }
+
       default:
         TODO_IMPL
     }
