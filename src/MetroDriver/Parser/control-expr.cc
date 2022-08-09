@@ -22,6 +22,28 @@ namespace Metro {
       return ast;
     }
 
+    if( eat("for") ) {
+      auto ast = new AST::For(ate);
+
+      if( !eat(";") ) {
+        ast->init = expr();
+        expect(";");
+      }
+
+      if( !eat(";") ) {
+        ast->cond = expr();
+        expect(";");
+      }
+
+      if( cur->str != "{" ) {
+        ast->counter = expr();
+      }
+
+      ast->code = expect_scope();
+
+      return ast;
+    }
+
     if( eat("let") ) {
       auto ast = new AST::Let(ate);
 
