@@ -23,7 +23,7 @@ namespace Metro::AST {
         return "<Scope (Empty)>";
       }
 
-      return Utils::format("<Scope %p ", this) + Utils::join(", ", elems, [] (auto x) { return x->to_string(); }) + ">";
+      return Utils::format("<Scope %p: ", this) + Utils::join(", ", elems, [] (auto x) { return x->to_string(); }) + ">";
     }
 
     Scope(Token* tok)

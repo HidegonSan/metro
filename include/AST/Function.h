@@ -10,7 +10,7 @@ namespace Metro::AST {
     std::string to_string() const {
       return Utils::linkstr(
         "<Function '", name, "' (", Utils::join(", ", args), ") ",
-        return_type != nullptr ? ("-> " + return_type->to_string()) : "", " ", code->to_string()
+        return_type != nullptr ? ("-> " + return_type->to_string()) : "", " ", code->to_string(), ">"
       );
     }
 
