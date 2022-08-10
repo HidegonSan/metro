@@ -14,8 +14,6 @@
 #include "AST/Value.h"
 #include "AST/Array.h"
 
-#include "AST/Member.h"
-
 #include "AST/Variable.h"
 #include "AST/Callfunc.h"
 #include "AST/Compare.h"
