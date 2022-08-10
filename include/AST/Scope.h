@@ -19,7 +19,11 @@ namespace Metro::AST {
     }
 
     std::string to_string() const {
-      return "<Scope>";
+      if( elems.empty() ) {
+        return "<Scope (Empty)>";
+      }
+
+      return Utils::format("<Scope %p ", this) + Utils::join(", ", elems, [] (auto x) { return x->to_string(); }) + ">";
     }
 
     Scope(Token* tok)

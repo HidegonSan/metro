@@ -52,6 +52,10 @@ namespace Metro {
 
     auto ast = parser.parse();
 
+    debug(
+      std::cout << ast->to_string() << std::endl;
+    )
+
     script.ast = ast;
 
     Error::check();

@@ -8,7 +8,10 @@ namespace Metro::AST {
     Scope*                  code;
 
     std::string to_string() const {
-      return "<Function>";
+      return Utils::linkstr(
+        "<Function '", name, "' (", Utils::join(", ", args), ") ",
+        return_type != nullptr ? ("-> " + return_type->to_string()) : "", " ", code->to_string()
+      );
     }
 
     Function(Token* token)
