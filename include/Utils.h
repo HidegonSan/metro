@@ -1,5 +1,6 @@
 #pragma once
 
+#include <concepts>
 #include <string>
 #include <vector>
 #include <locale>
@@ -7,6 +8,11 @@
 #include <sstream>
 #include "Debug.h"
 #include "macro.h"
+
+template <class T>
+concept contains_to_string_method = requires (T const& x) {
+  { x.to_string() } -> std::convertible_to<std::string>;
+};
 
 namespace Utils {
   template <class... Args>
@@ -25,21 +31,48 @@ namespace Utils {
     return ss.str();
   }
 
-  template <class T, class _E = std::remove_all_extents_t<T>, class F = std::string(*)(_E)>
-  std::string join(std::string s, std::vector<T> const& vec, F conv = std::to_string) {
+  template <contains_to_string_method T>
+  std::string join(std::string const& s, std::vector<T> const& vec) {
+    std::string ret;
+
+    for( auto last = &*vec.rbegin(); auto&& x : vec ) {
+      ret += x.to_string();
+      if( last != &x ) ret += s;
+    }
+
+    return ret;
+  }
+
+  template <class T>
+  std::string join(std::string const& s, std::vector<T> const& vec, auto conv) {
+    std::string ret;
+
+    for( auto last = &*vec.rbegin(); auto&& x : vec ) {
+      ret += conv(x);
+      if( last != &x ) ret += s;
+    }
+
+    return ret;
+  }
+
+  template <class T>
+  std::string join(std::string const& s, std::vector<T> const& vec) {
     std::string ret;
 
     for( auto it = vec.begin(); it != vec.end(); it++ ) {
-      if constexpr( !std::is_same_v<_E, char const*> && !std::is_same_v<_E, std::string> ) {
-        ret += conv(*it);
+      if constexpr( std::is_convertible_v<T, std::string>) {
+        ret += *it;
+      }
+      else if constexpr( std::is_constructible_v<std::string, T> ) {
+        ret += std::string{ *it };
       }
       else {
-        ret += *it;
+        ret += std::to_string(*it);
       }
 
       if( it < vec.end() - 1 ) ret += s;
     }
-    
+
     return ret;
   }
 

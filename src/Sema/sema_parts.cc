@@ -6,24 +6,36 @@
 
 namespace Metro::Semantics {
   ValueType Sema::sema_callfunc(AST::CallFunc* ast) {
-    bool is_builtin = false;
     std::vector<ValueType> arg_types;
 
+    // arguments
     for( auto&& arg : ast->args ) {
       arg_types.emplace_back(walk(arg));
     }
 
-    if( (ast->callee = find_func(ast->name)) == nullptr ) {
-      if( (ast->callee_builtin = find_builtin_func(ast->name)) == nullptr ) {
+    auto find = find_func(ast->name);
+    auto is_builtin = find == nullptr;
+
+    BuiltinFunc const* bfun = nullptr;
+
+    // doesn't exists user-defined function
+    if( find == nullptr ) {
+      // doens't exists built-in function
+      if( (bfun = find_builtin_func(ast->name)) == nullptr ) {
         Error::add_error(ErrorKind::Undefined, ast->token, "undefined function name");
         Error::exit_app();
       }
-
-      is_builtin = true;
+      else {
+        ast->callee_builtin = bfun;
+      }
+    }
+    else {
+      ast->callee = find;
     }
 
     auto arg = arg_types.begin();
-    size_t max = is_builtin ? ast->callee_builtin->arg_types.size() : ast->callee->args.size();
+    //size_t max = is_builtin ? ast->callee_builtin->arg_types.size() : ast->callee->args.size();
+    size_t max = is_builtin ? bfun->arg_types.size() : find->args.size();
 
     for( size_t i = 0;; i++, arg++ ) {
       if( i == max ) {
@@ -34,7 +46,7 @@ namespace Metro::Semantics {
         break;
       }
 
-      auto&& func_arg_type = is_builtin ? ast->callee_builtin->arg_types[i] : walk(ast->callee->args[i].type);
+      auto&& func_arg_type = is_builtin ? bfun->arg_types[i] : walk(find->args[i].type);
 
       if( func_arg_type.equals_kind(ValueType::Kind::Args) ) {
         break;
@@ -45,14 +57,12 @@ namespace Metro::Semantics {
         break;
       }
 
-      auto arg_ast = ast->args[i];
-
       if( !func_arg_type.equals(*arg) ) {
-        Error::add_error(ErrorKind::TypeMismatch, arg_ast, "type mismatch");
+        Error::add_error(ErrorKind::TypeMismatch, ast->args[i], "type mismatch");
       }
     }
 
-    return is_builtin ? ast->callee_builtin->ret_type : walk(ast->callee);
+    return is_builtin ? bfun->ret_type : walk(find);
   }
 
   ValueType Sema::sema_controls(AST::Base* ast) {
@@ -68,8 +78,8 @@ namespace Metro::Semantics {
 
         ret = walk(if_x->if_true);
 
-        if( if_x->if_false&&!ret.equals(walk(if_x->if_false)) ) {
-          Error::add_error(ErrorKind::TypeMismatch,if_x,"if-expr type mismatch");
+        if( if_x->if_false && !ret.equals(walk(if_x->if_false)) ) {
+          Error::add_error(ErrorKind::TypeMismatch, if_x, "if-expr type mismatch");
         }
 
         break;
