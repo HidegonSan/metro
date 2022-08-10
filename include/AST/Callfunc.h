@@ -16,10 +16,10 @@ namespace Metro::AST {
       auto ret = "<Callfunc '" + std::string(name) + "'";
 
       if( !args.empty() ) {
-        ret += " " + Utils::join<AST::Base*>(", ", args, [](auto x){return x->to_string();}) + ">";
+        ret += " " + Utils::join<AST::Base*>(", ", args, [] (auto x) {return x->to_string();});
       }
 
-      return ret;
+      return ret + ">";
     }
 
     CallFunc(Token* token)

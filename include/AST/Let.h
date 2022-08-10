@@ -13,7 +13,17 @@ namespace Metro::AST {
     Object*           value;
 
     std::string to_string() const {
-      return "<Let>";
+      auto&& ret = "<Let '" + std::string(name) + "'";
+
+      if( type != nullptr ) {
+        ret += " : " + type->to_string();
+      }
+
+      if( init != nullptr ) {
+        ret += " = " + init->to_string();
+      }
+
+      return ret + ">";
     }
 
     Let(Token* token)

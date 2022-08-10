@@ -11,7 +11,7 @@ namespace Metro::AST {
     }
 
     std::string to_string() const {
-      return "<Argument>";
+      return Utils::linkstr("<Argument '", name, "' : ", type->to_string(), ">");
     }
 
     Argument(Token* tok)

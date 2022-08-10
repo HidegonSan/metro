@@ -38,7 +38,13 @@ namespace Metro::AST {
     }
 
     std::string to_string() const {
-      return "<Compare>";
+      std::string ret{ "<Compare " + first->to_string() };
+
+      for( auto&& item : list ) {
+        ret += " " + std::string(item.token->str) + " " + item.ast->to_string();
+      }
+
+      return ret + ">";
     }
 
     explicit Compare(Base* first)

@@ -5,7 +5,7 @@ namespace Metro::AST {
     bool const val;
     
     std::string to_string() const {
-      return val ? "true" : "false";
+      return val ? "<Boolean true>" : "<Boolean false>";
     }
 
     Boolean(Token* tok)
