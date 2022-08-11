@@ -1,8 +1,7 @@
-#pragma once
-
 // -----------------------
 //  Variable : 変数
 // -----------------------
+#pragma once
 
 namespace Metro::AST {
   struct Variable : Base {

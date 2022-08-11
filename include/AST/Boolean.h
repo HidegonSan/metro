@@ -1,8 +1,7 @@
-#pragma once
-
 // -----------------------
 //  Boolean
 // -----------------------
+#pragma once
 
 namespace Metro::AST {
   struct Boolean : Base {

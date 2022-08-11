@@ -1,10 +1,9 @@
-#pragma once
-
 // -----------------------
 //  return 式
 
 //  戻り値の記述がない場合は AST::
 // -----------------------
+#pragma once
 
 namespace Metro::AST {
   struct Return : Base {

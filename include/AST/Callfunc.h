@@ -1,10 +1,9 @@
-#pragma once
-
 // -----------------------
 //  関数呼び出し
 
 //  callee, callee_builtin は Sema で設定され、実行時にどちらかが呼ばれる
 // -----------------------
+#pragma once
 
 namespace Metro::AST {
   struct Function;

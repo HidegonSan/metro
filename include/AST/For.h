@@ -1,10 +1,9 @@
-#pragma once
-
 // -----------------------
 //  for ループ
 
-//  C と同じように 開始; 条件; 更新 と書ける
+//  C と同じように 開始; 条件; 更新 がある
 // -----------------------
+#pragma once
 
 namespace Metro::AST {
   struct For : Base {

@@ -1,8 +1,7 @@
-#pragma once
-
 // -----------------------
 //  式
 // -----------------------
+#pragma once
 
 namespace Metro::AST {
   struct Expr : Base {

@@ -1,10 +1,9 @@
-#pragma once
-
 // -----------------------
 //  ユーザー定義関数
 
 //  戻り値の指定がない場合は、Sema::analyze_func_return_type() で推論される
 // -----------------------
+#pragma once
 
 namespace Metro::AST {
   struct Function : Base {

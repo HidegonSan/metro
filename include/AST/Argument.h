@@ -1,8 +1,7 @@
-#pragma once
-
 // -----------------------
 //  引数
 // -----------------------
+#pragma once
 
 namespace Metro::AST {
   struct Argument : Base {

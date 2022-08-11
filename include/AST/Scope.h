@@ -1,10 +1,9 @@
-#pragma once
-
 // -----------------------
 //  スコープ
 
 //  last-expr は全て同じ型である必要がある
 // -----------------------
+#pragma once
 
 namespace Metro::AST {
   struct Scope : Base {

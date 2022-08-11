@@ -1,5 +1,3 @@
-#pragma once
-
 // -----------------------
 //  比較式
 
@@ -10,6 +8,7 @@
 //    {1, {{BiggerRight, 2}, {NotEqual, 3}}
 //  のようになる
 // -----------------------
+#pragma once
 
 namespace Metro::AST {
   struct Compare : Base {

@@ -1,8 +1,7 @@
-#pragma once
-
 // -----------------------
 //  構造体
 // -----------------------
+#pragma once
 
 namespace Metro::AST {
   struct Struct : Base {

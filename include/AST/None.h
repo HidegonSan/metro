@@ -1,8 +1,7 @@
-#pragma once
-
 // -----------------------
 //  None
 // -----------------------
+#pragma once
 
 namespace Metro::AST {
   struct None : Base {

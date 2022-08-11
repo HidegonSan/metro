@@ -1,10 +1,9 @@
-#pragma once
-
 // -----------------------
 //  VarDefine : 変数定義
 
 //  let 文で使われます
 // -----------------------
+#pragma once
 
 namespace Metro::AST {
   struct Type;

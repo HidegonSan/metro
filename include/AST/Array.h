@@ -1,10 +1,9 @@
-#pragma once
-
 // -----------------------
 //  配列
 
 //  Sema: 全ての要素が一貫して同じ型である必要がある
 // -----------------------
+#pragma once
 
 namespace Metro::AST {
   struct Array : Base {
