@@ -1,10 +1,15 @@
+// -----------------------
+//  ユーザー定義関数
+
+//  戻り値の指定がない場合は、Sema::analyze_func_return_type() で推論される
+// -----------------------
 #pragma once
 
 namespace Metro::AST {
   struct Function : Base {
     std::string_view        name;
     std::vector<Argument>   args;
-    Type*                   return_type;
+    Type*                   return_type; // after '->' token
     Scope*                  code;
 
     std::string to_string() const;

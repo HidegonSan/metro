@@ -1,28 +1,25 @@
+// ----------------------------- //
+//  Evaluator : 構文木を評価 (実行) する
+// ----------------------------- //
+
 #pragma once
 
 namespace Metro {
-  struct Object;
-  namespace AST {
-    struct Base;
-  }
-
   class Evaluator {
   public:
     Evaluator() { }
 
-    // =====
-    //  Evaluate tree
-    // ==================
+    //
+    //  Evaluate AST
     Object* eval(AST::Base* ast);
     Object** eval_lvalue(AST::Base* ast);
 
     //
-    // 演算子を評価する
+    // 演算子
     Object* eval_operator(AST::Kind kind, Object* left, Object* right);
 
     //
     // 型情報を元にオブジェクトを構築する
     Object* construct_from_type(AST::Type* type);
-
   };
 }

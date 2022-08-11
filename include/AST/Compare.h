@@ -1,8 +1,14 @@
-#pragma once
+// -----------------------
+//  比較式
 
-namespace Metro {
-  struct Token;
-}
+//  3 個以上並べることができる
+//  first に最初の式が割り当てられ、それ以降は演算子と一緒に Item として vector に追加される
+
+//  例えば、"1 < 2 != 3" の場合は
+//    {1, {{BiggerRight, 2}, {NotEqual, 3}}
+//  のようになる
+// -----------------------
+#pragma once
 
 namespace Metro::AST {
   struct Compare : Base {
@@ -17,8 +23,8 @@ namespace Metro::AST {
       };
 
       Kind    kind;
-      Token*  token;
-      Base*   ast;
+      Token*  token;  // operator
+      Base*   ast;    // expression
 
       explicit Item(Item::Kind kind, Token* token, Base* ast)
         : kind(kind),
@@ -31,14 +37,12 @@ namespace Metro::AST {
     Base*               first;
     std::vector<Item>   list;
 
-    static Compare* create(Base*& ast);
-
-    Item& append(Item::Kind kind, Token* tok, Base* ast) {
-      return list.emplace_back(kind, tok, ast);
-    }
+    Item& append(Item::Kind kind, Token* tok, Base* ast);
 
     std::string to_string() const;
     SourceRange get_range_on_source() const;
+
+    static Compare* create(Base*& ast);
 
     explicit Compare(Base* first)
       : Base(Kind::Compare, first->token),

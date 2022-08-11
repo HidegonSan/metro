@@ -1,3 +1,9 @@
+// ----------------------------- //
+//  Sema : 意味解析
+
+//  型の一致確認、型推論、など行う
+// ----------------------------- //
+
 #pragma once
 
 #include <vector>
@@ -26,9 +32,7 @@ namespace Metro::Semantics {
     };
 
   public:
-
-    // initialize Sema
-    void init(AST::Scope* root);
+    explicit Sema(AST::Scope* root);
 
     // == walk ==
     ValueType walk(AST::Base* ast);
@@ -36,7 +40,6 @@ namespace Metro::Semantics {
     // sema-parts
     ValueType sema_callfunc(AST::CallFunc* ast);
     ValueType sema_controls(AST::Base* ast);
-
 
 
     //
@@ -92,7 +95,7 @@ namespace Metro::Semantics {
     AST::Variable* arrow_unini = nullptr;
 
     // current walking function
-    AST::Function* cfn_ast;
+    AST::Function* cur_func_ast;
 
     // all functions in root
     std::vector<AST::Function*> functions;

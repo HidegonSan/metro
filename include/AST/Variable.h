@@ -1,9 +1,12 @@
+// -----------------------
+//  Variable : 変数
+// -----------------------
 #pragma once
 
 namespace Metro::AST {
   struct Variable : Base {
     std::string_view  name;
-    Base*             defined;
+    Base*             defined; // <deprecated>
 
     std::string to_string() const;
 
