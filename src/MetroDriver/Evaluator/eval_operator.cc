@@ -32,7 +32,35 @@ namespace Metro {
 
       // Sub
       case AST::Kind::Sub: {
-        TODO_IMPL
+        switch( type.kind ) {
+          case ValueKind::Int: {
+            left->v_int -= right->v_int;
+            break;
+          }
+        }
+        break;
+      }
+
+      // Mul
+      case AST::Kind::Mul: {
+        switch( type.kind ) {
+          case ValueKind::Int: {
+            left->v_int *= right->v_int;
+            break;
+          }
+        }
+        break;
+      }
+
+      // Div
+      case AST::Kind::Div: {
+        switch( type.kind ) {
+          case ValueKind::Int: {
+            left->v_int /= right->v_int;
+            break;
+          }
+        }
+        break;
       }
     }
 
