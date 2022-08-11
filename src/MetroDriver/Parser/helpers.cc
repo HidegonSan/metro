@@ -51,7 +51,7 @@ namespace Metro {
 
       if( eat(";") ) {
         if( eat("}") ) {
-          ast->append(AST::None::val);
+          ast->append(new AST::None(nullptr));
           break;
         }
       }

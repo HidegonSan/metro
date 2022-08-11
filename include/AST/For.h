@@ -7,13 +7,8 @@ namespace Metro::AST {
     Base* counter;
     Base* code;
 
-    std::string to_string() const {
-      return Utils::linkstr(
-        "<For ",
-        init->to_string(), "; ", cond->to_string(), "; ",
-        counter->to_string(), " ", code->to_string(), ">"
-      );
-    }
+    std::string to_string() const;
+    SourceRange get_range_on_source() const;
 
     For(Token* tok)
       : Base(Kind::For, tok),

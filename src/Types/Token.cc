@@ -3,6 +3,8 @@
 
 namespace Metro {
   std::vector<std::pair<char const*, PunctuatorKind>> const Token::punctuator_strtable {
+    { "->", PunctuatorKind::SpecifyReturnType },
+
     { "+", PunctuatorKind::Add },
     { "-", PunctuatorKind::Sub },
     { "*", PunctuatorKind::Mul },
@@ -21,6 +23,7 @@ namespace Metro {
     { "]", PunctuatorKind::SquareBracketClone },
     { "<", PunctuatorKind::AngleBracketOpen },
     { ">", PunctuatorKind::AngleBracketClone },
+
 
   };
 }

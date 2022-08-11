@@ -31,12 +31,15 @@ namespace Metro {
         break;
       }
 
-      case Kind::Variable: {
+      case Kind::Variable:
+        ret = *eval_lvalue(ast);
+        break;
+      /* {
         auto x = (AST::Variable*)ast;
 
         switch( x->defined->kind ) {
-          case Kind::Let:
-            ret = ((AST::Let*)x->defined)->value;
+          case Kind::VarDefine:
+            ret = ((AST::VarDefine*)x->defined)->value;
             break;
 
           case Kind::Argument:
@@ -45,7 +48,7 @@ namespace Metro {
         }
 
         break;
-      }
+      }*/
 
       case Kind::Callfunc: {
         auto x = (AST::CallFunc*)ast;
@@ -155,8 +158,8 @@ namespace Metro {
         break;
       }
 
-      case Kind::Let: {
-        auto x = (AST::Let*)ast;
+      case Kind::VarDefine: {
+        auto x = (AST::VarDefine*)ast;
 
         if( !x->init ) {
           if( x->type ) {

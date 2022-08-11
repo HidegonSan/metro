@@ -7,11 +7,11 @@ namespace Metro {
   void ErrorContext::show() {
     alert;
 
-    auto spacec = err_pos - err_begin;
+    auto spacec = err_begin - view_begin;
 
     std::cerr
-      << std::string_view(script->data.data() + err_begin, err_end - err_begin) << std::endl
-      << std::string(spacec, ' ') << std::string(err_underline_length, '^') << ' ' << message << std::endl;
+      << Utils::format("%6zu | ", linenum) << script->data.substr(view_begin, view_end - view_begin) << std::endl
+      << "       | " << std::string(spacec, ' ') << std::string(err_underline_len, '^') << ' ' << message << std::endl;
   }
 
   void Error::show_all() {

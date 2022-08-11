@@ -28,12 +28,16 @@ namespace Metro {
       return ast;
     }
 
-    if( eat("true") || eat("false") ) {
-      return new AST::Boolean(ate);
+    if( eat("true") ) {
+      return new AST::Boolean(ate, true);
+    }
+
+    if( eat("false") ) {
+      return new AST::Boolean(ate, false);
     }
 
     if( eat("none") ) {
-      return AST::None::val;
+      return new AST::None(ate);
     }
 
     switch( cur->kind ) {

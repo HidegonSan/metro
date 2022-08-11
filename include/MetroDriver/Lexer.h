@@ -19,5 +19,6 @@ namespace Metro {
     std::string const& source;
     size_t position;
     size_t const length;
+    size_t linenum;
   };
 }

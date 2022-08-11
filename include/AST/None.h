@@ -2,13 +2,11 @@
 
 namespace Metro::AST {
   struct None : Base {
-    static None* val;
+    std::string to_string() const;
 
-    std::string to_string() const {
-      return "<None>";
+    None(Token* tok)
+      : Base(Kind::None, tok)
+    {
     }
-
-  private:
-    None() { }
   };
 }

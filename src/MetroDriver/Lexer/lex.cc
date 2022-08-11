@@ -95,6 +95,9 @@ namespace Metro {
       }
 
       cur->str = { str, position - pos };
+      cur->endpos = cur->pos + cur->str.length();
+      cur->lastpos = cur->endpos - 1;
+
       pass_space();
     }
 

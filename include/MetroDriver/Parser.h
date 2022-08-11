@@ -14,7 +14,7 @@ namespace Metro {
     AST::Base* add();
     AST::Base* compare();
     AST::Base* assign();
-    
+
     AST::Base* expr();
     AST::Base* stmt();
 

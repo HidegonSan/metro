@@ -37,15 +37,8 @@ namespace Metro::AST {
       return list.emplace_back(kind, tok, ast);
     }
 
-    std::string to_string() const {
-      std::string ret{ "<Compare " + first->to_string() };
-
-      for( auto&& item : list ) {
-        ret += " " + std::string(item.token->str) + " " + item.ast->to_string();
-      }
-
-      return ret + ">";
-    }
+    std::string to_string() const;
+    SourceRange get_range_on_source() const;
 
     explicit Compare(Base* first)
       : Base(Kind::Compare, first->token),

@@ -14,6 +14,7 @@
 #else
   #define  alert              0
   #define  alertmsg(...)      0
+  #define  alertfmt(...)      0
   #define  alertios(...)      0
   #define  alertwarn(...)     0
   #define  alertctor(__x)     0

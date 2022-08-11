@@ -25,7 +25,7 @@ namespace Metro::AST {
 
     Return,
     If,
-    Let,
+    VarDefine,
     For,
     Loop,
     While,

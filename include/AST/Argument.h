@@ -6,13 +6,8 @@ namespace Metro::AST {
     Type*               type;
     Object*             value;
 
-    std::pair<size_t, size_t> get_range_on_source() {
-      return { token->pos, type->get_range_on_source().second };
-    }
-
-    std::string to_string() const {
-      return Utils::linkstr("<Argument '", name, "' : ", type->to_string(), ">");
-    }
+    std::string to_string() const;
+    SourceRange get_range_on_source() const;
 
     Argument(Token* tok)
       : Base(Kind::Argument, tok),

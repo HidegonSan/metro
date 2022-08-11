@@ -6,23 +6,10 @@ namespace Metro::AST {
     Base*   if_true;
     Base*   if_false;
 
-    bool closed_with_else() const {
-      auto x = if_false;
+    bool closed_with_else() const;
 
-      while( x && x->kind == Kind::If ) {
-        x = ((AST::If*)x)->if_false;
-      }
-
-      return x != nullptr;
-    }
-
-    std::string to_string() const {
-      return Utils::linkstr(
-        "<If ", cond->to_string(),
-        "{ ", if_true->to_string(), " }",
-        if_false != nullptr ? Utils::linkstr(" else {", if_false->to_string(), "}") : "", ">"
-      );
-    }
+    std::string to_string() const;
+    SourceRange get_range_on_source() const;
 
     If(Token* tok)
       : Base(Kind::If, tok),

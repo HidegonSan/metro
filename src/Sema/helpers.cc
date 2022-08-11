@@ -9,7 +9,7 @@ namespace Metro::Semantics {
       for( int64_t i = ctx.cur_index; i >= 0; i-- ) {
         auto& x = ctx.scope->elems[i];
 
-        if( x->kind == ASTKind::Let && ((AST::Let*)x)->name == name ) {
+        if( x->kind == ASTKind::VarDefine && ((AST::VarDefine*)x)->name == name ) {
           return x;
         }
       }

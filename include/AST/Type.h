@@ -10,23 +10,8 @@ namespace Metro::AST {
 
     AST::Struct* userdef;
 
-    std::string to_string() const {
-      auto&& ret = "<Type '" + std::string(name) + "'";
-
-      if( !elems.empty() ) {
-        ret += " elems{" + Utils::join(", ", elems, [] (auto x) { return x->to_string(); }) + "}";
-      }
-
-      if( is_constant ) {
-        ret += " const";
-      }
-
-      if( is_reference ) {
-        ret += "&";
-      }
-
-      return ret + ">";
-    }
+    std::string to_string() const;
+    SourceRange get_range_on_source() const;
 
     Type(Token* tok)
       : Base(Kind::Type, tok),
