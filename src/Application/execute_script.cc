@@ -5,8 +5,8 @@
 #include "Types.h"
 #include "MetroDriver/Lexer.h"
 #include "MetroDriver/Parser.h"
+#include "MetroDriver/Sema.h"
 #include "MetroDriver/Evaluator.h"
-#include "Sema/Sema.h"
 #include "Application.h"
 #include "Error.h"
 #include "Debug.h"
@@ -60,11 +60,10 @@ namespace Metro {
 
     Error::check();
 
-    Semantics::Sema sema;
-
     assert(ast->kind == AST::Kind::Scope);
 
-    sema.init((AST::Scope*)ast);
+    Semantics::Sema sema{ (AST::Scope*)ast };
+
     sema.walk(ast);
 
     Error::check();
