@@ -23,7 +23,10 @@ namespace Metro {
     Mul,
     Mod,
     Div,
-    
+    And,
+    Or,
+    Not,
+    Xor,
     Assign, // =
 
     Equal,
@@ -36,6 +39,11 @@ namespace Metro {
 
     Colon,
     Semicolon,
+    Comma,
+    Dot,
+    Exclamation,
+    Question,
+    Dollar,
 
     RoundBracketOpen,     // (
     RoundBracketClone,    // )
