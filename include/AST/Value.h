@@ -1,8 +1,10 @@
 #pragma once
 
-namespace Metro {
-  struct Object;
-}
+// -----------------------
+//  Value :  即値
+
+//  オブジェクトの実態は Sema で作成＆割り当てられる
+// -----------------------
 
 namespace Metro::AST {
   struct Value : Base {

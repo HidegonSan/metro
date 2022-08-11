@@ -1,5 +1,11 @@
 #pragma once
 
+// -----------------------
+//  スコープ
+
+//  last-expr は全て同じ型である必要がある
+// -----------------------
+
 namespace Metro::AST {
   struct Scope : Base {
     std::vector<Base*>  elems;

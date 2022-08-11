@@ -1,5 +1,11 @@
 #pragma once
 
+// -----------------------
+//  配列
+
+//  Sema: 全ての要素が一貫して同じ型である必要がある
+// -----------------------
+
 namespace Metro::AST {
   struct Array : Base {
     std::vector<AST::Base*> elements;

@@ -1,5 +1,9 @@
 #pragma once
 
+// -----------------------
+//  None
+// -----------------------
+
 namespace Metro::AST {
   struct None : Base {
     std::string to_string() const;

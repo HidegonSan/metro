@@ -1,5 +1,11 @@
 #pragma once
 
+// -----------------------
+//  Type
+
+//  型情報
+// -----------------------
+
 namespace Metro::AST {
   struct Struct;
   struct Type : Base {

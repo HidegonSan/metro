@@ -1,5 +1,11 @@
 #pragma once
 
+// -----------------------
+//  if 式
+
+//  成立時処理、不成立時処理はどちらも同じ型である必要がある
+// -----------------------
+
 namespace Metro::AST {
   struct If : Base {
     Base*   cond;

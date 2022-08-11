@@ -1,5 +1,9 @@
 #pragma once
 
+// -----------------------
+//  引数
+// -----------------------
+
 namespace Metro::AST {
   struct Argument : Base {
     std::string_view    name;
