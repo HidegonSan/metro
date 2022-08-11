@@ -16,13 +16,7 @@ namespace Metro::AST {
       return x != nullptr;
     }
 
-    std::string to_string() const {
-      return Utils::linkstr(
-        "<If ", cond->to_string(),
-        "{ ", if_true->to_string(), " }",
-        if_false != nullptr ? Utils::linkstr(" else {", if_false->to_string(), "}") : "", ">"
-      );
-    }
+    std::string to_string() const;
 
     If(Token* tok)
       : Base(Kind::If, tok),

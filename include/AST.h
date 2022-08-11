@@ -22,7 +22,7 @@
 #include "AST/Return.h"
 #include "AST/If.h"
 #include "AST/For.h"
-#include "AST/Let.h"
+#include "AST/VarDefine.h"
 #include "AST/Scope.h"
 
 #include "AST/Argument.h"

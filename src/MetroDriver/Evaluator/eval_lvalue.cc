@@ -14,8 +14,8 @@ namespace Metro {
           case ASTKind::Argument:
             return &((AST::Argument*)x->defined)->value;
 
-          case ASTKind::Let:
-            return &((AST::Let*)x->defined)->value;
+          case ASTKind::VarDefine:
+            return &((AST::VarDefine*)x->defined)->value;
         }
 
         break;

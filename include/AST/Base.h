@@ -1,7 +1,5 @@
 #pragma once
 
-#include "Utils.h"
-
 namespace Metro::AST {
   using namespace std::string_literals;
 
@@ -16,9 +14,7 @@ namespace Metro::AST {
       return { token->pos, token->pos + token->str.length() };
     }
 
-    virtual std::string to_string() const {
-      return Utils::format("<AST::Base at %p>", this);
-    }
+    virtual std::string to_string() const = 0;
 
   protected:
     Base()

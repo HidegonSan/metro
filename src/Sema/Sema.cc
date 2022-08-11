@@ -78,7 +78,7 @@ namespace Metro::Semantics {
           Error::add_error(ErrorKind::Undefined, ast->token, "undefined variable name");
           Error::exit_app();
         }
-        else if( arrow_unini != var && var->defined->kind == ASTKind::Let ) {
+        else if( arrow_unini != var && var->defined->kind == ASTKind::VarDefine ) {
           if( auto ctx = find_var_context(var->defined); !ctx->was_type_analyzed ) {
             alertios(ctx);
 
@@ -158,8 +158,8 @@ namespace Metro::Semantics {
         break;
       }
 
-      case ASTKind::Let: {
-        auto let = (AST::Let*)ast;
+      case ASTKind::VarDefine: {
+        auto let = (AST::VarDefine*)ast;
         auto& scope = get_cur_scope();
 
         // shadowing

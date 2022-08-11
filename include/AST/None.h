@@ -4,9 +4,7 @@ namespace Metro::AST {
   struct None : Base {
     static None* val;
 
-    std::string to_string() const {
-      return "<None>";
-    }
+    std::string to_string() const;
 
   private:
     None() { }

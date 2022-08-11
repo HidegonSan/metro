@@ -10,9 +10,7 @@ namespace Metro::AST {
       return { token->pos, type->get_range_on_source().second };
     }
 
-    std::string to_string() const {
-      return Utils::linkstr("<Argument '", name, "' : ", type->to_string(), ">");
-    }
+    std::string to_string() const;
 
     Argument(Token* tok)
       : Base(Kind::Argument, tok),

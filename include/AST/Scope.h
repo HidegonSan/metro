@@ -6,7 +6,7 @@ namespace Metro::AST {
 
     std::pair<size_t, size_t> get_range_on_source() {
       auto begin = token->pos;
-      
+
       if( elems.empty() ) {
         return { begin, token->next->pos + 1 };
       }
@@ -18,13 +18,7 @@ namespace Metro::AST {
       return elems.emplace_back(ast);
     }
 
-    std::string to_string() const {
-      if( elems.empty() ) {
-        return "<Scope (Empty)>";
-      }
-
-      return Utils::format("<Scope %p: ", this) + Utils::join(", ", elems, [] (auto x) { return x->to_string(); }) + ">";
-    }
+    std::string to_string() const;
 
     Scope(Token* tok)
       : Base(Kind::Scope, tok)

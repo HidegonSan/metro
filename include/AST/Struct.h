@@ -5,20 +5,13 @@ namespace Metro::AST {
     struct Member {
       std::string_view name;
       Type* type;
+      Token* token;
     };
 
     std::string_view name;
     std::vector<Member> members;
 
-    std::string to_string() const {
-      return Utils::linkstr(
-        "<Struct '", name, "' {",
-        Utils::join(", ", members, [] (auto&& x) {
-          return Utils::linkstr(x.name, ": ", x.type->to_string());
-        }),
-        "}>"
-      );
-    }
+    std::string to_string() const;
 
     Struct(Token* tok)
       : Base(Kind::Struct, tok)

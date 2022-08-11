@@ -45,7 +45,7 @@ namespace Metro {
     }
 
     if( eat("let") ) {
-      auto ast = new AST::Let(ate);
+      auto ast = new AST::VarDefine(ate);
 
       expect_ident();
       ast->name = cur->str;

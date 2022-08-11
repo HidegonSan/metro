@@ -56,8 +56,9 @@ namespace Metro {
       do {
         expect_ident();
 
-        auto& member = x->members.emplace_back(cur);
+        auto& member = x->members.emplace_back();
         member.name = cur->str;
+        member.token = cur;
 
         next();
         expect(":"); // TODO: add template type if didnt eat
