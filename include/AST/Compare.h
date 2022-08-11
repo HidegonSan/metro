@@ -38,6 +38,7 @@ namespace Metro::AST {
     }
 
     std::string to_string() const;
+    SourceRange get_range_on_source() const;
 
     explicit Compare(Base* first)
       : Base(Kind::Compare, first->token),

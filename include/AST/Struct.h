@@ -12,6 +12,7 @@ namespace Metro::AST {
     std::vector<Member> members;
 
     std::string to_string() const;
+    SourceRange get_range_on_source() const;
 
     Struct(Token* tok)
       : Base(Kind::Struct, tok)

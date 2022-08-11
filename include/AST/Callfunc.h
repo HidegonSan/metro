@@ -13,6 +13,7 @@ namespace Metro::AST {
     BuiltinFunc const*  callee_builtin;
 
     std::string to_string() const;
+    SourceRange get_range_on_source() const;
 
     CallFunc(Token* token)
       : Base(Kind::Callfunc, token),

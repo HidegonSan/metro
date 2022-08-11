@@ -2,6 +2,12 @@
 #include "Utils.h"
 
 namespace Metro::AST {
+  std::string Base::to_string() const {
+    alertfmt("called AST::Base::to_string(), did you not override for AST::Kind %d ?", kind);
+
+    return Utils::format("<Base at %p>");
+  }
+
   std::string Argument::to_string() const {
     return Utils::linkstr("<Argument '", name, "' : ", type->to_string(), ">");
   }
@@ -135,7 +141,4 @@ namespace Metro::AST {
   std::string Variable::to_string() const {
     return "<Variable '" + std::string(name) + "'>";
   }
-
-
-
 }

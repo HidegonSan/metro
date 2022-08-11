@@ -11,6 +11,7 @@ namespace Metro::AST {
     AST::Struct* userdef;
 
     std::string to_string() const;
+    SourceRange get_range_on_source() const;
 
     Type(Token* tok)
       : Base(Kind::Type, tok),

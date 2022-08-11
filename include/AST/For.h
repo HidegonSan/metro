@@ -8,6 +8,7 @@ namespace Metro::AST {
     Base* code;
 
     std::string to_string() const;
+    SourceRange get_range_on_source() const;
 
     For(Token* tok)
       : Base(Kind::For, tok),

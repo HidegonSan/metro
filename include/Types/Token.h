@@ -15,6 +15,9 @@ namespace Metro {
   };
 
   enum class PunctuatorKind {
+    SpecifyReturnType, // ->
+
+
     Add,
     Sub,
     Mul,
@@ -42,6 +45,7 @@ namespace Metro {
     SquareBracketClone,   // ]
     AngleBracketOpen,     // <
     AngleBracketClone,    // >
+
     
   };
 
@@ -52,12 +56,16 @@ namespace Metro {
     Token* next;
     std::string_view str;
     size_t pos;
+    size_t lastpos;
+    size_t endpos;
 
     Token(TokenKind kind = TokenKind::Int)
       : kind(kind),
         prev(nullptr),
         next(nullptr),
-        pos(0)
+        pos(0),
+        lastpos(0),
+        endpos(0)
     {
     }
 

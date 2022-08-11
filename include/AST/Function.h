@@ -8,6 +8,7 @@ namespace Metro::AST {
     Scope*                  code;
 
     std::string to_string() const;
+    SourceRange get_range_on_source() const;
 
     Function(Token* token)
       : Base(Kind::Function, token),

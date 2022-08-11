@@ -2,10 +2,16 @@
 
 #include <string>
 #include <vector>
+#include <utility>
+
+namespace Metro::AST {
+  using SourceRange = std::pair<size_t, size_t>;
+}
 
 #include "Types.h"
 
 #include "AST/Kind.h"
+
 #include "AST/Base.h"
 #include "AST/None.h"
 #include "AST/Type.h"

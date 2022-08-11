@@ -7,7 +7,12 @@
 // alertmsg
 #define  alertmsg(e...) \
   fprintf(stderr,COL_YELLOW "\t#message: " \
-  COL_ALERTMSG #e COL_YELLOW " :from " __FILE__ ":%d\n" COL_DEFAULT,__LINE__)
+    COL_ALERTMSG #e COL_YELLOW " :from " __FILE__ ":%d\n" COL_DEFAULT,__LINE__)
+
+// alertfmt
+#define  alertfmt(fmt, e...) \
+  fprintf(stderr,COL_YELLOW "\t#message: " fmt \
+    COL_ALERTMSG #e COL_YELLOW " :from " __FILE__ ":%d\n" COL_DEFAULT,e,__LINE__)
 
 // alertios
 #define  alertios(e...) \

@@ -37,7 +37,7 @@ namespace Metro {
     }
 
     if( eat("none") ) {
-      return AST::None::val;
+      return new AST::None(ate);
     }
 
     switch( cur->kind ) {

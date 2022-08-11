@@ -7,7 +7,8 @@ namespace Metro {
   Lexer::Lexer(std::string const& source)
     : source(source),
       position(0),
-      length(source.length())
+      length(source.length()),
+      linenum(0)
   {
   }
 }

@@ -39,15 +39,20 @@ namespace Metro {
     Token*      token;
     AST::Base*  node;
 
+    // line of error
     size_t  view_begin;
     size_t  view_end;
     std::string_view  src_view;
 
+    // range of error
     size_t  err_pos;
     size_t  err_begin;
     size_t  err_end;
+    size_t  err_underline_len;
 
-    size_t  err_underline_length;
+    // index of line
+    size_t  linenum;
+
     std::string message;
 
     AppContext::Script const* script;
@@ -57,9 +62,9 @@ namespace Metro {
 
   class Error {
   public:
-    static ErrorContext& add_error(ErrorKind kind, size_t pos, std::string const& msg);
-    static ErrorContext& add_error(ErrorKind kind, Token* token, std::string const& msg);
-    static ErrorContext& add_error(ErrorKind kind, AST::Base* ast, std::string const& msg);
+    static ErrorContext& add_error(ErrorKind kind, size_t pos, std::string&& msg);
+    static ErrorContext& add_error(ErrorKind kind, Token* token, std::string&& msg);
+    static ErrorContext& add_error(ErrorKind kind, AST::Base* ast, std::string&& msg);
 
     static void show_all();
 
