@@ -1,24 +1,11 @@
 #include "AST.h"
-#include "Sema/Sema.h"
+#include "MetroDriver/Sema.h"
+#include "MetroDriver/Evaluator.h"
 #include "Error.h"
 #include "Debug.h"
 #include "Utils.h"
-#include "MetroDriver/Evaluator.h"
 
 namespace Metro::Semantics {
-
-  // initialize Sema
-  void Sema::init(AST::Scope* root) {
-    this->root = root;
-
-    // append all functions to functions
-    for( auto scope = (AST::Scope*)root; auto&& x : scope->elems ) {
-      if( x->kind == ASTKind::Function ) {
-        functions.emplace_back((AST::Function*)x);
-      }
-    }
-  }
-
   ValueType Sema::walk(AST::Base* ast) {
     if( !ast ) {
       return { };
@@ -221,7 +208,7 @@ namespace Metro::Semantics {
       case ASTKind::Function: {
         auto func = (AST::Function*)ast;
 
-        cfn_ast = func;
+        cur_func_ast = func;
 
         // arguments
         for( auto&& arg : func->args ) {
@@ -234,7 +221,7 @@ namespace Metro::Semantics {
         // code
         walk(func->code);
 
-        cfn_ast = nullptr;
+        cur_func_ast = nullptr;
 
         break;
       }

@@ -15,5 +15,4 @@ namespace Metro::AST {
 
     return x != nullptr;
   }
-
 }

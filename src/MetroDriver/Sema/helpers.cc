@@ -1,5 +1,5 @@
 #include "AST.h"
-#include "Sema/Sema.h"
+#include "MetroDriver/Sema.h"
 #include "Debug.h"
 #include "Utils.h"
 
@@ -15,8 +15,8 @@ namespace Metro::Semantics {
       }
     }
 
-    if( cfn_ast != nullptr ) {
-      for( auto&& arg : cfn_ast->args ) {
+    if( cur_func_ast != nullptr ) {
+      for( auto&& arg : cur_func_ast->args ) {
         if( arg.name == name ) {
           return &arg;
         }
