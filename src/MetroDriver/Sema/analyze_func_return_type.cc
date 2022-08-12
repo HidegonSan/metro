@@ -15,6 +15,7 @@ namespace Metro::Semantics {
     if( func->return_type != nullptr ) {
       out = walk(func->return_type);
       expect_all_same_with(lastexpr_list, out);
+      return;
     }
 
     // == 指定されていない場合、推論する == //
