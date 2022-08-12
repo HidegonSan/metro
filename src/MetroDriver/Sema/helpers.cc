@@ -15,6 +15,8 @@ namespace Metro::Semantics {
         );
       }
     }
+
+    Error::check();
   }
 
   AST::Base* Sema::find_var_defined(std::string_view name) {
