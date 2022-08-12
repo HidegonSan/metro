@@ -2,8 +2,21 @@
 #include "MetroDriver/Sema.h"
 #include "Debug.h"
 #include "Utils.h"
+#include "Error.h"
 
 namespace Metro::Semantics {
+  void Sema::expect_all_same_with(std::vector<AST::Base*> const& vec, ValueType const& type) {
+    for( auto&& ast : vec ) {
+      auto&& tmp = walk(ast);
+
+      if( !type.equals(tmp) ) {
+        Error::add_error(ErrorKind::TypeMismatch, ast,
+          Utils::linkstr("expected '", type.to_string(), "', but found '", tmp.to_string(), "'")
+        );
+      }
+    }
+  }
+
   AST::Base* Sema::find_var_defined(std::string_view name) {
     for( auto&& ctx : scopelist ) {
       for( int64_t i = ctx.cur_index; i >= 0; i-- ) {

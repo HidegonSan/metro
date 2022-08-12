@@ -43,6 +43,9 @@ namespace Metro::Semantics {
 
 
     //
+    void expect_all_same_with(std::vector<AST::Base*> const& vec, ValueType const& type);
+
+    //
     // 名前から変数の定義場所を探す
     AST::Base* find_var_defined(std::string_view name);
 
