@@ -4,6 +4,7 @@
 namespace Metro {
   std::vector<std::pair<char const*, PunctuatorKind>> const Token::punctuator_strtable {
     { "->", PunctuatorKind::SpecifyReturnType },
+    { "[]", PunctuatorKind::ArrayType },
 
     { "+", PunctuatorKind::Add },
     { "-", PunctuatorKind::Sub },

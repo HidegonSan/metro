@@ -16,7 +16,7 @@ namespace Metro {
 
   enum class PunctuatorKind {
     SpecifyReturnType, // ->
-
+    ArrayType,         // []
 
     Add,
     Sub,

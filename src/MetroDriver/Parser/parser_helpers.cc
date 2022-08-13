@@ -76,6 +76,26 @@ namespace Metro {
 
     next();
 
+    if( eat("<") ) {
+      do {
+        ast->elems.emplace_back(expect_type());
+      } while( eat(",") );
+
+      if( cur->str == ">>" ) {
+        cur->str = ">";
+        cur->insert(TokenKind::Punctuator, 1, ">");
+      }
+
+      expect(">");
+    }
+
+    while( eat("[]") ) {
+      ast->arr_depth++;
+    }
+
+    ast->is_constant = eat("const");
+    ast->is_reference = eat("&");
+
     return ast;
   }
 
