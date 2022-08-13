@@ -2,12 +2,6 @@
 #include "Utils.h"
 
 namespace Metro::AST {
-  std::string Base::to_string() const {
-    alertfmt("called AST::Base::to_string(), did you not override for AST::Kind %d ?", kind);
-
-    return Utils::format("<Base at %p>");
-  }
-
   std::string Argument::to_string() const {
     return Utils::linkstr("<Argument '", name, "' : ", type->to_string(), ">");
   }
@@ -15,7 +9,7 @@ namespace Metro::AST {
   std::string Array::to_string() const {
     std::string ret { "<Array " };
 
-    for( int64_t i = 0; i < elements.size(); i++ ) {
+    for( size_t i = 0; i < elements.size(); i++ ) {
       ret += std::to_string(i) + ": " + elements[i]->to_string();
       if( i < elements.size() - 1 ) ret += ", ";
     }

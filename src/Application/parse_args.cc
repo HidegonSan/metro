@@ -4,10 +4,6 @@
 #include "Application.h"
 
 namespace Metro {
-  static constexpr auto operator"" _view (char const* s, size_t len) {
-    return std::string_view{ s, len };
-  }
-
   template <size_t Len>
   static inline bool startswith(char const* s, char const (&cmp) [Len]) {
     for( size_t i = 0; auto&& c : cmp ) {
@@ -59,9 +55,5 @@ namespace Metro {
     }
 
     return true;
-
-  _L_invalid_arg:
-    std::cerr << "invalid argument" << std::endl;
-    return 0;
   }
 }

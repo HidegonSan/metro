@@ -12,13 +12,6 @@
 #include "Debug.h"
 
 namespace Metro {
-
-  static void _print_token(Token* token) {
-    for( ; token->kind != TokenKind::End; token = token->next ) {
-      std::cerr << token->str << std::endl;
-    }
-  }
-
   AppContext::Script Application::open_script_file(char const* path) {
     std::ifstream ifs{ path };
     AppContext::Script script;
@@ -38,8 +31,6 @@ namespace Metro {
   }
 
   Object* Application::execute_script(AppContext::Script& script) {
-    auto const* ctx = Application::get_cur_appcontext();
-
     running_script.push_front(&script);
 
     Lexer lexer{ script.data };

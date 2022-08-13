@@ -12,7 +12,7 @@ namespace Metro::AST {
 
     //
     // 文字列に変換 (現時点ではデバッグ用)
-    virtual std::string to_string() const;
+    virtual std::string to_string() const = 0;
 
     //
     // ソースコード上での範囲を取得する
