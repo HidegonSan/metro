@@ -1,5 +1,6 @@
 #include "Types.h"
 #include "Debug.h"
+#include "Utils.h"
 
 namespace Metro {
   bool ValueType::equals(ValueType::Kind kind) const {
@@ -25,6 +26,10 @@ namespace Metro {
         ret = "string";
         break;
 
+      case Kind::Tuple:
+        ret = "tuple";
+        break;
+
       case Kind::None:
         ret = "none";
         break;
@@ -32,6 +37,14 @@ namespace Metro {
       default: {
         TODO_IMPL
       }
+    }
+
+    if( !elems.empty() ) {
+      ret += "<" + Utils::join<ValueType>(", ", elems) + ">";
+    }
+
+    for( size_t i = 0; i < arr_depth; i++ ) {
+      ret += "[]";
     }
 
     if( attr & ATTR_CONST ) {

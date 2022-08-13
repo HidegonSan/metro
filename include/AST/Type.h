@@ -13,6 +13,7 @@ namespace Metro::AST {
     size_t arr_depth;
     bool  is_constant;
     bool  is_reference;
+    bool  have_elements;
 
     AST::Struct* userdef;
 
@@ -24,6 +25,7 @@ namespace Metro::AST {
         arr_depth(0),
         is_constant(false),
         is_reference(false),
+        have_elements(false),
         userdef(nullptr)
     {
     }

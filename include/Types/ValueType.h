@@ -31,12 +31,14 @@ namespace Metro {
     Kind        kind;
     uint8_t     attr;
     size_t      arr_depth;
+    bool        have_elements;
     std::vector<ValueType>   elems;
 
     ValueType(Kind kind = Kind::None)
       : kind(kind),
         attr(ATTR_NONE),
-        arr_depth(0)
+        arr_depth(0),
+        have_elements(false)
     {
     }
 

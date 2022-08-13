@@ -16,8 +16,9 @@ namespace Metro {
       bool        v_bool;
       char16_t    v_char;
     };
-    
+
     std::u16string  v_str;
+    std::vector<Object*> list;
 
     static Object* none;
 

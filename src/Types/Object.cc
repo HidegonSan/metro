@@ -49,12 +49,23 @@ namespace Metro {
         ret = Utils::Strings::to_string(v_str);
         break;
 
+      case ValueType::Kind::Tuple:
+        ret = "tuple";
+        break;
+
       case ValueType::Kind::None:
         ret = "none";
         break;
       
       default:
         TODO_IMPL
+    }
+
+    if( type.have_elements ) {
+
+    }
+    else if( !type.elems.empty() ) {
+
     }
 
     return ret;

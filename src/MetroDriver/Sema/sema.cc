@@ -6,7 +6,11 @@
 #include "Utils.h"
 
 namespace Metro::Semantics {
+  static Sema* __inst;
+
   Sema::Sema(AST::Scope* root) {
+    __inst = this;
+
     this->root = root;
 
     // make functions
@@ -15,5 +19,9 @@ namespace Metro::Semantics {
         functions.emplace_back((AST::Function*)x);
       }
     }
+  }
+
+  Sema* Sema::get_instance() {
+    return __inst;
   }
 }

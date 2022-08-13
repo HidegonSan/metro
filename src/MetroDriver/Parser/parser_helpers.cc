@@ -77,6 +77,8 @@ namespace Metro {
     next();
 
     if( eat("<") ) {
+      ast->have_elements = true;
+
       do {
         ast->elems.emplace_back(expect_type());
       } while( eat(",") );

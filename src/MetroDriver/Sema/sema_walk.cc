@@ -28,10 +28,13 @@ namespace Metro::Semantics {
 
         for( auto&& pair : ValueType::name_table ) {
           if( type->name == pair.first ) {
+            alert;
             ret = pair.second;
             goto _found_type;
           }
         }
+
+        ret.have_elements = type->have_elements;
 
         // TODO: find struct
 

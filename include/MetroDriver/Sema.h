@@ -34,6 +34,8 @@ namespace Metro::Semantics {
   public:
     explicit Sema(AST::Scope* root);
 
+    static Sema* get_instance();
+
     // == walk ==
     ValueType walk(AST::Base* ast);
 
