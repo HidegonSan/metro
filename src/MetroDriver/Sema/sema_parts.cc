@@ -73,7 +73,7 @@ namespace Metro::Semantics {
         auto if_x = (AST::If*)ast;
 
         if( !walk(if_x->cond).equals(ValueType::Kind::Bool) ) {
-          Error::add_error(ErrorKind::TypeMismatch, if_x->cond, "condision must be boolean");
+          Error::add_error(ErrorKind::TypeMismatch, if_x->cond, "condition must be boolean");
         }
 
         ret = walk(if_x->if_true);
@@ -91,7 +91,7 @@ namespace Metro::Semantics {
         walk(for_x->init);
 
         if( !walk(for_x->cond).equals(ValueType::Kind::Bool) ) {
-          Error::add_error(ErrorKind::TypeMismatch, for_x->cond, "condision must be boolean");
+          Error::add_error(ErrorKind::TypeMismatch, for_x->cond, "condition must be boolean");
         }
 
         walk(for_x->counter);
