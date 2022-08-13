@@ -6,13 +6,12 @@
 # 使用方法
 ## リポジトリをクローンし、ビルドする
 ```
-git clone --recursive git@github.com:bomkei/metro
-pip install fbp
-cd metro
-fbp metro
+git clone --recursive https://github.com/bomkei/metro.git
+make -j
 ```
 
 ## 実行
+複数個のスクリプトファイルを連続で実行できます
 ```
 ./metro [your script files]
 ```

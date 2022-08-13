@@ -6,13 +6,12 @@ A statically typed scripting language. Powerful and accurate type inference is i
 # Usage
 ## Clone this repository, and build
 ```
-git clone --recursive git@github.com:bomkei/metro
-pip install fbp
-cd metro
-fbp metro
+git clone --recursive https://github.com/bomkei/metro.git
+make -j
 ```
 
 ## Run
+You can execute multiple script file.
 ```
 ./metro [your script files]
 ```
