@@ -10,9 +10,8 @@
 
 ```bash
 git clone --recursive git@github.com:bomkei/metro
-pip install fbp
 cd metro
-fbp metro
+make -j
 ```
 
 ### 実行
