@@ -86,6 +86,19 @@ namespace Metro {
       if( prev ) prev->next = this;
     }
 
+    Token* insert(TokenKind kind, int pos_diff, std::string_view const& str) {
+      auto tok = new Token(kind);
+
+      tok->pos = this->pos + pos_diff;
+      tok->str = str;
+
+      tok->prev = this;
+      tok->next = this->next;
+
+      this->next = tok;
+      return tok;
+    }
+
     static std::vector<std::pair<char const*, PunctuatorKind>> const punctuator_strtable;
   };
 }
