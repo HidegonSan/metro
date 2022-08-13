@@ -50,6 +50,7 @@ namespace Metro {
     { "float", Kind::Float },
     { "char", Kind::Char },
     { "string", Kind::String },
+    { "tuple", Kind::Tuple },
     { "none", Kind::None },
   };
 
