@@ -20,8 +20,8 @@ namespace Metro::AST {
 
     Type(Token* tok)
       : Base(Kind::Type, tok),
-        is_reference(false),
         is_constant(false),
+        is_reference(false),
         userdef(nullptr)
     {
     }

@@ -4,32 +4,6 @@
 #include "Error.h"
 #include "Utils.h"
 
-static constexpr char const punctuaters[] =
-  "(){}[]<>"
-  "+-*/%="
-  "&^|~"
-  ":;,."
-  "!?%";
-
-static constexpr char const* long_punctuaters[] = {
-  ">>=",
-  "<<=",
-  "->",
-  ">=",
-  "<=",
-  "+=",
-  "-=",
-  "*=",
-  "/=",
-  "%=",
-  "++",
-  "--",
-  "<<",
-  ">>",
-  "&&",
-  "||",
-};
-
 namespace Metro {
   Token* Lexer::lex() {
     Token top;

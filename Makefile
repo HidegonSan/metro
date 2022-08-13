@@ -25,7 +25,7 @@ SOURCES	= src \
 	src/Utils
 
 OPTFLAGS		= -O3
-WARNFLAGS		= -Weverything -Wno-switch
+WARNFLAGS		= -Wall -Wextra -Wno-switch
 COMMONFLAGS	= $(INCLUDES) $(OPTFLAGS) $(WARNFLAGS)
 CFLAGS			= $(COMMONFLAGS) -std=c17
 CXXFLAGS		= $(COMMONFLAGS) -std=c++20
@@ -56,7 +56,7 @@ all: $(BUILD)
 	@$(MAKE) --no-print-directory -C $(BUILD) -f $(CURDIR)/Makefile
 
 debug: $(BUILD)
-	@$(MAKE) --no-print-directory OPTFLAGS="-g -O0" WARNFLAGS="-Weverything" LDFLAGS="" -C $(BUILD) -f $(CURDIR)/Makefile
+	@$(MAKE) --no-print-directory OPTFLAGS="-g -O0" WARNFLAGS="-Wall -Wextra" LDFLAGS="" -C $(BUILD) -f $(CURDIR)/Makefile
 
 $(BUILD):
 	@[ -d $@ ] || mkdir -p $@
