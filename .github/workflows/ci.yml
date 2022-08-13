@@ -7,13 +7,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
-    - uses: egor-tensin/setup-gcc@v1
-      with:
-        version: 11
-
-    - run: pip install fbp
+    - uses: egor-tensin/setup-clang
 
     - name: Build
-      run: fbp metro
+      run: make -j
       env:
         TERM: xterm-256color
