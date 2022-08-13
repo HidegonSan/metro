@@ -38,4 +38,4 @@ def com_check_duplicate(folders: list):
       print(COL_RED + 'file name duplicated in folder ' + COL_YELLOW + '"' + folder + COL_DEFAULT + \
         '":\n  ' + '\n'.join(['\n  '.join(v) for v in res]))
     else:
-      print('no duplcicated files.')
+      print('no duplicated files.')

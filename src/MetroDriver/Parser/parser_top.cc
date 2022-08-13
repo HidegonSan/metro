@@ -61,7 +61,7 @@ namespace Metro {
         member.token = cur;
 
         next();
-        expect(":"); // TODO: add template type if didnt eat
+        expect(":"); // TODO: If not eaten, add template type
 
         member.type = expect_type();
       } while( eat(",") );

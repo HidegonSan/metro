@@ -23,7 +23,7 @@ namespace Metro {
     IndefiniteType,
     UnknownTypeName,
     CannotInfer,
-    MayNotbeEvaluated,
+    MayNotBeEvaluated,
     ValueType,
     TypeMismatch,
     TooFewArguments,
