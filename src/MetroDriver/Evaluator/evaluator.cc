@@ -184,12 +184,10 @@ namespace Metro {
         auto x = (AST::VarDefine*)ast;
 
         if( !x->init ) {
-          if( x->type ) {
-            
-          }
-          else {
-            break;
-          }
+          if( x->type )
+            x->value = construct_from_type(x->type);
+
+          break;
         }
 
         auto val = eval(x->init);

@@ -26,6 +26,10 @@ namespace Metro {
   }
 
   std::string Object::to_string() const {
+    alert;
+
+    static bool str_q = false;
+
     auto ret = std::string{ };
 
     switch( type.kind ) {
@@ -47,25 +51,33 @@ namespace Metro {
 
       case ValueType::Kind::String:
         ret = Utils::Strings::to_string(v_str);
+
+        if( ret.empty() && str_q )
+          ret = "\"\"";
+
         break;
 
-      case ValueType::Kind::Tuple:
-        ret = "tuple";
+      case ValueType::Kind::Tuple: {
+        auto bak = str_q;
+
+        str_q = true;
+        ret = "(" + Utils::join(", ", list, [] (auto& p) { return p->to_string(); }) + ")";
+
+        str_q = bak;
         break;
+      }
 
       case ValueType::Kind::None:
+        alert;
         ret = "none";
         break;
-      
+
+      case ValueType::Kind::UserDef: {
+        TODO_IMPL
+      }
+
       default:
         TODO_IMPL
-    }
-
-    if( type.have_elements ) {
-
-    }
-    else if( !type.elems.empty() ) {
-
     }
 
     return ret;

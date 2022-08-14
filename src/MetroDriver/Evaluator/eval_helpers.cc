@@ -7,7 +7,10 @@ namespace Metro {
   Object* Evaluator::construct_from_type(AST::Type* type) {
     auto obj = new Object;
 
+    alert;
     obj->type = Semantics::Sema::get_instance()->walk(type);
+
+    alertios(obj->type.to_string());
 
     if( !type->elems.empty() ) {
       for( auto&& elem : type->elems ) {

@@ -34,13 +34,18 @@ namespace Metro::Semantics {
           }
         }
 
-        ret.have_elements = type->have_elements;
-
         // TODO: find struct
 
         Error::add_error(ErrorKind::Undefined, ast->token, "undefined type name");
 
       _found_type:
+        alert;
+        ret.have_elements = type->have_elements;
+
+        for( auto&& sub : type->elems ) {
+          ret.elems.emplace_back(walk(sub));
+        }
+
         break;
       }
 
