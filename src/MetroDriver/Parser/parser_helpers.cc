@@ -116,6 +116,7 @@ namespace Metro {
   }
 
   void Parser::expect_semi() {
+    alert;
     expect(";");
   }
 }

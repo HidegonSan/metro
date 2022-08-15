@@ -48,7 +48,7 @@ namespace Metro::Semantics {
 
       auto&& func_arg_type = is_builtin ? bfun->arg_types[i] : walk(find->args[i].type);
 
-      if( func_arg_type.equals_kind(ValueType::Kind::Args) ) {
+      if( func_arg_type.equals(ValueType::Kind::Args) ) {
         break;
       }
 

@@ -97,7 +97,7 @@ namespace Metro::AST {
   }
 
   SourceRange VarDefine::get_range_on_source() const {
-    size_t end = token->next->endpos; // name
+    size_t end = token->next->endpos; // end of name
 
     if( init ) {
       end = init->get_range_on_source().second;

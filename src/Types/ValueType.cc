@@ -3,6 +3,12 @@
 #include "Utils.h"
 
 namespace Metro {
+  bool ValueType::is_no_extents() const {
+    return
+      !is_mutable &&
+      !is_reference;
+  }
+
   bool ValueType::equals(ValueType::Kind kind) const {
     return this->kind == kind;
   }

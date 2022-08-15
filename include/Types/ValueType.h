@@ -42,15 +42,7 @@ namespace Metro {
     {
     }
 
-    bool is_no_extents() const {
-      return
-        !is_mutable &&
-        !is_reference;
-    }
-
-    bool equals_kind(Kind kind) const {
-      return !is_no_extents() && this->kind == kind;
-    }
+    bool is_no_extents() const;
 
     bool equals(Kind kind) const;
     bool equals(ValueType const& type) const;
