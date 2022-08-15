@@ -18,6 +18,7 @@ namespace Metro {
     ExpectedToken,
     ExpectedSemicolon,
     NotAllowed,
+    NotMutable,
     Undefined,
     MultipleDefinition,
     IndefiniteType,

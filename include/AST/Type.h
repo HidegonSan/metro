@@ -11,7 +11,7 @@ namespace Metro::AST {
     std::string_view    name;
     std::vector<Type*>  elems;
     size_t arr_depth;
-    bool  is_constant;
+    bool  is_mutable;
     bool  is_reference;
     bool  have_elements;
 
@@ -23,7 +23,7 @@ namespace Metro::AST {
     Type(Token* tok)
       : Base(Kind::Type, tok),
         arr_depth(0),
-        is_constant(false),
+        is_mutable(false),
         is_reference(false),
         have_elements(false),
         userdef(nullptr)

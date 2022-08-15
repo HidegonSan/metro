@@ -47,11 +47,11 @@ namespace Metro {
       ret += "[]";
     }
 
-    if( attr & ATTR_CONST ) {
-      ret += " const";
+    if( is_mutable ) {
+      ret += " mut";
     }
 
-    if( attr & ATTR_REFERENCE ) {
+    if( is_reference ) {
       ret += "&";
     }
 

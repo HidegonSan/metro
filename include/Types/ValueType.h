@@ -53,7 +53,7 @@ namespace Metro {
     }
 
     bool equals(Kind kind) const;
-    bool equals(ValueType const& type, bool ) const;
+    bool equals(ValueType const& type) const;
 
     std::string to_string() const;
 

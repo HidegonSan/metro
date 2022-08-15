@@ -117,8 +117,8 @@ namespace Metro::AST {
       ret += " elems{" + Utils::join(", ", elems, [] (auto x) { return x->to_string(); }) + "}";
     }
 
-    if( is_constant ) {
-      ret += " const";
+    if( is_mutable ) {
+      ret += " mut";
     }
 
     if( is_reference ) {

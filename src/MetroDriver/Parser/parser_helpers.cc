@@ -95,7 +95,7 @@ namespace Metro {
       ast->arr_depth++;
     }
 
-    ast->is_constant = eat("const");
+    ast->is_mutable = eat("mut");
     ast->is_reference = eat("&");
 
     return ast;

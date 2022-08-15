@@ -122,6 +122,11 @@ namespace Metro::Semantics {
           arrow_unini = var;
           auto&& vartype = walk(expr->lhs);
 
+          if( !vartype.is_mutable ) {
+            Error::add_error(ErrorKind::NotMutable, expr->token, "left side is not mutable");
+            Error::exit_app();
+          }
+
           if( std::find(root->elems.begin(), root->elems.end(), var->defined) != root->elems.end() ) {
             if( !find_var_context(var->defined)->was_type_analyzed ) {
               Error::add_error(ErrorKind::UninitializedValue, var->token, "uninitialized value");

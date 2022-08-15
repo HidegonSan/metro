@@ -85,7 +85,7 @@ namespace Metro::AST {
       endtok = endtok->next;
     }
 
-    if( is_constant ) {
+    if( is_mutable ) {
       endtok = endtok->next;
     }
 
