@@ -12,6 +12,10 @@ namespace Metro {
 
     alertios(obj->type.to_string());
 
+    if( type->arr_depth != 0 ) {
+      return obj;
+    }
+
     if( !type->elems.empty() ) {
       for( auto&& elem : type->elems ) {
         obj->list.emplace_back(construct_from_type(elem));

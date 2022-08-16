@@ -26,9 +26,11 @@ namespace Metro {
   }
 
   std::string Object::to_string() const {
-    alert;
-
     static bool str_q = false;
+
+    if( type.arr_depth != 0 ) {
+      return "[" + Utils::join(", ", list, [] (auto& p) { return p->to_string(); }) + "]";
+    }
 
     auto ret = std::string{ };
 

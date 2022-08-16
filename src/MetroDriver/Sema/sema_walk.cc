@@ -40,6 +40,8 @@ namespace Metro::Semantics {
 
       _found_type:
         alert;
+
+        ret.arr_depth = type->arr_depth;
         ret.have_elements = type->have_elements;
 
         for( auto&& sub : type->elems ) {

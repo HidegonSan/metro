@@ -34,7 +34,6 @@ namespace Metro::Semantics {
     }
 
     auto arg = arg_types.begin();
-    //size_t max = is_builtin ? ast->callee_builtin->arg_types.size() : ast->callee->args.size();
     size_t max = is_builtin ? bfun->arg_types.size() : find->args.size();
 
     for( size_t i = 0;; i++, arg++ ) {
