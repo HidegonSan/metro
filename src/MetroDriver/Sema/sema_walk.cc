@@ -44,6 +44,9 @@ namespace Metro::Semantics {
         ret.arr_depth = type->arr_depth;
         ret.have_elements = type->have_elements;
 
+        ret.is_mutable = type->is_mutable;
+        ret.is_reference = type->is_reference;
+
         for( auto&& sub : type->elems ) {
           ret.elems.emplace_back(walk(sub));
         }
@@ -160,6 +163,8 @@ namespace Metro::Semantics {
         break;
       }
 
+      //
+      // variable definition
       case ASTKind::VarDefine: {
         auto let = (AST::VarDefine*)ast;
         auto& scope = get_cur_scope();
@@ -176,6 +181,18 @@ namespace Metro::Semantics {
         if( let->type != nullptr ) {
           context.was_type_analyzed = true;
           context.type = walk(let->type);
+
+          // 参照型の場合は初期化式が必要
+          if( context.type.is_reference ) {
+            // 初期化式がない
+            if( !let->init ) {
+              Error::add_error(ErrorKind::TypeMismatch, let->token, "cannot define reference-type variable without initializer expression");
+            }
+            // あるなら、左辺値じゃなければエラー
+            else {
+              Error::add_error(ErrorKind::TypeMismatch, let->init, "expected lvalue expression");
+            }
+          }
         }
         else if( let->init != nullptr ) {
           context.was_type_analyzed = true;
@@ -194,9 +211,8 @@ namespace Metro::Semantics {
       case ASTKind::Scope: {
         auto scope = (AST::Scope*)ast;
 
-        if( scope->elems.empty() ) {
+        if( scope->elems.empty() )
           break;
-        }
 
         auto& context = scopelist.emplace_front();
 
@@ -226,9 +242,8 @@ namespace Metro::Semantics {
         cur_func_ast = func;
 
         // arguments
-        for( auto&& arg : func->args ) {
+        for( auto&& arg : func->args )
           walk(&arg);
-        }
 
         // return-type
         analyze_func_return_type(ret, func);

@@ -25,6 +25,8 @@ namespace Metro {
   )
   }
 
+  //
+  // object to string
   std::string Object::to_string() const {
     static bool str_q = false;
 
@@ -32,59 +34,51 @@ namespace Metro {
       return "[" + Utils::join(", ", list, [] (auto& p) { return p->to_string(); }) + "]";
     }
 
-    auto ret = std::string{ };
-
     switch( type.kind ) {
       case ValueType::Kind::Int:
-        ret = std::to_string(v_int);
-        break;
+        return std::to_string(v_int);
 
       case ValueType::Kind::Float:
-        ret = std::to_string(v_float);
-        break;
+        return std::to_string(v_float);
 
       case ValueType::Kind::Bool:
-        ret = v_bool ? "true" : "false";
-        break;
+        return v_bool ? "true" : "false";
 
       case ValueType::Kind::Char:
-        ret = Utils::Strings::to_string(std::u16string(v_char, 1));
-        break;
+        return Utils::Strings::to_string(std::u16string(v_char, 1));
 
-      case ValueType::Kind::String:
-        ret = Utils::Strings::to_string(v_str);
+      case ValueType::Kind::String: {
+        if( str_q )
+          return '"' + Utils::Strings::to_string(v_str) + '"';
 
-        if( ret.empty() && str_q )
-          ret = "\"\"";
-
-        break;
+        return Utils::Strings::to_string(v_str);
+      }
 
       case ValueType::Kind::Tuple: {
         auto bak = str_q;
 
         str_q = true;
-        ret = "(" + Utils::join(", ", list, [] (auto& p) { return p->to_string(); }) + ")";
+        auto ret = "(" + Utils::join(", ", list, [] (auto& p) { return p->to_string(); }) + ")";
 
         str_q = bak;
-        break;
+        return ret;
       }
 
       case ValueType::Kind::None:
-        alert;
-        ret = "none";
-        break;
+        return "none";
 
       case ValueType::Kind::UserDef: {
-        TODO_IMPL
+        
+        break;
       }
 
-      default:
-        TODO_IMPL
     }
 
-    return ret;
+    TODO_IMPL
   }
 
+  //
+  // clone
   Object* Object::clone() const {
     return new Object(*this);
   }
