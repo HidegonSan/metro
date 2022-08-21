@@ -3,7 +3,7 @@
 #include <string>
 #include <vector>
 
-namespace Metro {
+namespace metro {
   struct Token;
   namespace AST {
     struct Base;

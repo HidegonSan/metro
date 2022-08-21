@@ -3,7 +3,7 @@
 #include "Utils.h"
 #include "Application.h"
 
-namespace Metro {
+namespace metro {
   static constexpr auto VERSION_STRING =
 R"(Metro 0.0.1
 )";

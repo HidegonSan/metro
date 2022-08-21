@@ -2,7 +2,7 @@
 #include "MetroDriver/Parser.h"
 #include "Error.h"
 
-namespace Metro {
+namespace metro {
   AST::Base* Parser::stmt() {
     if( eat("if") ) {
       auto ast = new AST::If(ate);

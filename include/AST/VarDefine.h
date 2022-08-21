@@ -5,7 +5,7 @@
 // -----------------------
 #pragma once
 
-namespace Metro::AST {
+namespace metro::AST {
   struct Type;
   struct VarDefine : Base {
     std::string_view  name;

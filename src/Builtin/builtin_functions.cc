@@ -17,7 +17,7 @@
 #define make_bifun_code(_name,_ret_t,_args,_code...) \
   make_bifun(_name,_ret_t,_args,make_bifun_lambda(_code))
 
-namespace Metro {
+namespace metro {
   namespace {
     //
     // print

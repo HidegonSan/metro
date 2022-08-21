@@ -11,7 +11,7 @@
 #include <map>
 #include "AST.h"
 
-namespace Metro::Semantics {
+namespace metro::Semantics {
   class Sema {
     using ASTKind = AST::Kind;
 
@@ -31,6 +31,30 @@ namespace Metro::Semantics {
       std::map<std::string_view, VariableContext> var_context;
     };
 
+    /* enum class ExprType {
+      LeftValue,
+      RightValue,
+      Reference,
+    }; */
+
+    struct ExprType {
+      bool    left;
+      bool    right;
+      bool    reference;
+
+      #pragma message "delete this"
+      auto ___() { sizeof(ExprType); }
+
+      ExprType()
+        : left(0),
+          right(0),
+          reference(0)
+      {
+      }
+
+
+    };
+
   public:
     explicit Sema(AST::Scope* root);
 
@@ -42,6 +66,9 @@ namespace Metro::Semantics {
     // sema-parts
     ValueType sema_callfunc(AST::CallFunc* ast);
     ValueType sema_controls(AST::Base* ast);
+
+
+    ExprType get_expr_type(AST::Base* ast);
 
 
     //

@@ -2,7 +2,7 @@
 #include "MetroDriver/Parser.h"
 #include "Error.h"
 
-namespace Metro {
+namespace metro {
   AST::Base* Parser::factor() {
 
     auto stmt_ast = stmt();

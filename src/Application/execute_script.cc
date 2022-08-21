@@ -11,7 +11,7 @@
 #include "Error.h"
 #include "Debug.h"
 
-namespace Metro {
+namespace metro {
   AppContext::Script Application::open_script_file(char const* path) {
     std::ifstream ifs{ path };
     AppContext::Script script;

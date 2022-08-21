@@ -4,7 +4,7 @@
 #include "ValueType.h"
 #include "Debug.h"
 
-namespace Metro {
+namespace metro {
   struct Object {
     ValueType   type;
     size_t      ref_count;

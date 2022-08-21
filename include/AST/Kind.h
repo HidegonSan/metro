@@ -1,6 +1,6 @@
 #pragma once
 
-namespace Metro::AST {
+namespace metro::AST {
   enum class Kind {
     None,
     Type,

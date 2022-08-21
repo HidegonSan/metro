@@ -4,7 +4,7 @@
 
 #pragma once
 
-namespace Metro {
+namespace metro {
   class Evaluator {
   public:
     Evaluator() { }

@@ -1,5 +1,6 @@
 .vscode/
 .old/
+bak/
 /build
 doc/
 __pycache__/

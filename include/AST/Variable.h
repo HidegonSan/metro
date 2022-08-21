@@ -3,7 +3,7 @@
 // -----------------------
 #pragma once
 
-namespace Metro::AST {
+namespace metro::AST {
   struct Variable : Base {
     std::string_view  name;
     Base*             defined; // <deprecated>

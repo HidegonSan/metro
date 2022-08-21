@@ -5,7 +5,7 @@
 #include "Types/BuiltinFunc.h"
 #include "AppContext.h"
 
-namespace Metro {
+namespace metro {
   class Application {
   public:
     Application();

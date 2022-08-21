@@ -3,7 +3,7 @@
 #include "Utils.h"
 #include "Application.h"
 
-namespace Metro {
+namespace metro {
   template <size_t Len>
   static inline bool startswith(char const* s, char const (&cmp) [Len]) {
     for( size_t i = 0; auto&& c : cmp ) {

@@ -4,7 +4,7 @@
 #include <vector>
 #include <utility>
 
-namespace Metro::AST {
+namespace metro::AST {
   using namespace std::string_literals;
   using SourceRange = std::pair<size_t, size_t>;
 }

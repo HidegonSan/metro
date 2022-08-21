@@ -2,7 +2,7 @@
 
 #include "Types/Object.h"
 
-namespace Metro {
+namespace metro {
   class GC {
   public:
     static void execute();

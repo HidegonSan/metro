@@ -2,7 +2,7 @@
 #include "MetroDriver/Evaluator.h"
 #include "GC.h"
 
-namespace Metro {
+namespace metro {
   Object** Evaluator::eval_lvalue(AST::Base* ast) {
     using ASTKind = AST::Kind;
 
@@ -101,7 +101,7 @@ namespace Metro {
         for( size_t i = 0; i < x->args.size(); i++ ) {
           callee->args[i].value = args_bak[i];
         }
-        
+
         break;
       }
 

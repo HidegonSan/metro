@@ -41,7 +41,7 @@
   {fprintf(stderr,COL_RED "\n\n# Not implemented error at " \
   COL_YELLOW "%s:%d\n" COL_DEFAULT,__FILE__,__LINE__);exit(1);}
 
-namespace Metro {
+namespace metro {
   namespace Debug {
   }
 }

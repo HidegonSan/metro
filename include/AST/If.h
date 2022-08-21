@@ -5,7 +5,7 @@
 // -----------------------
 #pragma once
 
-namespace Metro::AST {
+namespace metro::AST {
   struct If : Base {
     Base*   cond;
     Base*   if_true;

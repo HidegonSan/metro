@@ -6,7 +6,7 @@
 
 #include "AST.h"
 
-namespace Metro {
+namespace metro {
   struct Object;
   class Parser {
   public:

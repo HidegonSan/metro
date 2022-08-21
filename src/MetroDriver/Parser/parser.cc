@@ -2,7 +2,7 @@
 #include "MetroDriver/Parser.h"
 #include "Error.h"
 
-namespace Metro {
+namespace metro {
   Parser::Parser(Token* token)
     : cur(token),
       ate(nullptr)

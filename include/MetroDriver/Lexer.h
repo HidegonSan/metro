@@ -6,11 +6,11 @@
 
 #include <string>
 
-namespace Metro {
+namespace metro {
   struct Token;
   class Lexer {
   public:
-    explicit Lexer(std::string const& source);
+    explicit Lexer(Source const& src);
 
     Token* lex();
 

@@ -5,7 +5,7 @@
 #include "GC.h"
 #include "Utils.h"
 
-namespace Metro {
+namespace metro {
   namespace {
     bool is_running;
     std::thread* thread;

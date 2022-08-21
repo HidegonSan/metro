@@ -5,7 +5,7 @@
 // -----------------------
 #pragma once
 
-namespace Metro::AST {
+namespace metro::AST {
   struct Array : Base {
     std::vector<AST::Base*> elements;
 

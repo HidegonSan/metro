@@ -1,7 +1,7 @@
 #include "AST.h"
 #include "Utils.h"
 
-namespace Metro::AST {
+namespace metro::AST {
   std::string Argument::to_string() const {
     return Utils::linkstr("<Argument '", name, "' : ", type->to_string(), ">");
   }

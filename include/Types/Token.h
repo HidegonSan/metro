@@ -3,7 +3,7 @@
 #include <string>
 #include <vector>
 
-namespace Metro {
+namespace metro {
   enum class TokenKind {
     Int,
     Float,
@@ -54,7 +54,7 @@ namespace Metro {
     AngleBracketOpen,     // <
     AngleBracketClone,    // >
 
-    
+
   };
 
   struct Token {

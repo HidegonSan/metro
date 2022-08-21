@@ -4,7 +4,7 @@
 #include "Debug.h"
 #include "Utils.h"
 
-namespace Metro::Semantics {
+namespace metro::Semantics {
   void Sema::analyze_func_return_type(ValueType& out, AST::Function* func) {
     std::vector<AST::Base*> lastexpr_list;
 
@@ -19,7 +19,7 @@ namespace Metro::Semantics {
     }
 
     // == 指定されていない場合、推論する == //
-  
+
     auto it = lastexpr_list.begin();
 
     for( ; it != lastexpr_list.end(); it++ ) {
@@ -27,7 +27,7 @@ namespace Metro::Semantics {
       if( contains_callfunc_in_expr(func->name, *it) ) {
         continue;
       }
-    
+
       auto&& tmp = walk(*it);
 
       alertios("last-expr of " << func->name << ": '" << tmp.to_string() << "' from " << (*it)->to_string());

@@ -3,7 +3,7 @@
 #include "Utils.h"
 #include "Debug.h"
 
-namespace Metro {
+namespace metro {
   Object* Object::none = new Object(ValueType::Kind::None);
 
   Object::Object(ValueType type)
@@ -68,7 +68,7 @@ namespace Metro {
         return "none";
 
       case ValueType::Kind::UserDef: {
-        
+
         break;
       }
 

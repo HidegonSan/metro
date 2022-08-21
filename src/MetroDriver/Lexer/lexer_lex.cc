@@ -4,7 +4,7 @@
 #include "Error.h"
 #include "Utils.h"
 
-namespace Metro {
+namespace metro {
   Token* Lexer::lex() {
     Token top;
     Token* cur = &top;
@@ -49,7 +49,7 @@ namespace Metro {
         for( position++; (ch = peek()) != begin; position++ );
         position++;
       }
-      
+
       else {
         cur->kind = TokenKind::Punctuator;
 

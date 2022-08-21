@@ -3,7 +3,7 @@
 #include "Utils.h"
 #include "Application.h"
 
-namespace Metro {
+namespace metro {
   static constexpr auto HELP_STRING =
 R"(usage: metro [options] <scripts>
 

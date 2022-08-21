@@ -10,7 +10,7 @@
 // -----------------------
 #pragma once
 
-namespace Metro::AST {
+namespace metro::AST {
   struct Compare : Base {
     struct Item {
       enum class Kind {

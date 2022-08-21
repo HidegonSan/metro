@@ -2,7 +2,7 @@
 #include "MetroDriver/Parser.h"
 #include "Error.h"
 
-namespace Metro {
+namespace metro {
   bool Parser::check() {
     return cur && cur->kind != TokenKind::End;
   }

@@ -4,7 +4,7 @@
 #include "Debug.h"
 #include "Utils.h"
 
-namespace Metro::Semantics {
+namespace metro::Semantics {
   ValueType Sema::sema_callfunc(AST::CallFunc* ast) {
     std::vector<ValueType> arg_types;
 

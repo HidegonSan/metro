@@ -1,7 +1,7 @@
 #include <vector>
 #include "Types/Token.h"
 
-namespace Metro {
+namespace metro {
   std::vector<std::pair<char const*, PunctuatorKind>> const Token::punctuator_strtable {
     { "->", PunctuatorKind::SpecifyReturnType },
     { "[]", PunctuatorKind::ArrayType },

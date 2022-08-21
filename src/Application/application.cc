@@ -5,7 +5,7 @@
 
 #include "Types.h"
 
-namespace Metro {
+namespace metro {
   static Application* _inst;
 
   std::list<AppContext::Script*> Application::running_script;

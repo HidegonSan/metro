@@ -4,7 +4,7 @@
 #include "Utils.h"
 #include "Error.h"
 
-namespace Metro::Semantics {
+namespace metro::Semantics {
   void Sema::expect_all_same_with(std::vector<AST::Base*> const& vec, ValueType const& type) {
     for( auto&& ast : vec ) {
       auto&& tmp = walk(ast);

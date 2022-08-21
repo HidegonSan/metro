@@ -3,7 +3,7 @@
 #include "MetroDriver/Lexer.h"
 #include "Utils.h"
 
-namespace Metro {
+namespace metro {
   bool Lexer::check() {
     return position < length;
   }

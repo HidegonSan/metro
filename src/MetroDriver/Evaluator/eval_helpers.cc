@@ -3,7 +3,7 @@
 #include "MetroDriver/Sema.h"
 #include "GC.h"
 
-namespace Metro {
+namespace metro {
   Object* Evaluator::construct_from_type(AST::Type* type) {
     auto obj = new Object;
 

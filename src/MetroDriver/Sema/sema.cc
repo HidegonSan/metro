@@ -5,7 +5,7 @@
 #include "Debug.h"
 #include "Utils.h"
 
-namespace Metro::Semantics {
+namespace metro::Semantics {
   static Sema* __inst;
 
   Sema::Sema(AST::Scope* root) {

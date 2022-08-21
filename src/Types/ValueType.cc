@@ -2,7 +2,7 @@
 #include "Debug.h"
 #include "Utils.h"
 
-namespace Metro {
+namespace metro {
   bool ValueType::is_no_extents() const {
     return
       !is_mutable &&
@@ -16,7 +16,7 @@ namespace Metro {
   bool ValueType::equals(ValueType const& type) const {
     if( kind != type.kind )
       return false;
-    
+
     return true;
   }
 

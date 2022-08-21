@@ -1,7 +1,7 @@
 #include "Types.h"
 #include "AST.h"
 
-namespace Metro::AST {
+namespace metro::AST {
   SourceRange Base::get_range_on_source() const {
     return { token->pos, token->pos + token->str.length() };
   }

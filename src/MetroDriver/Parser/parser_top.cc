@@ -2,7 +2,7 @@
 #include "MetroDriver/Parser.h"
 #include "Error.h"
 
-namespace Metro {
+namespace metro {
   AST::Base* Parser::toplevel() {
     if( eat("fn") ) {
       auto ast = new AST::Function(cur);

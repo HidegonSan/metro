@@ -5,7 +5,7 @@
 // -----------------------
 #pragma once
 
-namespace Metro::AST {
+namespace metro::AST {
   struct Function : Base {
     std::string_view        name;
     std::vector<Argument>   args;

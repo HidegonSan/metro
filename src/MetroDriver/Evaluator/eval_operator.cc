@@ -2,7 +2,7 @@
 #include "MetroDriver/Evaluator.h"
 #include "GC.h"
 
-namespace Metro {
+namespace metro {
   using ASTKind = AST::Kind;
   using ValueKind = ValueType::Kind;
 

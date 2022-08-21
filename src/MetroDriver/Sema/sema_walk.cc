@@ -5,7 +5,7 @@
 #include "Debug.h"
 #include "Utils.h"
 
-namespace Metro::Semantics {
+namespace metro::Semantics {
   ValueType Sema::walk(AST::Base* ast) {
     if( !ast ) {
       return { };
@@ -189,7 +189,7 @@ namespace Metro::Semantics {
               Error::add_error(ErrorKind::TypeMismatch, let->token, "cannot define reference-type variable without initializer expression");
             }
             // あるなら、左辺値じゃなければエラー
-            else {
+            else if( !get_expr_type(let->init).left ) {
               Error::add_error(ErrorKind::TypeMismatch, let->init, "expected lvalue expression");
             }
           }
@@ -218,6 +218,21 @@ namespace Metro::Semantics {
 
         context.scope = scope;
 
+        std::vector<AST::Base*> lastexpr_list;
+
+        // get last expressions
+        get_lastval_full(lastexpr_list, scope);
+
+        for( auto begin = *lastexpr_list.begin(); auto&& last : lastexpr_list ) {
+          // first
+          if( last == begin ) {
+            ret = walk(last);
+          }
+          else if( auto&& tmp = walk(last); !tmp.equals(ret) ) {
+            Error::add_error(
+          }
+        }
+
         auto iter = scope->elems.begin();
         auto last = scope->elems.end() - 1;
 
@@ -228,8 +243,10 @@ namespace Metro::Semantics {
           context.cur_index++;
         }
 
-        context.cur_ast=*last;
+        context.cur_ast = *last;
         ret = walk(*last);
+
+
 
         scopelist.pop_front();
 

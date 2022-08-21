@@ -1,7 +1,7 @@
 #include "Types.h"
 #include "AST.h"
 
-namespace Metro::AST {
+namespace metro::AST {
   Compare::Item& Compare::append(Item::Kind kind, Token* tok, Base* ast) {
     return list.emplace_back(kind, tok, ast);
   }

@@ -5,7 +5,7 @@
 
 #define BIT(N)  (1 << N)
 
-namespace Metro {
+namespace metro {
   namespace AST {
     struct Struct;
   }
