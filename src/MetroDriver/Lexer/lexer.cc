@@ -6,10 +6,11 @@
 
 namespace metro {
   Lexer::Lexer(Source const& src)
-    : source(source),
-      position(0),
-      length(source.length()),
-      linenum(0)
+    : position(0),
+      linenum(0),
+      source(src.data),
+      length(src.data.length()),
+      src(src)
   {
   }
 }
