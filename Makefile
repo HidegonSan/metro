@@ -26,9 +26,10 @@ SOURCES	= src \
 
 OPTFLAGS		= -O3
 WARNFLAGS		= -Wall -Wextra -Wno-switch
-COMMONFLAGS	= $(INCLUDES) $(OPTFLAGS) $(WARNFLAGS)
-CFLAGS			= $(COMMONFLAGS) -std=c17
-CXXFLAGS		= $(COMMONFLAGS) -std=c++20
+DBGFLAGS		=
+COMMONFLAGS	= $(DBGFLAGS) $(INCLUDES) $(OPTFLAGS) $(WARNFLAGS)
+CFLAGS			= $(COMMONFLAGS)
+CXXFLAGS		= $(CFLAGS) -std=c++20
 LDFLAGS			= -Wl,--gc-sections
 
 %.o: %.c
@@ -56,7 +57,7 @@ all: $(BUILD)
 	@$(MAKE) --no-print-directory -C $(BUILD) -f $(CURDIR)/Makefile
 
 debug: $(BUILD)
-	@$(MAKE) --no-print-directory OPTFLAGS="-g -O0" WARNFLAGS="-Wall -Wextra" LDFLAGS="" -C $(BUILD) -f $(CURDIR)/Makefile
+	@$(MAKE) --no-print-directory OPTFLAGS="-g -O0" DBGFLAGS="-DMETRO_DEBUG" WARNFLAGS="-Wall -Wextra" LDFLAGS="" -C $(BUILD) -f $(CURDIR)/Makefile
 
 $(BUILD):
 	@[ -d $@ ] || mkdir -p $@

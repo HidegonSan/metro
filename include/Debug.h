@@ -4,8 +4,6 @@
 #include <iostream>
 #include "colors.h"
 
-#define METRO_DEBUG  1
-
 // color in message area in alert macro
 #define  COL_ALERTMSG  COL_WHITE
 

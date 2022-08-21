@@ -5,14 +5,14 @@
 //  最後に emit() とすること
 
 Error(...)
-  .add_help(ast1, "hello")
-  .add_help(ast2, "good morning")
+  .add_help(token, "try remove this")
   .emit()
  ------------------------------- */
 #pragma once
 
 #include <vector>
 #include "AppContext.h"
+#include "source.h"
 
 namespace metro {
 
@@ -31,25 +31,34 @@ enum class ErrorKind {
   ExpectedSemicolon,
   NotAllowed,
   NotMutable,
+
   Undefined,
+  UndefinedVariable,
+  UndefinedFunction,
+  UndefinedTypeName,
+
   MultipleDefinition,
   IndefiniteType,
-  UnknownTypeName,
+  UnknownTypeName, // deprecated
   CannotInfer,
   MayNotBeEvaluated,
   ValueType,
   TypeMismatch,
+
   TooFewArguments,
   TooManyArguments,
   InvalidArguments,
+
+  EmptyStruct,
+
   StackOverflow,
-  EmptyStruct
 };
 
 class Error {
   struct Help {
     AST::Base* ast;
     std::string&& msg;
+    Source::LineLoc* lineloc;
 
     explicit Help(AST::Base* ast, std::string&& msg)
       : ast(ast),
@@ -74,8 +83,9 @@ public:
   void emit(bool exit = false);
 
   //
-  // この関数が呼ばれる前までにおいて
-  // エラーが出力されたかどうかを確認し、されていたらアプリを終了する
+  // check
+  //   この関数が呼ばれる前までに
+  //   エラーが出力されたかどうかを確認し、されていたらアプリを終了する
   static void check();
 
 private:

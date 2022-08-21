@@ -24,6 +24,8 @@ namespace metro {
       if( (bfun = find_builtin_func(ast->name)) == nullptr ) {
         Error::add_error(ErrorKind::Undefined, ast->token, "undefined function name");
         Error::exit_app();
+
+        Error(ErrorKind::Undefined
       }
       else {
         ast->callee_builtin = bfun;

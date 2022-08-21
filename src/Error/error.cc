@@ -12,6 +12,7 @@ namespace metro {
 //
 // タプルの要素 :
 //   tuple< 行番号, 開始位置, 終了位置 >
+/*
 static std::tuple<std::size_t, std::size_t, std::size_t> get_line_from_pos(AppContext::Script const* script, size_t pos) {
   size_t line_num = 1;
   size_t begin = 0;
@@ -37,20 +38,7 @@ static std::tuple<std::size_t, std::size_t, std::size_t> get_line_from_pos(AppCo
   }
 
   return { line_num, begin, end };
-}
-
-//
-// エラー出力
-void Error::emit_error(Error& err) {
-  constexpr auto field = 6;
-
-  auto [line_num, begin, end] = get_line_from_pos(err.script,
-
-  std::cout
-    << "error: " << err.message << std::endl
-    << "  => " << err.script->path << std::endl
-    << std::setw(field) << " | " <<
-}
+}*/
 
 Error::Error(ErrorKind kind, Token* token, std::string&& msg)
   : kind(kind),
@@ -72,38 +60,5 @@ Error& Error::add_help(AST::Base* ast, std::string&& msg) {
   return *this;
 }
 
-void Error::emit(bool exit) {
+} // namespace metro
 
-}
-
-
-/*
-void ErrorContext::show() {
-  alert;
-
-  auto spacec = err_begin - view_begin;
-
-  std::cerr
-    << Utils::format("%6zu | ", linenum) << script->data.substr(view_begin, view_end - view_begin) << std::endl
-    << "       | " << std::string(spacec, ' ') << std::string(err_underline_len, '^') << ' ' << message << std::endl;
-}
-
-void Error::show_all() {
-  for( auto&& ctx : contexts ) {
-    ctx.show();
-  }
-}
-
-void Error::check() {
-  if( !contexts.empty() ) {
-    exit_app();
-  }
-}
-
-void Error::exit_app() {
-  show_all();
-  exit(1);
-}*/
-
-
-}
