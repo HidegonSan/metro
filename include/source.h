@@ -21,7 +21,8 @@ struct Source {
 
   std::vector<LineLoc> lineloc_list;
 
-  explicit Source(std::string_view _path, std::string&& _data);
+  Source() { }
+  Source(std::string_view _path, std::string&& _data);
 };
 
 } // namespace metro

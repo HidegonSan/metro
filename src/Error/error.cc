@@ -40,11 +40,14 @@ static std::tuple<std::size_t, std::size_t, std::size_t> get_line_from_pos(AppCo
   return { line_num, begin, end };
 }*/
 
+extern size_t _emitted_err_count;
+
 Error::Error(ErrorKind kind, Token* token, std::string&& msg)
   : kind(kind),
     message(std::forward<std::string>(msg)),
     token(token),
-    ast(nullptr)
+    ast(nullptr),
+    pos(0)
 {
   this->script = Application::get_running_script();
 }
@@ -55,9 +58,22 @@ Error::Error(ErrorKind kind, AST::Base* ast, std::string&& msg)
   this->ast = ast;
 }
 
+Error::Error(ErrorKind kind, size_t pos, std::string&& msg)
+  : Error(kind, (Token*)nullptr, std::forward<std::string>(msg))
+{
+  this->ast = ast;
+  this->pos = pos;
+}
+
 Error& Error::add_help(AST::Base* ast, std::string&& msg) {
   this->helps.emplace_back(ast, std::forward<std::string>(msg));
   return *this;
+}
+
+void Error::check() {
+  if( _emitted_err_count >= 1 ) {
+    std::exit(1);
+  }
 }
 
 } // namespace metro

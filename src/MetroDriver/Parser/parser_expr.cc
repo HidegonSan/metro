@@ -1,146 +1,151 @@
 #include "Types.h"
-#include "MetroDriver/Parser.h"
+#include "MetroDriver/parser.h"
 #include "Error.h"
 
 namespace metro {
-  AST::Base* Parser::factor() {
 
-    auto stmt_ast = stmt();
+AST::Base* Parser::factor() {
 
-    if( stmt_ast != nullptr ) {
-      return stmt_ast;
+  auto stmt_ast = stmt();
+
+  if( stmt_ast != nullptr ) {
+    return stmt_ast;
+  }
+
+  if( cur->str == "{" ) {
+    return expect_scope();
+  }
+
+  if( eat("[") ) {
+    auto ast = new AST::Array(ate);
+
+    if( !eat("]") ) {
+      do {
+        ast->elements.emplace_back(expr());
+      } while( eat(",") );
+      expect("]");
     }
 
-    if( cur->str == "{" ) {
-      return expect_scope();
-    }
+    return ast;
+  }
 
-    if( eat("[") ) {
-      auto ast = new AST::Array(ate);
+  if( eat("true") ) {
+    return new AST::Boolean(ate, true);
+  }
 
-      if( !eat("]") ) {
-        do {
-          ast->elements.emplace_back(expr());
-        } while( eat(",") );
-        expect("]");
-      }
+  if( eat("false") ) {
+    return new AST::Boolean(ate, false);
+  }
 
-      return ast;
-    }
+  if( eat("none") ) {
+    return new AST::None(ate);
+  }
 
-    if( eat("true") ) {
-      return new AST::Boolean(ate, true);
-    }
+  switch( cur->kind ) {
+    case TokenKind::Int:
+    case TokenKind::Float:
+    case TokenKind::Char:
+    case TokenKind::String:
+      next();
+      return new AST::Value(cur->prev);
 
-    if( eat("false") ) {
-      return new AST::Boolean(ate, false);
-    }
+    case TokenKind::Ident: {
+      if( cur->next->str == "(" ) {
+        auto ast = new AST::CallFunc(cur);
 
-    if( eat("none") ) {
-      return new AST::None(ate);
-    }
-
-    switch( cur->kind ) {
-      case TokenKind::Int:
-      case TokenKind::Float:
-      case TokenKind::Char:
-      case TokenKind::String:
+        ast->name = cur->str;
         next();
-        return new AST::Value(cur->prev);
 
-      case TokenKind::Ident: {
-        if( cur->next->str == "(" ) {
-          auto ast = new AST::CallFunc(cur);
+        next();
 
-          ast->name = cur->str;
-          next();
+        if( !eat(")") ) {
+          do {
+            ast->args.emplace_back(expr());
+          } while( eat(",") );
 
-          next();
-
-          if( !eat(")") ) {
-            do {
-              ast->args.emplace_back(expr());
-            } while( eat(",") );
-
-            expect(")");
-          }
-
-          return ast;
+          expect(")");
         }
 
-        auto ast = new AST::Variable(cur);
-        ast->name = cur->str;
-
-        next();
         return ast;
       }
+
+      auto ast = new AST::Variable(cur);
+      ast->name = cur->str;
+
+      next();
+      return ast;
     }
-
-    Error::add_error(ErrorKind::InvalidSyntax, cur, "invalid syntax");
-    Error::exit_app();
   }
 
-  AST::Base* Parser::member() {
-    auto x = factor();
+  // Error::add_error(ErrorKind::InvalidSyntax, cur, "invalid syntax");
+  // Error::exit_app();
 
-    while( check() && eat(".") ) {
-      x = new AST::Expr(AST::Kind::MemberAccess, x, factor(), ate);
-    }
+  Error(ErrorKind::InvalidSyntax, cur, "invalid syntax")
+    .emit(true);
+}
 
-    return x;
+AST::Base* Parser::member() {
+  auto x = factor();
+
+  while( check() && eat(".") ) {
+    x = new AST::Expr(AST::Kind::MemberAccess, x, factor(), ate);
   }
 
-  AST::Base* Parser::mul() {
-    auto x = member();
+  return x;
+}
 
-    while( check() ) {
-      if( eat("*") ) x = new AST::Expr(AST::Kind::Mul, x, member(), ate);
-      else if( eat("/") ) x = new AST::Expr(AST::Kind::Div, x, member(), ate);
-      else break;
-    }
+AST::Base* Parser::mul() {
+  auto x = member();
 
-    return x;
+  while( check() ) {
+    if( eat("*") ) x = new AST::Expr(AST::Kind::Mul, x, member(), ate);
+    else if( eat("/") ) x = new AST::Expr(AST::Kind::Div, x, member(), ate);
+    else break;
   }
 
-  AST::Base* Parser::add() {
-    auto x = mul();
+  return x;
+}
 
-    while( check() ) {
-      auto tok = cur;
+AST::Base* Parser::add() {
+  auto x = mul();
 
-      if( eat("+") ) x = new AST::Expr(AST::Kind::Add, x, mul(), tok);
-      else if( eat("-") ) x = new AST::Expr(AST::Kind::Sub, x, mul(), tok);
-      else break;
-    }
+  while( check() ) {
+    auto tok = cur;
 
-    return x;
+    if( eat("+") ) x = new AST::Expr(AST::Kind::Add, x, mul(), tok);
+    else if( eat("-") ) x = new AST::Expr(AST::Kind::Sub, x, mul(), tok);
+    else break;
   }
 
-  AST::Base* Parser::compare() {
-    using ItemKind = AST::Compare::Item::Kind;
+  return x;
+}
 
-    auto x = add();
+AST::Base* Parser::compare() {
+  using ItemKind = AST::Compare::Item::Kind;
 
-    while( check() ) {
-      if( eat(">") ) AST::Compare::create(x)->append(ItemKind::BiggerLeft, ate, add());
-      else if( eat("<") ) AST::Compare::create(x)->append(ItemKind::BiggerRight, ate, add());
-      else break;
-    }
+  auto x = add();
 
-    return x;
+  while( check() ) {
+    if( eat(">") ) AST::Compare::create(x)->append(ItemKind::BiggerLeft, ate, add());
+    else if( eat("<") ) AST::Compare::create(x)->append(ItemKind::BiggerRight, ate, add());
+    else break;
   }
 
-  AST::Base* Parser::assign() {
-    auto x = compare();
+  return x;
+}
 
-    if( eat("=") ) {
-      x = new AST::Expr(AST::Kind::Assign, x, assign(), ate);
-    }
+AST::Base* Parser::assign() {
+  auto x = compare();
 
-    return x;
+  if( eat("=") ) {
+    x = new AST::Expr(AST::Kind::Assign, x, assign(), ate);
   }
 
-  AST::Base* Parser::expr() {
-    return assign();
-  }
+  return x;
+}
+
+AST::Base* Parser::expr() {
+  return assign();
+}
+
 }

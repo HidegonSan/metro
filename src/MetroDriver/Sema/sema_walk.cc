@@ -37,7 +37,7 @@ ValueType Sema::walk(AST::Base* ast) {
 
       // TODO: find struct
 
-      Error::add_error(ErrorKind::Undefined, ast->token, "undefined type name");
+      Error(ErrorKind::Undefined, ast->token, "undefined type name").emit();
 
     _found_type:
       alert;
@@ -76,15 +76,13 @@ ValueType Sema::walk(AST::Base* ast) {
       auto var = (AST::Variable*)ast;
 
       if( (var->defined = find_var_defined(var->name)) == nullptr ) {
-        Error::add_error(ErrorKind::Undefined, ast->token, "undefined variable name");
-        Error::exit_app();
+        Error(ErrorKind::Undefined, ast->token, "undefined variable name").emit(true);
       }
       else if( arrow_unini != var && var->defined->kind == ASTKind::VarDefine ) {
         if( auto ctx = find_var_context(var->defined); !ctx->was_type_analyzed ) {
           alertios(ctx);
 
-          Error::add_error(ErrorKind::UninitializedValue, ast->token, "uninitialized value");
-          Error::exit_app();
+          Error(ErrorKind::UninitializedValue, ast->token, "uninitialized value").emit(true);
         }
       }
 
@@ -129,14 +127,12 @@ ValueType Sema::walk(AST::Base* ast) {
         auto&& vartype = walk(expr->lhs);
 
         if( !vartype.is_mutable ) {
-          Error::add_error(ErrorKind::NotMutable, expr->token, "left side is not mutable");
-          Error::exit_app();
+          Error(ErrorKind::NotMutable, expr->token, "left side is not mutable").emit(true);
         }
 
         if( std::find(root->elems.begin(), root->elems.end(), var->defined) != root->elems.end() ) {
           if( !find_var_context(var->defined)->was_type_analyzed ) {
-            Error::add_error(ErrorKind::UninitializedValue, var->token, "uninitialized value");
-            Error::exit_app();
+            Error(ErrorKind::UninitializedValue, var->token, "uninitialized value").emit(true);
           }
         }
 
@@ -151,7 +147,7 @@ ValueType Sema::walk(AST::Base* ast) {
 
         if( context->was_type_analyzed ) {
           if( !vartype.equals(rhs) ) {
-            Error::add_error(ErrorKind::TypeMismatch, expr->token, "assignment type mismatch");
+            Error(ErrorKind::TypeMismatch, expr->token, "assignment type mismatch").emit();
           }
         }
         else {
@@ -187,11 +183,11 @@ ValueType Sema::walk(AST::Base* ast) {
         if( context.type.is_reference ) {
           // 初期化式がない
           if( !let->init ) {
-            Error::add_error(ErrorKind::TypeMismatch, let->token, "cannot define reference-type variable without initializer expression");
+            Error(ErrorKind::TypeMismatch, let->token, "cannot define reference-type variable without initializer expression").emit(true);
           }
           // あるなら、左辺値じゃなければエラー
-          else if( !get_expr_type(let->init).left ) {
-            Error::add_error(ErrorKind::TypeMismatch, let->init, "expected lvalue expression");
+          else if( !get_type_attr(let->init).left ) {
+            Error(ErrorKind::TypeMismatch, let->init, "expected lvalue expression").emit(true);
           }
         }
       }
@@ -219,35 +215,30 @@ ValueType Sema::walk(AST::Base* ast) {
 
       context.scope = scope;
 
+      for(auto&&i:scope->elems){
+        walk(i);
+      }
+
       std::vector<AST::Base*> lastexpr_list;
 
       // get last expressions
       get_lastval_full(lastexpr_list, scope);
 
       for( auto begin = *lastexpr_list.begin(); auto&& last : lastexpr_list ) {
+        context.cur_ast = last;
+
         // first
         if( last == begin ) {
           ret = walk(last);
         }
         else if( auto&& tmp = walk(last); !tmp.equals(ret) ) {
-          Error::add_error(
+          Error(ErrorKind::TypeMismatch, last,
+            Utils::linkstr("expected '",ret.to_string(),"' but found '",tmp.to_string(),"'"))
+              .emit(true);
         }
-      }
-
-      auto iter = scope->elems.begin();
-      auto last = scope->elems.end() - 1;
-
-      for( ; iter != last; iter++ ) {
-        context.cur_ast = *iter;
-        walk(*iter);
 
         context.cur_index++;
       }
-
-      context.cur_ast = *last;
-      ret = walk(*last);
-
-
 
       scopelist.pop_front();
 

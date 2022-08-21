@@ -6,6 +6,18 @@
 
 namespace metro {
 
+Sema::TypeAttr Sema::get_type_attr(AST::Base* ast) {
+  // TODO
+
+  TypeAttr attr;
+
+  if( ast->kind == AST::Kind::Variable ) {
+    attr.left = true;
+  }
+
+  return attr;
+}
+
 void Sema::expect_all_same_with(std::vector<AST::Base*> const& vec, ValueType const& _expect) {
   for( auto&& ast : vec ) {
     auto&& elem_type = walk(ast);

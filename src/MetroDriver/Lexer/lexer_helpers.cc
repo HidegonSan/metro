@@ -4,23 +4,25 @@
 #include "Utils.h"
 
 namespace metro {
-  bool Lexer::check() {
-    return position < length;
-  }
 
-  char Lexer::peek() {
-    return source[position];
-  }
+bool Lexer::check() {
+  return position < length;
+}
 
-  bool Lexer::match(std::string_view const& s) {
-    return
-      position + s.length() <= length &&
-      memcmp(source.data() + position, s.data(), s.length()) == 0;
-  }
+char Lexer::peek() {
+  return source[position];
+}
 
-  void Lexer::pass_space() {
-    while( check() && peek() <= ' ' ) {
-      position++;
-    }
+bool Lexer::match(std::string_view const& s) {
+  return
+    position + s.length() <= length &&
+    memcmp(source.data() + position, s.data(), s.length()) == 0;
+}
+
+void Lexer::pass_space() {
+  while( check() && peek() <= ' ' ) {
+    position++;
   }
 }
+
+} // namespace metro

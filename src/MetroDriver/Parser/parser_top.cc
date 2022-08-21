@@ -1,76 +1,82 @@
 #include "Types.h"
-#include "MetroDriver/Parser.h"
+#include "MetroDriver/parser.h"
 #include "Error.h"
 
 namespace metro {
-  AST::Base* Parser::toplevel() {
-    if( eat("fn") ) {
-      auto ast = new AST::Function(cur);
 
-      expect_ident();
-      ast->name = cur->str;
+AST::Base* Parser::toplevel() {
+  if( eat("fn") ) {
+    auto ast = new AST::Function(cur);
 
-      next();
-      expect("(");
+    expect_ident();
+    ast->name = cur->str;
 
-      if( !eat(")") ) {
-        do {
-          auto& arg = ast->args.emplace_back(cur);
+    next();
+    expect("(");
 
-          expect_ident();
-          arg.name = cur->str;
-          arg.token = cur;
-
-          next();
-          expect(":");
-
-          arg.type = expect_type();
-        } while( eat(",") );
-
-        expect(")");
-      }
-
-      if( eat("->") ) {
-        ast->return_type = expect_type();
-      }
-
-      ast->code = expect_scope();
-
-      return ast;
-    }
-
-    if( eat("struct") ) {
-      auto x = new AST::Struct(ate);
-
-      expect_ident();
-      x->name = cur->str;
-
-      next();
-      expect("{");
-
-      if( cur->str == "}" ) {
-        Error::add_error(ErrorKind::EmptyStruct, cur, "empty struct is not valid");
-        Error::exit_app();
-      }
-
+    if( !eat(")") ) {
       do {
-        expect_ident();
+        auto& arg = ast->args.emplace_back(cur);
 
-        auto& member = x->members.emplace_back();
-        member.name = cur->str;
-        member.token = cur;
+        expect_ident();
+        arg.name = cur->str;
+        arg.token = cur;
 
         next();
-        expect(":"); // TODO: If not eaten, add template type
+        expect(":");
 
-        member.type = expect_type();
+        arg.type = expect_type();
       } while( eat(",") );
 
-      expect("}");
+      expect(")");
+    }
 
+    // if( eat("->") ) {
+    //   ast->return_type = expect_type();
+    // }
+
+    if( this->cur->str != "{" ) {
+      ast->return_type = expect_type();
+    }
+
+    ast->code = expect_scope();
+
+    return ast;
+  }
+
+  if( eat("struct") ) {
+    auto x = new AST::Struct(ate);
+
+    this->expect_ident();
+    x->name = cur->str;
+
+    this->next();
+    this->expect("{");
+
+    if( this->eat("}") ) {
+      Error(ErrorKind::EmptyStruct, cur, "empty struct is not valid").emit();
       return x;
     }
 
-    return expr();
+    do {
+      this->expect_ident();
+
+      auto& member = x->members.emplace_back();
+      member.name = cur->str;
+      member.token = cur;
+
+      this->next();
+      this->expect(":"); // TODO: If not eaten, add template type
+
+      member.type = this->expect_type();
+    } while( eat(",") );
+
+    this->expect("}");
+
+    return x;
   }
+
+  return expr();
 }
+
+} // namespace metro

@@ -41,7 +41,7 @@ namespace metro {
       for( auto&& script : ctx.scripts ) {
         if( !ctx.no_print_filenames && ctx.scripts.size() > 1 ) {
           std::cout
-            << script.path << std::endl;
+            << script.source.path << std::endl;
         }
 
         execute_script(script);

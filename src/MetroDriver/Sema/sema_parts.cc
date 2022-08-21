@@ -22,10 +22,10 @@ namespace metro {
     if( find == nullptr ) {
       // doens't exists built-in function
       if( (bfun = find_builtin_func(ast->name)) == nullptr ) {
-        Error::add_error(ErrorKind::Undefined, ast->token, "undefined function name");
-        Error::exit_app();
+        // Error::add_error(ErrorKind::Undefined, ast->token, "undefined function name");
+        // Error::exit_app();
 
-        Error(ErrorKind::Undefined
+        Error(ErrorKind::Undefined, ast->token, "undefined function name").emit(true);
       }
       else {
         ast->callee_builtin = bfun;
@@ -41,7 +41,8 @@ namespace metro {
     for( size_t i = 0;; i++, arg++ ) {
       if( i == max ) {
         if( i != ast->args.size() ) {
-          Error::add_error(ErrorKind::TooManyArguments, ast->token, "too many arguments");
+          // Error::add_error(ErrorKind::TooManyArguments, ast->token, "too many arguments");
+          Error(ErrorKind::TooManyArguments, ast->token, "too many arguments").emit();
         }
 
         break;
@@ -54,12 +55,12 @@ namespace metro {
       }
 
       if( i == ast->args.size() ) {
-        Error::add_error(ErrorKind::TooFewArguments, ast->token, "too few arguments");
+        Error(ErrorKind::TooFewArguments, ast->token, "too few arguments").emit();
         break;
       }
 
       if( !func_arg_type.equals(*arg) ) {
-        Error::add_error(ErrorKind::TypeMismatch, ast->args[i], "type mismatch");
+        Error(ErrorKind::TypeMismatch, ast->args[i], "type mismatch").emit();
       }
     }
 
@@ -74,13 +75,13 @@ namespace metro {
         auto if_x = (AST::If*)ast;
 
         if( !walk(if_x->cond).equals(ValueType::Kind::Bool) ) {
-          Error::add_error(ErrorKind::TypeMismatch, if_x->cond, "condition must be boolean");
+          Error(ErrorKind::TypeMismatch, if_x->cond, "condition must be boolean").emit();
         }
 
         ret = walk(if_x->if_true);
 
         if( if_x->if_false && !ret.equals(walk(if_x->if_false)) ) {
-          Error::add_error(ErrorKind::TypeMismatch, if_x, "if-expr type mismatch");
+          Error(ErrorKind::TypeMismatch, if_x, "if-expr type mismatch").emit();
         }
 
         break;
@@ -92,7 +93,7 @@ namespace metro {
         walk(for_x->init);
 
         if( !walk(for_x->cond).equals(ValueType::Kind::Bool) ) {
-          Error::add_error(ErrorKind::TypeMismatch, for_x->cond, "condition must be boolean");
+          Error(ErrorKind::TypeMismatch, for_x->cond, "condition must be boolean").emit();
         }
 
         walk(for_x->counter);

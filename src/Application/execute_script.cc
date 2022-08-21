@@ -19,15 +19,15 @@ AppContext::Script Application::open_script_file(char const* path) {
   std::ifstream ifs{ path };
   AppContext::Script script;
 
+  script.source.path = path;
+
   if( ifs.fail() ) {
     std::cout << "cannot open file: " << path << std::endl;
     exit(1);
   }
 
-  script.path = path;
-
   for( std::string line; std::getline(ifs, line); ) {
-    script.data += line + '\n';
+    script.source.data += line + '\n';
   }
 
   return script;
@@ -36,7 +36,7 @@ AppContext::Script Application::open_script_file(char const* path) {
 Object* Application::execute_script(AppContext::Script& script) {
   running_script.push_front(&script);
 
-  Lexer lexer{ script.data };
+  Lexer lexer{ script.source };
 
   auto token = lexer.lex();
 

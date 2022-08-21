@@ -97,10 +97,11 @@ private:
 
   Token*      token;
   AST::Base*  ast;
+  size_t      pos;
 
   std::vector<Help> helps;
 
-  static void Error::emit_error(Error& err);
+  static void emit_error(Error& err);
 
 };
 

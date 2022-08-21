@@ -6,12 +6,17 @@
 
 namespace metro {
 
-
+size_t _emitted_err_count;
 
 void Error::emit(bool exit) {
   alert;
 
+  std::cout
+    << "ERROR: " << this->message << std::endl;
 
+  if( exit ) {
+    std::exit(1);
+  }
 }
 
 //
