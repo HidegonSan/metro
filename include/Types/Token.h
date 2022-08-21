@@ -15,6 +15,7 @@ namespace metro {
   };
 
   enum class PunctuatorKind {
+    VariableLengthArgument,
     SpecifyReturnType, // ->
     ArrayType,         // []
 
@@ -67,38 +68,13 @@ namespace metro {
     size_t lastpos;
     size_t endpos;
 
-    Token(TokenKind kind = TokenKind::Int)
-      : kind(kind),
-        prev(nullptr),
-        next(nullptr),
-        pos(0),
-        lastpos(0),
-        endpos(0)
-    {
-    }
+    Token(TokenKind kind = TokenKind::Int);
+    Token(TokenKind kind, Token* prev, size_t pos);
 
-    Token(TokenKind kind, Token* prev, size_t pos)
-      : Token(kind)
-    {
-      this->prev = prev;
-      this->pos = pos;
+    Token* insert(TokenKind kind, int pos_diff, std::string_view const& str);
 
-      if( prev ) prev->next = this;
-    }
-
-    Token* insert(TokenKind kind, int pos_diff, std::string_view const& str) {
-      auto tok = new Token(kind);
-
-      tok->pos = this->pos + pos_diff;
-      tok->str = str;
-
-      tok->prev = this;
-      tok->next = this->next;
-
-      this->next = tok;
-      return tok;
-    }
-
-    static std::vector<std::pair<char const*, PunctuatorKind>> const punctuator_strtable;
+    static
+      std::vector<std::pair<char const*, PunctuatorKind>> const
+        punctuator_string_table;
   };
 }

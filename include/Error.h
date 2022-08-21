@@ -70,6 +70,7 @@ class Error {
 public:
   explicit Error(ErrorKind kind, Token* token, std::string&& msg);
   Error(ErrorKind kind, AST::Base* ast, std::string&& msg);
+  Error(ErrorKind kind, size_t pos, std::string&& msg);
 
   //
   // add_help

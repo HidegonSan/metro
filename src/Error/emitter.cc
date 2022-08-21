@@ -6,7 +6,7 @@
 
 namespace metro {
 
-std::vector
+
 
 void Error::emit(bool exit) {
   alert;
