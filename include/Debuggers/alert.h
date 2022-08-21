@@ -29,4 +29,9 @@
     COL_CYAN #_Name_ " (%p)" \
     COL_GREEN":" __FILE__":%d\n" COL_DEFAULT,this,__LINE__)
 
+// alertwhere
+#define  alertwhere \
+  fprintf(stderr,"\t" COL_MAGENTA "# here is in function " \
+  COL_YELLOW "'%s'" COL_MAGENTA " in " COL_GREEN __FILE__ "\n" COL_DEFAULT,__func__)
+
 
