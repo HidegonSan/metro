@@ -58,13 +58,6 @@ class Error {
     }
   };
 
-  struct ErrLocation {
-    struct Line {
-      size_t linenum;
-
-    };
-  };
-
 public:
   explicit Error(ErrorKind kind, Token* token, std::string&& msg);
   Error(ErrorKind kind, AST::Base* ast, std::string&& msg);
@@ -86,15 +79,13 @@ public:
   static void check();
 
 private:
-
-
   ErrorKind kind;
   std::string&& message;
 
+  AppContext::Script const* script;
+
   Token*      token;
   AST::Base*  ast;
-
-  AppContext::Script const* script;
 
   std::vector<Help> helps;
 
@@ -102,4 +93,4 @@ private:
 
 };
 
-}
+} // namespace metro

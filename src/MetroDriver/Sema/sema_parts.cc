@@ -1,10 +1,10 @@
 #include "AST.h"
-#include "MetroDriver/Sema.h"
+#include "MetroDriver/sema.h"
 #include "Error.h"
 #include "Debug.h"
 #include "Utils.h"
 
-namespace metro::Semantics {
+namespace metro {
   ValueType Sema::sema_callfunc(AST::CallFunc* ast) {
     std::vector<ValueType> arg_types;
 

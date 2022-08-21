@@ -6,14 +6,20 @@
 
 namespace metro {
 
-void Sema::expect_all_same_with(std::vector<AST::Base*> const& vec, ValueType const& type) {
+void Sema::expect_all_same_with(std::vector<AST::Base*> const& vec, ValueType const& _expect) {
   for( auto&& ast : vec ) {
-    auto&& tmp = walk(ast);
+    auto&& elem_type = walk(ast);
 
-    if( !type.equals(tmp) ) {
-      Error::add_error(ErrorKind::TypeMismatch, ast,
-        Utils::linkstr("expected '", type.to_string(), "', but found '", tmp.to_string(), "'")
-      );
+    if( !elem_type.equals(_expect) ) {
+      // Error::add_error(ErrorKind::TypeMismatch, ast,
+      //   Utils::linkstr("expected '", type.to_string(), "', but found '", tmp.to_string(), "'")
+      // );
+
+      Error(
+        ErrorKind::TypeMismatch, ast,
+        Utils::linkstr("expected '", _expect.to_string(), "', but found '", elem_type.to_string(), "'")
+      )
+        .emit();
     }
   }
 
