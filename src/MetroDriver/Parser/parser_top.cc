@@ -31,10 +31,6 @@ AST::Base* Parser::toplevel() {
       expect(")");
     }
 
-    // if( eat("->") ) {
-    //   ast->return_type = expect_type();
-    // }
-
     if( this->cur->str != "{" ) {
       ast->return_type = expect_type();
     }

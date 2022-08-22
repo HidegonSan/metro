@@ -187,6 +187,12 @@ Object* Sema::create_obj(Token* token) {
       break;
     }
 
+    case TokenKind::Float: {
+      obj->type = ValueType::Kind::Float;
+      obj->v_float = atof(token->str.data());
+      break;
+    }
+
     case TokenKind::String: {
       obj->type = ValueType::Kind::String;
       obj->v_str = Utils::Strings::to_u16string(std::string(token->str));

@@ -77,9 +77,6 @@ AST::Base* Parser::factor() {
     }
   }
 
-  // Error::add_error(ErrorKind::InvalidSyntax, cur, "invalid syntax");
-  // Error::exit_app();
-
   Error(ErrorKind::InvalidSyntax, cur, "invalid syntax")
     .emit(true);
 }
@@ -148,4 +145,4 @@ AST::Base* Parser::expr() {
   return assign();
 }
 
-}
+} // namespace metro

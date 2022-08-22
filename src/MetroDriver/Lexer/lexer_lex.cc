@@ -21,17 +21,15 @@ Token* Lexer::lex() {
 
     // digits
     if( isdigit(ch) ) {
-      while( isdigit(peek()) ) position++;
-
-      if( peek() == '.' ) {
+      while( isdigit(peek()) )
         position++;
 
-        if( peek() <= ' ' ) {
-          cur->kind = TokenKind::Float;
-        }
-        else if( isalpha(ch == peek()) || ch == '_' ) {
-          position--;
-        }
+      if( peek() == '.' ) {
+        cur->kind = TokenKind::Float;
+        position++;
+
+        while( isdigit(peek()) )
+          position++;
       }
     }
 

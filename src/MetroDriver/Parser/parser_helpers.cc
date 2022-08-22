@@ -24,9 +24,6 @@ bool Parser::eat(std::string_view str) {
 
 void Parser::expect(std::string_view str) {
   if( !eat(str) ) {
-    // Error::add_error(ErrorKind::ExpectedToken, cur, "expected '" + std::string(str) + "' before this token");
-    // Error::exit_app();
-
     Error(ErrorKind::ExpectedToken, cur, "expected '" + std::string(str) + "' before this token")
       .emit(true);
   }
@@ -34,9 +31,6 @@ void Parser::expect(std::string_view str) {
 
 void Parser::expect_ident() {
   if( cur->kind != TokenKind::Ident ) {
-    // Error::add_error(ErrorKind::ExpectedToken, cur, "expected identifier");
-    // Error::exit_app();
-
     Error(ErrorKind::ExpectedToken, cur, "expected identifier")
       .emit(true);
   }
