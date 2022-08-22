@@ -8,8 +8,8 @@ using ASTKind = AST::Kind;
 using ValueKind = ValueType::Kind;
 
 /*
-  * left に変更を加えて、戻り値として left を返してください
-  */
+ * left に変更を加えて、戻り値として left を返してください
+ */
 
 Object* Evaluator::eval_operator(AST::Kind kind, Object* left, Object* right) {
   auto const& type = left->type;
@@ -68,4 +68,4 @@ Object* Evaluator::eval_operator(AST::Kind kind, Object* left, Object* right) {
   return left;
 }
 
-}
+} // namespace metro

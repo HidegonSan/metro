@@ -5,7 +5,7 @@
 
 namespace metro {
 
-Object* Evaluator::construct_from_type(AST::Type* type) {
+Object* Evaluator::construct_object_from_type(AST::Type* type) {
   auto obj = new Object;
 
   alert;
@@ -19,7 +19,7 @@ Object* Evaluator::construct_from_type(AST::Type* type) {
 
   if( !type->elems.empty() ) {
     for( auto&& elem : type->elems ) {
-      obj->list.emplace_back(construct_from_type(elem));
+      obj->list.emplace_back(construct_object_from_type(elem));
     }
   }
 

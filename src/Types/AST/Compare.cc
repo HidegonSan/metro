@@ -3,6 +3,12 @@
 
 namespace metro::AST {
 
+Compare::Compare(Base* first)
+  : Base(Kind::Compare, nullptr),
+    first(first)
+{
+}
+
 Compare::Item& Compare::append(Item::Kind kind, Token* tok, Base* ast) {
   return list.emplace_back(kind, tok, ast);
 }

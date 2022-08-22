@@ -10,6 +10,7 @@ namespace metro::AST {
     Boolean,
     Value,
     Array,
+    EmptyArray, // TODO: impl
 
     Variable,
     Callfunc,
@@ -29,7 +30,9 @@ namespace metro::AST {
     For,
     Loop,
     While,
+
     Scope,
+    EmptyScope,
 
     Function,
     Struct,

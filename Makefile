@@ -24,13 +24,13 @@ SOURCES	= src \
 	src/Types/AST \
 	src/Utils
 
-OPTFLAGS		= -O3
+OPTFLAGS		= -O0 -g
 WARNFLAGS		= -Wall -Wextra -Wno-switch
-DBGFLAGS		=
+DBGFLAGS		= -DMETRO_DEBUG
 COMMONFLAGS	= $(DBGFLAGS) $(INCLUDES) $(OPTFLAGS) $(WARNFLAGS)
 CFLAGS			= $(COMMONFLAGS)
 CXXFLAGS		= $(CFLAGS) -std=c++20
-LDFLAGS			= -Wl,--gc-sections
+LDFLAGS			=
 
 %.o: %.c
 	@echo $(notdir $<)
@@ -56,8 +56,8 @@ export OFILES		= $(CFILES:.c=.o) $(CXXFILES:.cc=.o)
 all: $(BUILD)
 	@$(MAKE) --no-print-directory -C $(BUILD) -f $(CURDIR)/Makefile
 
-debug: $(BUILD)
-	@$(MAKE) --no-print-directory OPTFLAGS="-g -O0" DBGFLAGS="-DMETRO_DEBUG" WARNFLAGS="-Wall -Wextra" LDFLAGS="" -C $(BUILD) -f $(CURDIR)/Makefile
+nodebug: $(BUILD)
+	@$(MAKE) --no-print-directory OPTFLAGS="-O3" DBGFLAGS="" LDFLAGS="-Wl,--gc-sections" -C $(BUILD) -f $(CURDIR)/Makefile
 
 $(BUILD):
 	@[ -d $@ ] || mkdir -p $@

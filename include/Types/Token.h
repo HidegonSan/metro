@@ -31,8 +31,9 @@ namespace metro {
     Assign, // =
 
     Equal,
-    BiggerLeft,
-    BiggerRight,
+    NotEqual,
+    // BiggerLeft,
+    // BiggerRight,
     BigOrEqualLeft,
     BigOrEqualRight,
     ShiftLeft,

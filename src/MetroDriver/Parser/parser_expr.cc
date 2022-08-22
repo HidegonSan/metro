@@ -120,11 +120,17 @@ AST::Base* Parser::add() {
 AST::Base* Parser::compare() {
   using ItemKind = AST::Compare::Item::Kind;
 
-  auto x = add();
+  auto x = this->add();
 
-  while( check() ) {
-    if( eat(">") ) AST::Compare::create(x)->append(ItemKind::BiggerLeft, ate, add());
-    else if( eat("<") ) AST::Compare::create(x)->append(ItemKind::BiggerRight, ate, add());
+  while( this->check() ) {
+    auto tok = this->cur;
+
+    if( this->eat(">") ) AST::Compare::create(x)->append(ItemKind::BiggerLeft, tok, this->add());
+    else if( this->eat("<") ) AST::Compare::create(x)->append(ItemKind::BiggerRight, tok, this->add());
+    else if( this->eat(">=") ) AST::Compare::create(x)->append(ItemKind::BiggerOrEqualLeft, tok, this->add());
+    else if( this->eat("<=") ) AST::Compare::create(x)->append(ItemKind::BiggerOrEqualRight, tok, this->add());
+    else if( this->eat("==") ) AST::Compare::create(x)->append(ItemKind::Equal, tok, this->add());
+    else if( this->eat("!=") ) AST::Compare::create(x)->append(ItemKind::NotEqual, tok, this->add());
     else break;
   }
 

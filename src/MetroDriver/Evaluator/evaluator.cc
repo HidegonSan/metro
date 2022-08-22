@@ -33,7 +33,8 @@ Object* Evaluator::eval(AST::Base* ast) {
     return Object::none;
   }
 
-  Object* ret = Object::none;
+  // Object* ret = Object::none;
+  Object* ret = nullptr;
 
   switch( ast->kind ) {
     case Kind::None:
@@ -106,41 +107,8 @@ Object* Evaluator::eval(AST::Base* ast) {
       break;
     }
 
-    case Kind::Compare: {
-      using CmpKind = AST::Compare::Item::Kind;
-
-      ret = gcnew(ValueType::Kind::Bool);
-
-      auto x = (AST::Compare*)ast;
-      bool res = false;
-
-      Object const* lhs = eval(x->first);
-      Object const* rhs = nullptr;
-
-      for( auto it = x->list.begin(); it != x->list.end(); it++, lhs = rhs ) {
-        rhs = eval(it->ast);
-
-        switch( it->kind ) {
-          case CmpKind::BiggerLeft:
-            break;
-
-          case CmpKind::BiggerRight:
-            switch( lhs->type.kind ) {
-              case ValueType::Kind::Int:
-                res = lhs->v_int < rhs->v_int;
-                break;
-            }
-            break;
-        }
-
-        if( !res ) {
-          break;
-        }
-      }
-
-      ret->v_bool = res;
-      break;
-    }
+    case Kind::Compare:
+      return compute_compare((AST::Compare*)ast);
 
     case Kind::Assign: {
       auto x = (AST::Expr*)ast;
@@ -186,7 +154,7 @@ Object* Evaluator::eval(AST::Base* ast) {
 
       if( !x->init ) {
         if( x->type )
-          x->value = construct_from_type(x->type);
+          x->value = construct_object_from_type(x->type);
 
         break;
       }
@@ -222,6 +190,10 @@ Object* Evaluator::eval(AST::Base* ast) {
 
       break;
     }
+  }
+
+  if( !ret ) {
+    return Object::none;
   }
 
   return ret;

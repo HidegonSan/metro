@@ -11,6 +11,11 @@ std::vector<std::pair<char const*, PunctuatorKind>> const
   { "...", PunctuatorKind::VariableLengthArgument },
   { "[]", PunctuatorKind::ArrayType },
 
+  { ">=", PunctuatorKind::BigOrEqualLeft },
+  { "<=", PunctuatorKind::BigOrEqualRight },
+  { "==", PunctuatorKind::Equal },
+  { "!=", PunctuatorKind::NotEqual },
+
   { "+", PunctuatorKind::Add },
   { "-", PunctuatorKind::Sub },
   { "*", PunctuatorKind::Mul },

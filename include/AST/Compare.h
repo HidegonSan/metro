@@ -44,10 +44,6 @@ namespace metro::AST {
 
     static Compare* create(Base*& ast);
 
-    explicit Compare(Base* first)
-      : Base(Kind::Compare, first->token),
-        first(first)
-    {
-    }
+    explicit Compare(Base* first);
   };
 }
