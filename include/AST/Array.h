@@ -12,6 +12,10 @@ namespace metro::AST {
     std::string to_string() const;
     SourceRange get_range_on_source() const;
 
+    bool is_empty() const {
+      return elements.empty();
+    }
+
     Array(Token* tok)
       : Base(Kind::Array, tok)
     {

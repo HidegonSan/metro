@@ -19,9 +19,9 @@ namespace metro::AST {
     std::string to_string() const;
     SourceRange get_range_on_source() const;
 
-    CallFunc(Token* token)
+    CallFunc(Token* token, AST::Base* expr)
       : Base(Kind::Callfunc, token),
-        expr(nullptr),
+        expr(expr),
         callee(nullptr),
         callee_builtin(nullptr)
     {

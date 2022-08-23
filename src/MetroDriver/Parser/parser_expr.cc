@@ -57,18 +57,41 @@ AST::Base* Parser::factor() {
 }
 
 AST::Base* Parser::callfunc() {
-  
+  auto x = this->factor();
+
+  if( this->eat("(") ) {
+    auto call = new AST::CallFunc(this->ate, x);
+
+    if( !this->eat(")") ) {
+      do {
+        call->args.emplace_back(this->expr());
+      } while( this->eat(",") );
+
+      this->expect(")");
+    }
+
+    return call;
+  }
+
+  return x;
 }
 
 AST::Base* Parser::subscript() {
-  
+  auto x = this->callfunc();
+
+  while( this->check() && this->eat("[") ) {
+    auto tok = ate;
+    x = new AST::Expr(AST::Kind::Subscript, x, this->expr(), tok);
+  }
+
+  return x;
 }
 
 AST::Base* Parser::member() {
-  auto x = subscript();
+  auto x = this->subscript();
 
-  while( check() && eat(".") ) {
-    x = new AST::Expr(AST::Kind::MemberAccess, x, factor(), ate);
+  while( this->check() && this->eat(".") ) {
+    x = new AST::Expr(AST::Kind::MemberAccess, x, this->factor(), this->ate);
   }
 
   return x;

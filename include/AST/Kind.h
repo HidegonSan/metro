@@ -9,13 +9,14 @@ namespace metro::AST {
 
     Boolean,
     Value,
+    Variable,
+
     Array,
     Tuple,
-    EmptyArray, // TODO: impl
+    // EmptyArray, // TODO: impl
 
-    Variable,
     Callfunc,
-
+    Subscript,
     MemberAccess,
 
     Mul,
