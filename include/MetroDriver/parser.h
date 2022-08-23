@@ -12,8 +12,13 @@ namespace metro {
   public:
     explicit Parser(Token* token);
 
+    AST::Base* atom();
     AST::Base* factor();
+
+    AST::Base* callfunc();
+    AST::Base* subscript();
     AST::Base* member();
+
     AST::Base* mul();
     AST::Base* add();
     AST::Base* compare();

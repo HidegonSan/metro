@@ -20,6 +20,7 @@ namespace metro::AST {
 #include "AST/Boolean.h"
 #include "AST/Value.h"
 #include "AST/Array.h"
+#include "AST/Tuple.h"
 
 #include "AST/Variable.h"
 #include "AST/Callfunc.h"

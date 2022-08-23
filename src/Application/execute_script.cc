@@ -73,4 +73,4 @@ Object* Application::execute_script(AppContext::Script& script) {
   return obj;
 }
 
-}
+} // namespace metro

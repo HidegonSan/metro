@@ -12,6 +12,7 @@ namespace metro::AST {
 
     Variable(Token* tok)
       : Base(Kind::Variable, tok),
+        name(tok->str),
         defined(nullptr)
     {
     }

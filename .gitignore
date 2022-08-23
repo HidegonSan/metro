@@ -13,7 +13,9 @@ metro
 *.lnk
 desktop.ini
 
+/test
 test.*
+
 memo.*
 TODO.*
 

@@ -8,8 +8,11 @@
 namespace metro::AST {
   struct Function;
   struct CallFunc : Base {
-    std::string_view    name;
+    //std::string_view    name;
+
+    AST::Base* expr;
     std::vector<Base*>  args;
+
     Function*           callee;           // 呼び出し先: ユーザー定義関数
     BuiltinFunc const*  callee_builtin;   // 呼び出し先: 組み込み
 
@@ -18,6 +21,7 @@ namespace metro::AST {
 
     CallFunc(Token* token)
       : Base(Kind::Callfunc, token),
+        expr(nullptr),
         callee(nullptr),
         callee_builtin(nullptr)
     {

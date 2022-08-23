@@ -13,21 +13,21 @@ Object::Object(ValueType type)
     is_weak(false),
     v_int(0)
 {
-debug(
-  alert;
-  alertctor(Object);
-)
+  debug(
+    alert;
+    alertctor(Object);
+  )
 }
 
 Object::~Object() {
-debug(
-  alert;
-  fprintf(stderr, "\t#Object destructing: %p\n", this);
-)
+  debug(
+    alert;
+    alertdtor(Object);
+  )
 }
 
 //
-// object to string
+// convert to string
 std::string Object::to_string() const {
   static bool str_q = false;
 
@@ -36,25 +36,30 @@ std::string Object::to_string() const {
   }
 
   switch( type.kind ) {
+    // int
     case ValueType::Kind::Int:
       return std::to_string(v_int);
 
+    // float
     case ValueType::Kind::Float: {
-      auto&& ret = std::to_string(v_float);
+      auto ret = std::to_string(v_float);
 
-      while( *ret.rbegin() == '0' ) {
+      while( ret.length() > 1 && (*ret.rbegin() == '0' || *ret.rbegin() == '.') ) {
         ret.pop_back();
       }
 
       return ret;
     }
 
+    // bool
     case ValueType::Kind::Bool:
       return v_bool ? "true" : "false";
 
+    // char
     case ValueType::Kind::Char:
       return Utils::Strings::to_string(std::u16string(v_char, 1));
 
+    // string
     case ValueType::Kind::String: {
       if( str_q )
         return '"' + Utils::Strings::to_string(v_str) + '"';
@@ -62,6 +67,7 @@ std::string Object::to_string() const {
       return Utils::Strings::to_string(v_str);
     }
 
+    // tuple
     case ValueType::Kind::Tuple: {
       auto bak = str_q;
 
@@ -72,9 +78,11 @@ std::string Object::to_string() const {
       return ret;
     }
 
+    // none
     case ValueType::Kind::None:
       return "none";
 
+    // struct
     case ValueType::Kind::UserDef: {
 
       break;

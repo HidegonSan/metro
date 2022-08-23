@@ -6,18 +6,17 @@ namespace metro {
 
 using ASTKind = AST::Kind;
 using ValueKind = ValueType::Kind;
+using CmpKind = AST::Compare::Item::Kind;
 
 Object* Evaluator::compute_compare(AST::Compare* ast) {
-  using CmpKind = AST::Compare::Item::Kind;
-
   Object const* lhs = eval(ast->first);
   Object const* rhs = nullptr;
 
-  auto const& typekind = lhs->type.kind;
-
-  bool res = false;
+  bool res = true;
 
   for( auto it = ast->list.begin(); res && it != ast->list.end(); it++, lhs = rhs ) {
+    auto const& typekind = lhs->type.kind;
+
     rhs = eval(it->ast);
 
     switch( it->kind ) {

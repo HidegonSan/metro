@@ -10,6 +10,7 @@ namespace metro::AST {
     Boolean,
     Value,
     Array,
+    Tuple,
     EmptyArray, // TODO: impl
 
     Variable,

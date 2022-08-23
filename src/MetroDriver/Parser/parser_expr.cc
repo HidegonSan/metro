@@ -6,16 +6,35 @@ namespace metro {
 
 AST::Base* Parser::factor() {
 
-  auto stmt_ast = stmt();
+  // bracket
+  if( this->eat("(") ) {
+    auto tok = ate;
+    auto x = this->expr();
 
-  if( stmt_ast != nullptr ) {
+    // tuple
+    if( eat(",") ) {
+      x = new AST::Tuple(tok, x);
+
+      do {
+        ((AST::Tuple*)x)->elements.emplace_back(this->expr());
+      } while( eat(",") );
+    }
+
+    this->expect(")");
+    return x;
+  }
+
+  // stmt
+  if( auto stmt_ast = stmt(); stmt_ast != nullptr ) {
     return stmt_ast;
   }
 
+  // scope
   if( cur->str == "{" ) {
     return expect_scope();
   }
 
+  // array
   if( eat("[") ) {
     auto ast = new AST::Array(ate);
 
@@ -29,60 +48,24 @@ AST::Base* Parser::factor() {
     return ast;
   }
 
-  if( eat("true") ) {
-    return new AST::Boolean(ate, true);
-  }
-
-  if( eat("false") ) {
-    return new AST::Boolean(ate, false);
-  }
-
-  if( eat("none") ) {
-    return new AST::None(ate);
-  }
-
-  switch( cur->kind ) {
-    case TokenKind::Int:
-    case TokenKind::Float:
-    case TokenKind::Char:
-    case TokenKind::String:
-      next();
-      return new AST::Value(cur->prev);
-
-    case TokenKind::Ident: {
-      if( cur->next->str == "(" ) {
-        auto ast = new AST::CallFunc(cur);
-
-        ast->name = cur->str;
-        next();
-
-        next();
-
-        if( !eat(")") ) {
-          do {
-            ast->args.emplace_back(expr());
-          } while( eat(",") );
-
-          expect(")");
-        }
-
-        return ast;
-      }
-
-      auto ast = new AST::Variable(cur);
-      ast->name = cur->str;
-
-      next();
-      return ast;
-    }
-  }
+  // atom
+  if( auto _atom = this->atom(); _atom != nullptr )
+    return _atom;
 
   Error(ErrorKind::InvalidSyntax, cur, "invalid syntax")
     .emit(true);
 }
 
+AST::Base* Parser::callfunc() {
+  
+}
+
+AST::Base* Parser::subscript() {
+  
+}
+
 AST::Base* Parser::member() {
-  auto x = factor();
+  auto x = subscript();
 
   while( check() && eat(".") ) {
     x = new AST::Expr(AST::Kind::MemberAccess, x, factor(), ate);

@@ -41,9 +41,8 @@ AST::Scope* Parser::expect_scope() {
 
   expect("{");
 
-  if( eat("}") ) {
+  if( eat("}") )
     return ast;
-  }
 
   while( check() ) {
     auto item = expr();
@@ -92,9 +91,8 @@ AST::Type* Parser::expect_type() {
     expect(">");
   }
 
-  while( eat("[]") ) {
+  while( eat("[]") )
     ast->arr_depth++;
-  }
 
   ast->is_mutable = eat("mut");
   ast->is_reference = eat("&");
@@ -117,7 +115,6 @@ bool Parser::is_need_semi(AST::Base* ast) {
 }
 
 void Parser::expect_semi() {
-  alert;
   expect(";");
 }
 
