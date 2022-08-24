@@ -6,6 +6,41 @@
 
 namespace metro {
 
+inline auto& append_vec(auto&&... e) {
+  return Utils::append_vec<AST::Base*>(e...);
+}
+
+int Sema::check_arguments(TypeVector const& fn_args, TypeVector const& call_args) {
+  if( fn_args.empty() ) {
+    if( !call_args.empty() )
+      return -2;
+  }
+  else if( fn_args.rbegin()->kind == ValueType::Kind::Args ) {
+    if( call_args.size() < (signed)fn_args.size() - 1 )
+      return -2;
+  }
+  else if( fn_args.size() < call_args.size() ) {
+    return -2;
+  }
+  else if( fn_args.size() > call_args.size() ) {
+    return -1;
+  }
+
+  size_t i = 0;
+
+  for( auto it = fn_args.begin(); auto&& arg : call_args ) {
+    if( it == fn_args.end() || it->kind == ValueType::Kind::Args )
+      break;
+
+    if( ! it++ ->equals(arg) )
+      return i;
+
+    i++;
+  }
+
+  return -3;
+}
+
 Sema::TypeAttr Sema::get_type_attr(AST::Base* ast) {
   // TODO
 
@@ -92,10 +127,12 @@ BuiltinFunc const* Sema::find_builtin_func(std::string_view name) {
   return nullptr;
 }
 
-void Sema::find_return(std::vector<AST::Base*>& out, AST::Base* ast) {
+ASTVector Sema::find_return(AST::Base* ast) {
+  ASTVector ret;
+
   switch( ast->kind ) {
     case AST::Kind::Return: {
-      out.emplace_back(ast);
+      ret.emplace_back(ast);
       break;
     }
 
@@ -103,7 +140,7 @@ void Sema::find_return(std::vector<AST::Base*>& out, AST::Base* ast) {
       auto ast_scope = (AST::Scope*)ast;
 
       for( auto&& x : ast_scope->elems ) {
-        find_return(out, x);
+        append_vec(ret, find_return(x));
       }
 
       break;
@@ -112,17 +149,21 @@ void Sema::find_return(std::vector<AST::Base*>& out, AST::Base* ast) {
     case AST::Kind::Function: {
       auto ast_func = (AST::Function*)ast;
 
-      find_return(out, ast_func->code);
+      append_vec(ret, find_return(ast_func->code));
 
       break;
     }
   }
+
+  return ret;
 }
 
-void Sema::get_lastvalues(std::vector<AST::Base*>& out, AST::Base* ast) {
-  if( !ast ) {
-    return;
-  }
+ASTVector Sema::get_all_final_expr(AST::Base* ast) {
+  // if( !ast )
+  //   return { };
+  assert(ast != nullptr);
+
+  ASTVector ret;
 
   switch( ast->kind ) {
     case AST::Kind::Function:
@@ -131,8 +172,8 @@ void Sema::get_lastvalues(std::vector<AST::Base*>& out, AST::Base* ast) {
     case AST::Kind::If: {
       auto if_ast = (AST::If*)ast;
 
-      get_lastvalues(out, if_ast->if_true);
-      get_lastvalues(out, if_ast->if_false);
+      append_vec(ret, get_all_final_expr(if_ast->if_true));
+      append_vec(ret, get_all_final_expr(if_ast->if_false));
 
       break;
     }
@@ -141,25 +182,37 @@ void Sema::get_lastvalues(std::vector<AST::Base*>& out, AST::Base* ast) {
       auto ast_scope = (AST::Scope*)ast;
 
       if( ast_scope->elems.empty() ) {
-        out.emplace_back(ast);
+        ret.emplace_back(ast);
         break;
       }
 
-      get_lastvalues(out, *ast_scope->elems.rbegin());
+      append_vec(ret, get_all_final_expr(*ast_scope->elems.rbegin()));
       break;
     }
 
     default:
-      out.emplace_back(ast);
+      ret.emplace_back(ast);
       break;
   }
+
+  return ret;
 }
 
-void Sema::get_lastval_full(std::vector<AST::Base*>& out, AST::Base* ast) {
-  find_return(out, ast);
-  get_lastvalues(out, ast);
+ASTVector Sema::get_final_expr_full(AST::Base* ast) {
+  ASTVector ret;
 
-  out.erase(std::unique(out.begin(), out.end()), out.end());
+  append_vec(ret, find_return(ast));
+  append_vec(ret, get_all_final_expr(ast));
+
+  debug(
+    auto s = ret.size();
+
+    ret.erase(std::unique(ret.begin(), ret.end()), ret.end());
+
+    assert(s == ret.size());
+  )
+
+  return ret;
 }
 
 bool Sema::contains_callfunc_in_expr(std::string_view name, AST::Base* ast) {

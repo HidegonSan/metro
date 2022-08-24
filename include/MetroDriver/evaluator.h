@@ -25,5 +25,11 @@ namespace metro {
     //
     // 型情報を元にオブジェクトを構築する
     Object* construct_object_from_type(AST::Type* type);
+
+  private:
+
+    size_t call_depth = 0;
+
+    std::vector<Object*> args;
   };
 }

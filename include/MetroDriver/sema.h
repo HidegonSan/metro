@@ -13,6 +13,9 @@
 
 namespace metro {
 
+using TypeVector = std::vector<ValueType>;
+using ASTVector = std::vector<AST::Base*>;
+
 class Sema {
   using ASTKind = AST::Kind;
 
@@ -53,10 +56,14 @@ public:
   // == walk ==
   ValueType walk(AST::Base* ast);
 
+  ValueType sema_factor(AST::Base* ast);
+
   // sema-parts
   ValueType sema_callfunc(AST::CallFunc* ast);
   ValueType sema_controls(AST::Base* ast);
 
+
+  // === helpers === //
 
   TypeAttr get_type_attr(AST::Base* ast);
 
@@ -82,21 +89,19 @@ public:
 
   //
   // 関数の戻り値の型を解析する
-  void analyze_func_return_type(ValueType& out, AST::Function* ast);
+  ValueType analyze_func_return_type(AST::Function* ast);
 
   //
   // return 式を探して out に追加する
-  void find_return(std::vector<AST::Base*>& out, AST::Base* ast);
+  ASTVector find_return(AST::Base* ast);
 
   //
-  // 全ての last-expr を out に追加する
-  // 注意: return は含まれません
-  void get_lastvalues(std::vector<AST::Base*>& out, AST::Base* ast);
+  // append all final-expr to paramater out (without return-expr)
+  ASTVector get_all_final_expr(AST::Base* ast);
 
   //
-  // 式の結果になりうる全ての式を out に追加する
-  //  last-expr と return どっちも追加される
-  void get_lastval_full(std::vector<AST::Base*>& out, AST::Base* ast);
+  // get all expressions that can be return value of ast
+  ASTVector get_final_expr_full(AST::Base* ast);
 
   //
   // 式の中に name と同名の関数呼び出しが含まれているかどうか確認
@@ -107,6 +112,20 @@ public:
   //
   // create object from token
   static Object* create_obj(Token* token);
+
+  //
+  //  /*  check argument types of call and callee   */
+  //
+  // args:
+  //   fn_args   : argument types in function
+  //   call_args : argument types in call
+  //
+  // return:
+  //   >=0 : position to detected mismatching type
+  //    -1 : too few arguments to call
+  //    -2 : too many arguments to call
+  //    -3 : success
+  static int check_arguments(TypeVector const& fn_args, TypeVector const& call_args);
 
 private:
 

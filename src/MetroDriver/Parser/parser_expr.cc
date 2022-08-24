@@ -49,35 +49,32 @@ AST::Base* Parser::factor() {
   }
 
   // atom
-  if( auto _atom = this->atom(); _atom != nullptr )
+  if( auto _atom = this->atom(); _atom != nullptr ) {
+    if( _atom->kind == AST::Kind::Variable && this->eat("(") ) {
+      auto call = new AST::CallFunc(this->ate);
+
+      call->name = ((AST::Variable*)_atom)->name;
+
+      if( !this->eat(")") ) {
+        do {
+          call->args.emplace_back(expr());
+        } while( this->eat(",") );
+
+        this->expect(")");
+      }
+
+      return call;
+    }
+
     return _atom;
+  }
 
   Error(ErrorKind::InvalidSyntax, cur, "invalid syntax")
     .emit(true);
 }
 
-AST::Base* Parser::callfunc() {
-  auto x = this->factor();
-
-  if( this->eat("(") ) {
-    auto call = new AST::CallFunc(this->ate, x);
-
-    if( !this->eat(")") ) {
-      do {
-        call->args.emplace_back(this->expr());
-      } while( this->eat(",") );
-
-      this->expect(")");
-    }
-
-    return call;
-  }
-
-  return x;
-}
-
 AST::Base* Parser::subscript() {
-  auto x = this->callfunc();
+  auto x = this->factor();
 
   while( this->check() && this->eat("[") ) {
     auto tok = ate;

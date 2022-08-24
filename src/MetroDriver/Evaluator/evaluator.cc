@@ -89,7 +89,7 @@ Object* Evaluator::eval(AST::Base* ast) {
       }
 
       std::vector<Object*> args_bak;
-      auto callee = x->callee;
+      auto callee = x->callee_func;
 
       alert;
 

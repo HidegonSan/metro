@@ -132,4 +132,9 @@ std::string Variable::to_string() const {
   return "<Variable '" + std::string(name) + "'>";
 }
 
+std::string Tuple::to_string() const {
+  TODO_IMPL
+  return "<tuple>";
+}
+
 } // namespace metro::AST

@@ -15,69 +15,79 @@ concept contains_to_string_method = requires (T const& x) {
 };
 
 namespace Utils {
-  template <class... Args>
-  std::string format(char const* fmt, Args&&... args) {
-    static char buf[0x1000];
-    sprintf(buf, fmt, args...);
-    return buf;
+
+template <class T, class V = std::vector<T>>
+V& append_vec(V& a, V const& b) {
+  for( auto&& e : b )
+    a.emplace_back(e);
+
+  return a;
+}
+
+template <class... Args>
+std::string format(char const* fmt, Args&&... args) {
+  static char buf[0x1000];
+  sprintf(buf, fmt, args...);
+  return buf;
+}
+
+template <class... Args>
+std::string linkstr(Args&&... args) {
+  std::stringstream ss;
+
+  (ss << ... << args);
+
+  return ss.str();
+}
+
+template <contains_to_string_method T>
+std::string join(std::string const& s, std::vector<T> const& vec) {
+  std::string ret;
+
+  for( auto last = &*vec.rbegin(); auto&& x : vec ) {
+    ret += x.to_string();
+    if( last != &x ) ret += s;
   }
 
-  template <class... Args>
-  std::string linkstr(Args&&... args) {
-    std::stringstream ss;
+  return ret;
+}
 
-    (ss << ... << args);
+template <class T>
+std::string join(std::string const& s, std::vector<T> const& vec, auto conv) {
+  std::string ret;
 
-    return ss.str();
+  for( auto last = &*vec.rbegin(); auto&& x : vec ) {
+    ret += conv(x);
+    if( last != &x ) ret += s;
   }
 
-  template <contains_to_string_method T>
-  std::string join(std::string const& s, std::vector<T> const& vec) {
-    std::string ret;
+  return ret;
+}
 
-    for( auto last = &*vec.rbegin(); auto&& x : vec ) {
-      ret += x.to_string();
-      if( last != &x ) ret += s;
+template <class T>
+std::string join(std::string const& s, std::vector<T> const& vec) {
+  std::string ret;
+
+  for( auto it = vec.begin(); it != vec.end(); it++ ) {
+    if constexpr( std::is_convertible_v<T, std::string>) {
+      ret += *it;
+    }
+    else if constexpr( std::is_constructible_v<std::string, T> ) {
+      ret += std::string{ *it };
+    }
+    else {
+      ret += std::to_string(*it);
     }
 
-    return ret;
+    if( it < vec.end() - 1 ) ret += s;
   }
 
-  template <class T>
-  std::string join(std::string const& s, std::vector<T> const& vec, auto conv) {
-    std::string ret;
+  return ret;
+}
 
-    for( auto last = &*vec.rbegin(); auto&& x : vec ) {
-      ret += conv(x);
-      if( last != &x ) ret += s;
-    }
+namespace Strings {
+  std::u16string to_u16string(std::string const& s);
+  std::string to_string(std::u16string const& s);
+}
 
-    return ret;
-  }
-
-  template <class T>
-  std::string join(std::string const& s, std::vector<T> const& vec) {
-    std::string ret;
-
-    for( auto it = vec.begin(); it != vec.end(); it++ ) {
-      if constexpr( std::is_convertible_v<T, std::string>) {
-        ret += *it;
-      }
-      else if constexpr( std::is_constructible_v<std::string, T> ) {
-        ret += std::string{ *it };
-      }
-      else {
-        ret += std::to_string(*it);
-      }
-
-      if( it < vec.end() - 1 ) ret += s;
-    }
-
-    return ret;
-  }
-
-  namespace Strings {
-    std::u16string to_u16string(std::string const& s);
-    std::string to_string(std::u16string const& s);
-  }
 }

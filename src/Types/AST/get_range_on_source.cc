@@ -110,4 +110,13 @@ SourceRange VarDefine::get_range_on_source() const {
   return { token->pos, end };
 }
 
+SourceRange Tuple::get_range_on_source() const {
+  if( elements.empty() ) {
+    return { token->pos, token->next->endpos };
+  }
+
+  return { elements[0]->get_range_on_source().first,
+    (*elements.rbegin())->get_range_on_source().second };
+}
+
 } // namespace metro

@@ -20,83 +20,13 @@ ValueType Sema::walk(AST::Base* ast) {
 
   switch( ast->kind ) {
     case ASTKind::None:
+    case ASTKind::Type:
+    case ASTKind::Argument:
+    case ASTKind::Value:
+    case ASTKind::Variable:
+    case ASTKind::Callfunc:
+      ret = sema_factor(ast);
       break;
-
-    case ASTKind::Type: {
-      auto type = (AST::Type*)ast;
-
-      alertios("type->name = " << type->name);
-
-      for( auto&& pair : ValueType::name_table ) {
-        if( type->name == pair.first ) {
-          alert;
-          ret = pair.second;
-          goto _found_type;
-        }
-      }
-
-      // TODO: find struct
-
-      Error(ErrorKind::Undefined, ast->token, "undefined type name").emit();
-
-    _found_type:
-      alert;
-
-      ret.arr_depth = type->arr_depth;
-      ret.have_elements = type->have_elements;
-
-      ret.is_mutable = type->is_mutable;
-      ret.is_reference = type->is_reference;
-
-      for( auto&& sub : type->elems ) {
-        ret.elems.emplace_back(walk(sub));
-      }
-
-      break;
-    }
-
-    case ASTKind::Argument: {
-      auto argument = (AST::Argument*)ast;
-
-      ret = walk(argument->type);
-
-      break;
-    }
-
-    case ASTKind::Value: {
-      auto val = (AST::Value*)ast;
-
-      val->object = create_obj(ast->token);
-
-      ret = val->object->type;
-      break;
-    }
-
-    case ASTKind::Variable: {
-      auto var = (AST::Variable*)ast;
-
-      if( (var->defined = find_var_defined(var->name)) == nullptr ) {
-        Error(ErrorKind::Undefined, ast->token, "undefined variable name").emit(true);
-      }
-      else if( arrow_unini != var && var->defined->kind == ASTKind::VarDefine ) {
-        if( auto ctx = find_var_context(var->defined); !ctx->was_type_analyzed ) {
-          alertios(ctx);
-
-          Error(ErrorKind::UninitializedValue, ast->token, "uninitialized value").emit(true);
-        }
-      }
-
-      ret = walk(var->defined);
-      break;
-    }
-
-    case ASTKind::Callfunc: {
-      ret = sema_callfunc((AST::CallFunc*)ast);
-
-      alertios("callfunc " << ((AST::CallFunc*)ast)->name << ": " << ret.to_string());
-
-      break;
-    }
 
     case ASTKind::Compare: {
       auto cmp = (AST::Compare*)ast;
@@ -219,10 +149,8 @@ ValueType Sema::walk(AST::Base* ast) {
         walk(i);
       }
 
-      std::vector<AST::Base*> lastexpr_list;
-
-      // get last expressions
-      get_lastval_full(lastexpr_list, scope);
+      // get final expressions
+      auto lastexpr_list = get_final_expr_full(scope);
 
       for( auto begin = *lastexpr_list.begin(); auto&& last : lastexpr_list ) {
         context.cur_ast = last;
@@ -255,7 +183,7 @@ ValueType Sema::walk(AST::Base* ast) {
         walk(&arg);
 
       // return-type
-      analyze_func_return_type(ret, func);
+      ret = analyze_func_return_type(func);
 
       // code
       walk(func->code);
@@ -276,6 +204,96 @@ ValueType Sema::walk(AST::Base* ast) {
       ret = lhs;
       break;
     }
+  }
+
+  return ret;
+}
+
+inline ValueType Sema::sema_factor(AST::Base* ast) {
+  ValueType ret;
+
+  switch( ast->kind ) {
+    case ASTKind::None:
+      break;
+
+    case ASTKind::Type: {
+      auto type = (AST::Type*)ast;
+
+      alertios("type->name = " << type->name);
+
+      for( auto&& pair : ValueType::name_table ) {
+        if( type->name == pair.first ) {
+          alert;
+          ret = pair.second;
+          goto _found_type;
+        }
+      }
+
+      // TODO: find struct
+
+      Error(ErrorKind::Undefined, ast->token, "undefined type name").emit();
+
+    _found_type:
+      alert;
+
+      ret.arr_depth = type->arr_depth;
+      ret.have_elements = type->have_elements;
+
+      ret.is_mutable = type->is_mutable;
+      ret.is_reference = type->is_reference;
+
+      for( auto&& sub : type->elems ) {
+        ret.elems.emplace_back(walk(sub));
+      }
+
+      break;
+    }
+
+    case ASTKind::Argument: {
+      auto argument = (AST::Argument*)ast;
+
+      ret = walk(argument->type);
+
+      break;
+    }
+
+    case ASTKind::Value: {
+      auto val = (AST::Value*)ast;
+
+      val->object = create_obj(ast->token);
+
+      ret = val->object->type;
+      break;
+    }
+
+    case ASTKind::Variable: {
+      auto var = (AST::Variable*)ast;
+
+      if( (var->defined = find_var_defined(var->name)) == nullptr ) {
+        Error(ErrorKind::Undefined, ast->token, "undefined variable name").emit(true);
+      }
+      else if( arrow_unini != var && var->defined->kind == ASTKind::VarDefine ) {
+        if( auto ctx = find_var_context(var->defined); !ctx->was_type_analyzed ) {
+          alertios(ctx);
+
+          Error(ErrorKind::UninitializedValue, ast->token, "uninitialized value").emit(true);
+        }
+      }
+
+      ret = walk(var->defined);
+      break;
+    }
+
+    case ASTKind::Callfunc: {
+      ret = sema_callfunc((AST::CallFunc*)ast);
+
+      alertios("callfunc " << ((AST::CallFunc*)ast)->name << ": " << ret.to_string());
+
+      break;
+    }
+
+    default:
+      crash;
   }
 
   return ret;

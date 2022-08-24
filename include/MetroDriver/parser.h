@@ -15,7 +15,6 @@ namespace metro {
     AST::Base* atom();
     AST::Base* factor();
 
-    AST::Base* callfunc();
     AST::Base* subscript();
     AST::Base* member();
 
