@@ -4,7 +4,7 @@
 #include "ValueType.h"
 #include "Debug.h"
 
-namespace Metro {
+namespace metro {
   struct Object {
     ValueType   type;
     size_t      ref_count;
@@ -16,8 +16,9 @@ namespace Metro {
       bool        v_bool;
       char16_t    v_char;
     };
-    
+
     std::u16string  v_str;
+    std::vector<Object*> list;
 
     static Object* none;
 

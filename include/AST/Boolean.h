@@ -3,7 +3,7 @@
 // -----------------------
 #pragma once
 
-namespace Metro::AST {
+namespace metro::AST {
   struct Boolean : Base {
     bool const val;
 

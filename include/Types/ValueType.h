@@ -5,7 +5,11 @@
 
 #define BIT(N)  (1 << N)
 
-namespace Metro {
+namespace metro {
+  namespace AST {
+    struct Struct;
+  }
+
   struct ValueType {
     enum class Kind {
       Int,
@@ -19,34 +23,26 @@ namespace Metro {
       None
     };
 
-    enum Attributes : uint8_t {
-      ATTR_NONE,
-      ATTR_LVALUE = BIT(1),
-      ATTR_RVALUE = BIT(2),
-      ATTR_CONST  = BIT(3),
-      ATTR_REFERENCE = BIT(4),
-      ATTR_CONSTREF  = ATTR_CONST | ATTR_REFERENCE,
-    };
-
     Kind        kind;
-    uint8_t     attr;
     size_t      arr_depth;
+    bool        have_elements;
     std::vector<ValueType>   elems;
+    AST::Struct*  structptr;
+
+    bool  is_mutable;
+    bool  is_reference;
 
     ValueType(Kind kind = Kind::None)
       : kind(kind),
-        attr(ATTR_NONE),
-        arr_depth(0)
+        arr_depth(0),
+        have_elements(false),
+        structptr(nullptr),
+        is_mutable(false),
+        is_reference(false)
     {
     }
 
-    bool have_extensions() const {
-      return attr != ATTR_NONE;
-    }
-
-    bool equals_kind(Kind kind) const {
-      return !have_extensions() && this->kind == kind;
-    }
+    bool is_no_extents() const;
 
     bool equals(Kind kind) const;
     bool equals(ValueType const& type) const;

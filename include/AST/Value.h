@@ -5,7 +5,7 @@
 // -----------------------
 #pragma once
 
-namespace Metro::AST {
+namespace metro::AST {
   struct Value : Base {
     Object*   object;
 

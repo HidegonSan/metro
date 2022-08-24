@@ -2,17 +2,19 @@
 
 #include "Types/Object.h"
 
-namespace Metro {
-  class GC {
-  public:
-    static void execute();
-    static void stop();
+namespace metro {
 
-    static Object* append(Object* obj);
-  };
+class GC {
+public:
+  static void execute();
+  static void stop();
 
-  template <class... Args>
-  inline Object* gcnew(Args&&... args) {
-    return GC::append(new Object(args...));
-  }
+  static Object* append(Object* obj);
+};
+
+template <class... Args>
+inline Object* gcnew(Args&&... args) {
+  return GC::append(new Object(args...));
+}
+
 }

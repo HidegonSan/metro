@@ -3,7 +3,7 @@
 #include <string>
 #include <vector>
 
-namespace Metro {
+namespace metro {
   enum class TokenKind {
     Int,
     Float,
@@ -15,8 +15,9 @@ namespace Metro {
   };
 
   enum class PunctuatorKind {
+    VariableLengthArgument,
     SpecifyReturnType, // ->
-
+    ArrayType,         // []
 
     Add,
     Sub,
@@ -30,8 +31,9 @@ namespace Metro {
     Assign, // =
 
     Equal,
-    BiggerLeft,
-    BiggerRight,
+    NotEqual,
+    // BiggerLeft,
+    // BiggerRight,
     BigOrEqualLeft,
     BigOrEqualRight,
     ShiftLeft,
@@ -54,7 +56,7 @@ namespace Metro {
     AngleBracketOpen,     // <
     AngleBracketClone,    // >
 
-    
+
   };
 
   struct Token {
@@ -67,25 +69,13 @@ namespace Metro {
     size_t lastpos;
     size_t endpos;
 
-    Token(TokenKind kind = TokenKind::Int)
-      : kind(kind),
-        prev(nullptr),
-        next(nullptr),
-        pos(0),
-        lastpos(0),
-        endpos(0)
-    {
-    }
+    Token(TokenKind kind = TokenKind::Int);
+    Token(TokenKind kind, Token* prev, size_t pos);
 
-    Token(TokenKind kind, Token* prev, size_t pos)
-      : Token(kind)
-    {
-      this->prev = prev;
-      this->pos = pos;
+    Token* insert(TokenKind kind, int pos_diff, std::string_view const& str);
 
-      if( prev ) prev->next = this;
-    }
-
-    static std::vector<std::pair<char const*, PunctuatorKind>> const punctuator_strtable;
+    static
+      std::vector<std::pair<char const*, PunctuatorKind>> const
+        punctuator_string_table;
   };
 }

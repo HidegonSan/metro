@@ -3,7 +3,7 @@
 // -----------------------
 #pragma once
 
-namespace Metro::AST {
+namespace metro::AST {
   struct Expr : Base {
     Base*   lhs;
     Base*   rhs;

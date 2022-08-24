@@ -3,7 +3,7 @@
 // -----------------------
 #pragma once
 
-namespace Metro::AST {
+namespace metro::AST {
   struct Struct : Base {
     struct Member {
       std::string_view name;

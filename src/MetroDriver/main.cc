@@ -2,7 +2,7 @@
 #include "Application.h"
 
 int main(int argc, char** argv) {
-  auto app = Metro::Application{ };
+  auto app = metro::Application{ };
 
   app.initialize();
 

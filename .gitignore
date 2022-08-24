@@ -1,5 +1,6 @@
 .vscode/
 .old/
+bak/
 /build
 doc/
 __pycache__/
@@ -12,7 +13,9 @@ metro
 *.lnk
 desktop.ini
 
+/test
 test.*
+
 memo.*
 TODO.*
 

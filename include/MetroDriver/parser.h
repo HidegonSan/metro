@@ -6,14 +6,18 @@
 
 #include "AST.h"
 
-namespace Metro {
+namespace metro {
   struct Object;
   class Parser {
   public:
     explicit Parser(Token* token);
 
+    AST::Base* atom();
     AST::Base* factor();
+
+    AST::Base* subscript();
     AST::Base* member();
+
     AST::Base* mul();
     AST::Base* add();
     AST::Base* compare();

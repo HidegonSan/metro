@@ -7,7 +7,7 @@
 #include <vector>
 #include "ValueType.h"
 
-namespace Metro {
+namespace metro {
   struct Object;
   struct BuiltinFunc {
     using FuncPointer = Object*(* const)(std::vector<Object*> const& args);

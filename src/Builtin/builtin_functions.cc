@@ -17,41 +17,43 @@
 #define make_bifun_code(_name,_ret_t,_args,_code...) \
   make_bifun(_name,_ret_t,_args,make_bifun_lambda(_code))
 
-namespace Metro {
-  namespace {
-    //
-    // print
-    auto _bifun_print = make_bifun_lambda(
-      auto ret = gcnew(ValueType::Kind::Int);
+namespace metro {
 
-      for( auto&& arg : args ) {
-        auto&& s = arg->to_string();
+namespace {
+  //
+  // print
+  auto _bifun_print = make_bifun_lambda(
+    auto ret = gcnew(ValueType::Kind::Int);
 
-        ret->v_int += s.length();
-        std::cout << s;
-      }
+    for( auto&& arg : args ) {
+      auto&& s = arg->to_string();
 
-      return ret;
-    );
-  }
+      ret->v_int += s.length();
+      std::cout << s;
+    }
 
-  // -------------------------- //
-  //  builtin-functions
-  // -------------------------- //
-  std::vector<BuiltinFunc> const BuiltinFunc::builtin_functions {
-    // print
-    make_bifun(print, Int, { ValueType::Kind::Args },
-      _bifun_print
-    ),
-
-    // println
-    make_bifun_code(println, Int, { ValueType::Kind::Args },
-      auto&& ret = _bifun_print(args);
-
-      std::cout << std::endl;
-      ret->v_int += 1;
-
-      return ret;
-    )
-  };
+    return ret;
+  );
 }
+
+// -------------------------- //
+//  builtin-functions
+// -------------------------- //
+std::vector<BuiltinFunc> const BuiltinFunc::builtin_functions {
+  // print
+  make_bifun(print, Int, { ValueType::Kind::Args },
+    _bifun_print
+  ),
+
+  // println
+  make_bifun_code(println, Int, { ValueType::Kind::Args },
+    auto&& ret = _bifun_print(args);
+
+    std::cout << std::endl;
+    ret->v_int += 1;
+
+    return ret;
+  )
+};
+
+} // namespace metro

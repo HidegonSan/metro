@@ -1,6 +1,6 @@
 #pragma once
 
-namespace Metro::AST {
+namespace metro::AST {
   struct Base {
     Kind    kind;
     Token*  token;

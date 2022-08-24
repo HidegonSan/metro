@@ -4,7 +4,7 @@
 #include <vector>
 #include <utility>
 
-namespace Metro::AST {
+namespace metro::AST {
   using namespace std::string_literals;
   using SourceRange = std::pair<size_t, size_t>;
 }
@@ -20,6 +20,7 @@ namespace Metro::AST {
 #include "AST/Boolean.h"
 #include "AST/Value.h"
 #include "AST/Array.h"
+#include "AST/Tuple.h"
 
 #include "AST/Variable.h"
 #include "AST/Callfunc.h"

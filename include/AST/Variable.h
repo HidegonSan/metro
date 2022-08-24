@@ -3,7 +3,7 @@
 // -----------------------
 #pragma once
 
-namespace Metro::AST {
+namespace metro::AST {
   struct Variable : Base {
     std::string_view  name;
     Base*             defined; // <deprecated>
@@ -12,6 +12,7 @@ namespace Metro::AST {
 
     Variable(Token* tok)
       : Base(Kind::Variable, tok),
+        name(tok->str),
         defined(nullptr)
     {
     }

@@ -24,12 +24,13 @@ SOURCES	= src \
 	src/Types/AST \
 	src/Utils
 
-OPTFLAGS		= -O3
+OPTFLAGS		= -O0 -g
 WARNFLAGS		= -Wall -Wextra -Wno-switch
-COMMONFLAGS	= $(INCLUDES) $(OPTFLAGS) $(WARNFLAGS)
-CFLAGS			= $(COMMONFLAGS) -std=c17
-CXXFLAGS		= $(COMMONFLAGS) -std=c++20
-LDFLAGS			= -Wl,--gc-sections
+DBGFLAGS		= -DMETRO_DEBUG
+COMMONFLAGS	= $(DBGFLAGS) $(INCLUDES) $(OPTFLAGS) $(WARNFLAGS)
+CFLAGS			= $(COMMONFLAGS)
+CXXFLAGS		= $(CFLAGS) -std=c++20
+LDFLAGS			=
 
 %.o: %.c
 	@echo $(notdir $<)
@@ -50,13 +51,13 @@ CXXFILES		= $(notdir $(foreach dir,$(SOURCES),$(wildcard $(dir)/*.cc)))
 
 export OFILES		= $(CFILES:.c=.o) $(CXXFILES:.cc=.o)
 
-.PHONY: $(BUILD) all debug clean re install
+.PHONY: $(BUILD) all nodebug clean re install
 
 all: $(BUILD)
 	@$(MAKE) --no-print-directory -C $(BUILD) -f $(CURDIR)/Makefile
 
-debug: $(BUILD)
-	@$(MAKE) --no-print-directory OPTFLAGS="-g -O0" WARNFLAGS="-Wall -Wextra" LDFLAGS="" -C $(BUILD) -f $(CURDIR)/Makefile
+nodebug: $(BUILD)
+	@$(MAKE) --no-print-directory OPTFLAGS="-O3" DBGFLAGS="" LDFLAGS="-Wl,--gc-sections" -C $(BUILD) -f $(CURDIR)/Makefile
 
 $(BUILD):
 	@[ -d $@ ] || mkdir -p $@

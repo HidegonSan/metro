@@ -1,14 +1,18 @@
 #include <cstring>
+#include "source.h"
 #include "Types/Token.h"
-#include "MetroDriver/Lexer.h"
+#include "MetroDriver/lexer.h"
 #include "Utils.h"
 
-namespace Metro {
-  Lexer::Lexer(std::string const& source)
-    : source(source),
-      position(0),
-      length(source.length()),
-      linenum(0)
-  {
-  }
+namespace metro {
+
+Lexer::Lexer(Source const& src)
+  : position(0),
+    linenum(0),
+    source(src.data),
+    length(src.data.length()),
+    src(src)
+{
+}
+
 }

@@ -1,19 +1,29 @@
 #include "AST.h"
-#include "MetroDriver/Sema.h"
-#include "MetroDriver/Evaluator.h"
+#include "MetroDriver/sema.h"
+#include "MetroDriver/evaluator.h"
 #include "Error.h"
 #include "Debug.h"
 #include "Utils.h"
 
-namespace Metro::Semantics {
-  Sema::Sema(AST::Scope* root) {
-    this->root = root;
+namespace metro {
 
-    // make functions
-    for( auto&& x : root->elems ) {
-      if( x->kind == ASTKind::Function ) {
-        functions.emplace_back((AST::Function*)x);
-      }
+static Sema* __inst;
+
+Sema::Sema(AST::Scope* root) {
+  __inst = this;
+
+  this->root = root;
+
+  // make functions
+  for( auto&& x : root->elems ) {
+    if( x->kind == ASTKind::Function ) {
+      functions.emplace_back((AST::Function*)x);
     }
   }
+}
+
+Sema* Sema::get_instance() {
+  return __inst;
+}
+
 }

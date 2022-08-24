@@ -1,146 +1,157 @@
 #include "Types.h"
-#include "MetroDriver/Parser.h"
+#include "MetroDriver/parser.h"
 #include "Error.h"
 
-namespace Metro {
-  AST::Base* Parser::factor() {
+namespace metro {
 
-    auto stmt_ast = stmt();
+AST::Base* Parser::factor() {
 
-    if( stmt_ast != nullptr ) {
-      return stmt_ast;
+  // bracket
+  if( this->eat("(") ) {
+    auto tok = ate;
+    auto x = this->expr();
+
+    // tuple
+    if( eat(",") ) {
+      x = new AST::Tuple(tok, x);
+
+      do {
+        ((AST::Tuple*)x)->elements.emplace_back(this->expr());
+      } while( eat(",") );
     }
 
-    if( cur->str == "{" ) {
-      return expect_scope();
+    this->expect(")");
+    return x;
+  }
+
+  // stmt
+  if( auto stmt_ast = stmt(); stmt_ast != nullptr ) {
+    return stmt_ast;
+  }
+
+  // scope
+  if( cur->str == "{" ) {
+    return expect_scope();
+  }
+
+  // array
+  if( eat("[") ) {
+    auto ast = new AST::Array(ate);
+
+    if( !eat("]") ) {
+      do {
+        ast->elements.emplace_back(expr());
+      } while( eat(",") );
+      expect("]");
     }
 
-    if( eat("[") ) {
-      auto ast = new AST::Array(ate);
+    return ast;
+  }
 
-      if( !eat("]") ) {
+  // atom
+  if( auto _atom = this->atom(); _atom != nullptr ) {
+    if( _atom->kind == AST::Kind::Variable && this->eat("(") ) {
+      auto call = new AST::CallFunc(this->ate);
+
+      call->name = ((AST::Variable*)_atom)->name;
+
+      if( !this->eat(")") ) {
         do {
-          ast->elements.emplace_back(expr());
-        } while( eat(",") );
-        expect("]");
+          call->args.emplace_back(expr());
+        } while( this->eat(",") );
+
+        this->expect(")");
       }
 
-      return ast;
+      return call;
     }
 
-    if( eat("true") ) {
-      return new AST::Boolean(ate, true);
-    }
-
-    if( eat("false") ) {
-      return new AST::Boolean(ate, false);
-    }
-
-    if( eat("none") ) {
-      return new AST::None(ate);
-    }
-
-    switch( cur->kind ) {
-      case TokenKind::Int:
-      case TokenKind::Float:
-      case TokenKind::Char:
-      case TokenKind::String:
-        next();
-        return new AST::Value(cur->prev);
-
-      case TokenKind::Ident: {
-        if( cur->next->str == "(" ) {
-          auto ast = new AST::CallFunc(cur);
-
-          ast->name = cur->str;
-          next();
-
-          next();
-
-          if( !eat(")") ) {
-            do {
-              ast->args.emplace_back(expr());
-            } while( eat(",") );
-
-            expect(")");
-          }
-
-          return ast;
-        }
-
-        auto ast = new AST::Variable(cur);
-        ast->name = cur->str;
-
-        next();
-        return ast;
-      }
-    }
-
-    Error::add_error(ErrorKind::InvalidSyntax, cur, "invalid syntax");
-    Error::exit_app();
+    return _atom;
   }
 
-  AST::Base* Parser::member() {
-    auto x = factor();
-
-    while( check() && eat(".") ) {
-      x = new AST::Expr(AST::Kind::MemberAccess, x, factor(), ate);
-    }
-
-    return x;
-  }
-
-  AST::Base* Parser::mul() {
-    auto x = member();
-
-    while( check() ) {
-      if( eat("*") ) x = new AST::Expr(AST::Kind::Mul, x, member(), ate);
-      else if( eat("/") ) x = new AST::Expr(AST::Kind::Div, x, member(), ate);
-      else break;
-    }
-
-    return x;
-  }
-
-  AST::Base* Parser::add() {
-    auto x = mul();
-
-    while( check() ) {
-      auto tok = cur;
-
-      if( eat("+") ) x = new AST::Expr(AST::Kind::Add, x, mul(), tok);
-      else if( eat("-") ) x = new AST::Expr(AST::Kind::Sub, x, mul(), tok);
-      else break;
-    }
-
-    return x;
-  }
-
-  AST::Base* Parser::compare() {
-    using ItemKind = AST::Compare::Item::Kind;
-
-    auto x = add();
-
-    while( check() ) {
-      if( eat(">") ) AST::Compare::create(x)->append(ItemKind::BiggerLeft, ate, add());
-      else if( eat("<") ) AST::Compare::create(x)->append(ItemKind::BiggerRight, ate, add());
-      else break;
-    }
-
-    return x;
-  }
-
-  AST::Base* Parser::assign() {
-    auto x = compare();
-
-    if( eat("=") ) {
-      x = new AST::Expr(AST::Kind::Assign, x, assign(), ate);
-    }
-
-    return x;
-  }
-
-  AST::Base* Parser::expr() {
-    return assign();
-  }
+  Error(ErrorKind::InvalidSyntax, cur, "invalid syntax")
+    .emit(true);
 }
+
+AST::Base* Parser::subscript() {
+  auto x = this->factor();
+
+  while( this->check() && this->eat("[") ) {
+    auto tok = ate;
+    x = new AST::Expr(AST::Kind::Subscript, x, this->expr(), tok);
+  }
+
+  return x;
+}
+
+AST::Base* Parser::member() {
+  auto x = this->subscript();
+
+  while( this->check() && this->eat(".") ) {
+    x = new AST::Expr(AST::Kind::MemberAccess, x, this->factor(), this->ate);
+  }
+
+  return x;
+}
+
+AST::Base* Parser::mul() {
+  auto x = member();
+
+  while( check() ) {
+    if( eat("*") ) x = new AST::Expr(AST::Kind::Mul, x, member(), ate);
+    else if( eat("/") ) x = new AST::Expr(AST::Kind::Div, x, member(), ate);
+    else break;
+  }
+
+  return x;
+}
+
+AST::Base* Parser::add() {
+  auto x = mul();
+
+  while( check() ) {
+    auto tok = cur;
+
+    if( eat("+") ) x = new AST::Expr(AST::Kind::Add, x, mul(), tok);
+    else if( eat("-") ) x = new AST::Expr(AST::Kind::Sub, x, mul(), tok);
+    else break;
+  }
+
+  return x;
+}
+
+AST::Base* Parser::compare() {
+  using ItemKind = AST::Compare::Item::Kind;
+
+  auto x = this->add();
+
+  while( this->check() ) {
+    auto tok = this->cur;
+
+    if( this->eat(">") ) AST::Compare::create(x)->append(ItemKind::BiggerLeft, tok, this->add());
+    else if( this->eat("<") ) AST::Compare::create(x)->append(ItemKind::BiggerRight, tok, this->add());
+    else if( this->eat(">=") ) AST::Compare::create(x)->append(ItemKind::BiggerOrEqualLeft, tok, this->add());
+    else if( this->eat("<=") ) AST::Compare::create(x)->append(ItemKind::BiggerOrEqualRight, tok, this->add());
+    else if( this->eat("==") ) AST::Compare::create(x)->append(ItemKind::Equal, tok, this->add());
+    else if( this->eat("!=") ) AST::Compare::create(x)->append(ItemKind::NotEqual, tok, this->add());
+    else break;
+  }
+
+  return x;
+}
+
+AST::Base* Parser::assign() {
+  auto x = compare();
+
+  if( eat("=") ) {
+    x = new AST::Expr(AST::Kind::Assign, x, assign(), ate);
+  }
+
+  return x;
+}
+
+AST::Base* Parser::expr() {
+  return assign();
+}
+
+} // namespace metro

@@ -5,13 +5,15 @@
 // -----------------------
 #pragma once
 
-namespace Metro::AST {
+namespace metro::AST {
   struct Struct;
   struct Type : Base {
     std::string_view    name;
     std::vector<Type*>  elems;
-    bool  is_constant;
+    size_t arr_depth;
+    bool  is_mutable;
     bool  is_reference;
+    bool  have_elements;
 
     AST::Struct* userdef;
 
@@ -20,8 +22,10 @@ namespace Metro::AST {
 
     Type(Token* tok)
       : Base(Kind::Type, tok),
-        is_constant(false),
+        arr_depth(0),
+        is_mutable(false),
         is_reference(false),
+        have_elements(false),
         userdef(nullptr)
     {
     }

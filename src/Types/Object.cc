@@ -3,64 +3,100 @@
 #include "Utils.h"
 #include "Debug.h"
 
-namespace Metro {
-  Object* Object::none = new Object(ValueType::Kind::None);
+namespace metro {
 
-  Object::Object(ValueType type)
-    : type(type),
-      ref_count(0),
-      is_weak(false),
-      v_int(0)
-  {
+Object* Object::none = new Object(ValueType::Kind::None);
+
+Object::Object(ValueType type)
+  : type(type),
+    ref_count(0),
+    is_weak(false),
+    v_int(0)
+{
   debug(
     alert;
     alertctor(Object);
   )
-  }
+}
 
-  Object::~Object() {
+Object::~Object() {
   debug(
     alert;
-    fprintf(stderr, "\t#Object destructing: %p\n", this);
+    alertdtor(Object);
   )
+}
+
+//
+// convert to string
+std::string Object::to_string() const {
+  static bool str_q = false;
+
+  if( type.arr_depth != 0 ) {
+    return "[" + Utils::join(", ", list, [] (auto& p) { return p->to_string(); }) + "]";
   }
 
-  std::string Object::to_string() const {
-    auto ret = std::string{ };
+  switch( type.kind ) {
+    // int
+    case ValueType::Kind::Int:
+      return std::to_string(v_int);
 
-    switch( type.kind ) {
-      case ValueType::Kind::Int:
-        ret = std::to_string(v_int);
-        break;
+    // float
+    case ValueType::Kind::Float: {
+      auto ret = std::to_string(v_float);
 
-      case ValueType::Kind::Float:
-        ret = std::to_string(v_float);
-        break;
+      while( ret.length() > 1 && (*ret.rbegin() == '0' || *ret.rbegin() == '.') ) {
+        ret.pop_back();
+      }
 
-      case ValueType::Kind::Bool:
-        ret = v_bool ? "true" : "false";
-        break;
-
-      case ValueType::Kind::Char:
-        ret = Utils::Strings::to_string(std::u16string(v_char, 1));
-        break;
-
-      case ValueType::Kind::String:
-        ret = Utils::Strings::to_string(v_str);
-        break;
-
-      case ValueType::Kind::None:
-        ret = "none";
-        break;
-      
-      default:
-        TODO_IMPL
+      return ret;
     }
 
-    return ret;
+    // bool
+    case ValueType::Kind::Bool:
+      return v_bool ? "true" : "false";
+
+    // char
+    case ValueType::Kind::Char:
+      return Utils::Strings::to_string(std::u16string(v_char, 1));
+
+    // string
+    case ValueType::Kind::String: {
+      if( str_q )
+        return '"' + Utils::Strings::to_string(v_str) + '"';
+
+      return Utils::Strings::to_string(v_str);
+    }
+
+    // tuple
+    case ValueType::Kind::Tuple: {
+      auto bak = str_q;
+
+      str_q = true;
+      auto ret = "(" + Utils::join(", ", list, [] (auto& p) { return p->to_string(); }) + ")";
+
+      str_q = bak;
+      return ret;
+    }
+
+    // none
+    case ValueType::Kind::None:
+      return "none";
+
+    // struct
+    case ValueType::Kind::UserDef: {
+
+      break;
+    }
+
   }
 
-  Object* Object::clone() const {
-    return new Object(*this);
-  }
+  TODO_IMPL
 }
+
+//
+// clone
+Object* Object::clone() const {
+  return new Object(*this);
+}
+
+} // namespace metro

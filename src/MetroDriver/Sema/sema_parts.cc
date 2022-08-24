@@ -1,109 +1,116 @@
 #include "AST.h"
-#include "MetroDriver/Sema.h"
+#include "MetroDriver/sema.h"
 #include "Error.h"
 #include "Debug.h"
 #include "Utils.h"
 
-namespace Metro::Semantics {
-  ValueType Sema::sema_callfunc(AST::CallFunc* ast) {
-    std::vector<ValueType> arg_types;
+namespace metro {
 
-    // arguments
-    for( auto&& arg : ast->args ) {
-      arg_types.emplace_back(walk(arg));
-    }
+// -------------------
+//  関数呼び出し
+// -------------------
+ValueType Sema::sema_callfunc(AST::CallFunc* ast) {
 
-    auto find = find_func(ast->name);
-    auto is_builtin = find == nullptr;
+  std::vector<ValueType> arg_types; // call
 
-    BuiltinFunc const* bfun = nullptr;
 
-    // doesn't exists user-defined function
-    if( find == nullptr ) {
-      // doens't exists built-in function
-      if( (bfun = find_builtin_func(ast->name)) == nullptr ) {
-        Error::add_error(ErrorKind::Undefined, ast->token, "undefined function name");
-        Error::exit_app();
-      }
-      else {
-        ast->callee_builtin = bfun;
-      }
-    }
-    else {
-      ast->callee = find;
-    }
-
-    auto arg = arg_types.begin();
-    //size_t max = is_builtin ? ast->callee_builtin->arg_types.size() : ast->callee->args.size();
-    size_t max = is_builtin ? bfun->arg_types.size() : find->args.size();
-
-    for( size_t i = 0;; i++, arg++ ) {
-      if( i == max ) {
-        if( i != ast->args.size() ) {
-          Error::add_error(ErrorKind::TooManyArguments, ast->token, "too many arguments");
-        }
-
-        break;
-      }
-
-      auto&& func_arg_type = is_builtin ? bfun->arg_types[i] : walk(find->args[i].type);
-
-      if( func_arg_type.equals_kind(ValueType::Kind::Args) ) {
-        break;
-      }
-
-      if( i == ast->args.size() ) {
-        Error::add_error(ErrorKind::TooFewArguments, ast->token, "too few arguments");
-        break;
-      }
-
-      if( !func_arg_type.equals(*arg) ) {
-        Error::add_error(ErrorKind::TypeMismatch, ast->args[i], "type mismatch");
-      }
-    }
-
-    return is_builtin ? bfun->ret_type : walk(find);
+  // arguments
+  for( auto&& arg : ast->args ) {
+    arg_types.emplace_back(walk(arg));
   }
 
-  ValueType Sema::sema_controls(AST::Base* ast) {
-    ValueType ret;
+  BuiltinFunc const* bfun;
 
-    switch( ast->kind ) {
-      case ASTKind::If: {
-        auto if_x = (AST::If*)ast;
+  auto find = find_func(ast->name);
+  auto is_builtin = find == nullptr;
 
-        if( !walk(if_x->cond).equals(ValueType::Kind::Bool) ) {
-          Error::add_error(ErrorKind::TypeMismatch, if_x->cond, "condition must be boolean");
-        }
+  // doesn't exists user-defined function
+  if( find == nullptr ) {
+    // doens't exists built-in function
+    if( (bfun = find_builtin_func(ast->name)) == nullptr )
+      Error(ErrorKind::Undefined, ast->token, "undefined function name").emit(true);
+    else
+      ast->callee_builtin = bfun;
+  }
+  else {
+    ast->callee_func = find;
+  }
 
-        ret = walk(if_x->if_true);
+  int check_res;
 
-        if( if_x->if_false && !ret.equals(walk(if_x->if_false)) ) {
-          Error::add_error(ErrorKind::TypeMismatch, if_x, "if-expr type mismatch");
-        }
+  if( is_builtin ) {
+    check_res = check_arguments(bfun->arg_types, arg_types);
+  }
+  else {
+    TypeVector tmp;
 
-        break;
-      }
-
-      case ASTKind::For: {
-        auto for_x = (AST::For*)ast;
-
-        walk(for_x->init);
-
-        if( !walk(for_x->cond).equals(ValueType::Kind::Bool) ) {
-          Error::add_error(ErrorKind::TypeMismatch, for_x->cond, "condition must be boolean");
-        }
-
-        walk(for_x->counter);
-        walk(for_x->code);
-
-        break;
-      }
-
-      default:
-        TODO_IMPL
+    for( auto&& x : find->args ) {
+      tmp.emplace_back(walk(x.type));
     }
 
-    return ret;
+    check_res = check_arguments(tmp, arg_types);
   }
+
+  switch( check_res ) {
+    case -1:
+      Error(ErrorKind::TooFewArguments, ast, "too few arguments to call").emit();
+      break;
+
+    case -2:
+      Error(ErrorKind::TooManyArguments, ast, "too many arguments to call").emit();
+      break;
+
+    case -3:
+      break;
+
+    default:
+      Error(ErrorKind::TypeMismatch, ast->args[check_res], "type mismatch").emit();
+      break;
+  }
+
+  return is_builtin ? bfun->ret_type : walk(find);
 }
+
+ValueType Sema::sema_controls(AST::Base* ast) {
+  ValueType ret;
+
+  switch( ast->kind ) {
+    case ASTKind::If: {
+      auto if_x = (AST::If*)ast;
+
+      if( !walk(if_x->cond).equals(ValueType::Kind::Bool) ) {
+        Error(ErrorKind::TypeMismatch, if_x->cond, "condition must be boolean").emit();
+      }
+
+      ret = walk(if_x->if_true);
+
+      if( if_x->if_false && !ret.equals(walk(if_x->if_false)) ) {
+        Error(ErrorKind::TypeMismatch, if_x, "if-expr type mismatch").emit();
+      }
+
+      break;
+    }
+
+    case ASTKind::For: {
+      auto for_x = (AST::For*)ast;
+
+      walk(for_x->init);
+
+      if( !walk(for_x->cond).equals(ValueType::Kind::Bool) ) {
+        Error(ErrorKind::TypeMismatch, for_x->cond, "condition must be boolean").emit();
+      }
+
+      walk(for_x->counter);
+      walk(for_x->code);
+
+      break;
+    }
+
+    default:
+      TODO_IMPL
+  }
+
+  return ret;
+}
+
+} // namespace metro

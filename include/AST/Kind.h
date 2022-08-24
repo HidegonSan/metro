@@ -1,6 +1,6 @@
 #pragma once
 
-namespace Metro::AST {
+namespace metro::AST {
   enum class Kind {
     None,
     Type,
@@ -9,11 +9,14 @@ namespace Metro::AST {
 
     Boolean,
     Value,
-    Array,
-
     Variable,
-    Callfunc,
 
+    Array,
+    Tuple,
+    // EmptyArray, // TODO: impl
+
+    Callfunc,
+    Subscript,
     MemberAccess,
 
     Mul,
@@ -29,7 +32,9 @@ namespace Metro::AST {
     For,
     Loop,
     While,
+
     Scope,
+    EmptyScope,
 
     Function,
     Struct,

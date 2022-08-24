@@ -5,7 +5,7 @@
 
 #include "Types.h"
 
-namespace Metro {
+namespace metro {
   static Application* _inst;
 
   std::list<AppContext::Script*> Application::running_script;
@@ -41,7 +41,7 @@ namespace Metro {
       for( auto&& script : ctx.scripts ) {
         if( !ctx.no_print_filenames && ctx.scripts.size() > 1 ) {
           std::cout
-            << script.path << std::endl;
+            << script.source.path << std::endl;
         }
 
         execute_script(script);
