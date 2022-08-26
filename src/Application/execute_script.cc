@@ -30,6 +30,8 @@ AppContext::Script Application::open_script_file(char const* path) {
     script.source.data += line + '\n';
   }
 
+  script.source.make_lineloc_list();
+
   return script;
 }
 

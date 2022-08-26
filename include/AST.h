@@ -4,9 +4,17 @@
 #include <vector>
 #include <utility>
 
-namespace metro::AST {
-  using namespace std::string_literals;
-  using SourceRange = std::pair<size_t, size_t>;
+namespace metro {
+
+struct Token;
+
+namespace AST {
+
+using namespace std::string_literals;
+using SourceRange = std::pair<Token*, Token*>;
+
+}
+
 }
 
 #include "Types.h"

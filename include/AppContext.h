@@ -45,4 +45,4 @@ struct AppContext {
   }
 };
 
-}
+} // namespace metro

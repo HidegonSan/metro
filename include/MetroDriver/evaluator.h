@@ -4,32 +4,36 @@
 
 #pragma once
 
+#include "AST.h"
+
 namespace metro {
-  class Evaluator {
-  public:
-    Evaluator() { }
 
-    //
-    // evaluate
-    Object* eval(AST::Base* ast);
-    Object** eval_lvalue(AST::Base* ast);
+class Evaluator {
+public:
+  Evaluator() { }
 
-    //
-    // operators
-    Object* eval_operator(AST::Kind kind, Object* left, Object* right);
+  //
+  // evaluate
+  Object* eval(AST::Base* ast);
+  Object** eval_lvalue(AST::Base* ast);
 
-    //
-    // compareing operators
-    Object* compute_compare(AST::Compare* ast);
+  //
+  // operators
+  Object* eval_operator(AST::Kind kind, Object* left, Object* right);
 
-    //
-    // 型情報を元にオブジェクトを構築する
-    Object* construct_object_from_type(AST::Type* type);
+  //
+  // compareing operators
+  Object* compute_compare(AST::Compare* ast);
 
-  private:
+  //
+  // 型情報を元にオブジェクトを構築する
+  Object* construct_object_from_type(AST::Type* type);
 
-    size_t call_depth = 0;
+private:
 
-    std::vector<Object*> args;
-  };
-}
+  size_t call_depth = 0;
+
+  std::vector<Object*> args;
+};
+
+} // namespace metro

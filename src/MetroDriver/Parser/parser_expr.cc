@@ -51,7 +51,7 @@ AST::Base* Parser::factor() {
   // atom
   if( auto _atom = this->atom(); _atom != nullptr ) {
     if( _atom->kind == AST::Kind::Variable && this->eat("(") ) {
-      auto call = new AST::CallFunc(this->ate);
+      auto call = new AST::CallFunc(_atom->token);
 
       call->name = ((AST::Variable*)_atom)->name;
 

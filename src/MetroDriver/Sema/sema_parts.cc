@@ -72,20 +72,22 @@ ValueType Sema::sema_callfunc(AST::CallFunc* ast) {
 }
 
 ValueType Sema::sema_controls(AST::Base* ast) {
-  ValueType ret;
+  auto ret = ValueType{ };
 
   switch( ast->kind ) {
     case ASTKind::If: {
       auto if_x = (AST::If*)ast;
 
       if( !walk(if_x->cond).equals(ValueType::Kind::Bool) ) {
-        Error(ErrorKind::TypeMismatch, if_x->cond, "condition must be boolean").emit();
+        Error(ErrorKind::TypeMismatch, if_x->cond, "condition must be boolean")
+          .emit();
       }
 
       ret = walk(if_x->if_true);
 
       if( if_x->if_false && !ret.equals(walk(if_x->if_false)) ) {
-        Error(ErrorKind::TypeMismatch, if_x, "if-expr type mismatch").emit();
+        Error(ErrorKind::TypeMismatch, if_x->token, "if-expr type mismatch")
+          .emit();
       }
 
       break;
