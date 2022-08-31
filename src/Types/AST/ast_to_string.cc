@@ -93,6 +93,9 @@ std::string None::to_string() const {
 }
 
 std::string Return::to_string() const {
+  if( !expr )
+    return "<Return>";
+
   return Utils::linkstr("<Return ", expr->to_string(), ">");
 }
 

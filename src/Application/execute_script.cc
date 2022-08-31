@@ -64,6 +64,9 @@ Object* Application::execute_script(AppContext::Script& script) {
 
   Error::check();
 
+  // ---------------
+  return nullptr;
+
   Evaluator evaluator;
 
   auto obj = evaluator.eval(ast);

@@ -33,8 +33,8 @@ fn func() int {
 ValueType& Sema::analyze_func_return_type(AST::Function* func) {
   auto& ret = walked[func];
 
-  // func->code からすべての last-expr を取得
-  auto lastlist = get_final_expr_full(func->code);
+  // func->code からすべての result を取得
+  auto lastlist = get_results_wrap(func->code);
 
   // 型が指定されている場合、すべての last-expr がそれと同じであることを確認し、帰る
   if( func->return_type != nullptr ) {
@@ -76,8 +76,7 @@ ValueType& Sema::analyze_func_return_type(AST::Function* func) {
       .emit(true);
   }
 
-
-  // alertios("function " << func->name << ": return-type = " << out.to_string());
+  alertios("function " << func->name << ": return-type = " << ret.to_string());
 
   return ret;
 }

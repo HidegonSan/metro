@@ -6,14 +6,15 @@
 namespace metro::AST {
   struct Variable : Base {
     std::string_view  name;
-    Base*             defined; // <deprecated>
+    
+    bool is_arg;
 
     std::string to_string() const;
 
     Variable(Token* tok)
       : Base(Kind::Variable, tok),
         name(tok->str),
-        defined(nullptr)
+        is_arg(false)
     {
     }
   };

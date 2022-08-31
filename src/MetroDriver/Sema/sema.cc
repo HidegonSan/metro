@@ -22,8 +22,10 @@ void Sema::analyze() {
     }
   }
 
-  for( auto&& ast : root->elements ) {
-    walk(ast);
+  this->scopelist.emplace_front().ast = root;
+
+  for( auto&& ast : this->root->elements ) {
+    this->walk(ast);
   }
 }
 

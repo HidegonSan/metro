@@ -44,4 +44,16 @@ void Evaluator::leave_scope() {
   this->cur_scope = &*this->scope_stack.begin();
 }
 
+Evaluator::CallStack& Evaluator::enter_func(AST::Function* ast) {
+
+  TODO_IMPL
+
+}
+
+void Evaluator::leave_func() {
+
+  TODO_IMPL
+
+}
+
 } // namespace metro

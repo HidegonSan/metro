@@ -10,14 +10,7 @@ Object** Evaluator::eval_lvalue(AST::Base* ast) {
     case ASTKind::Variable: {
       auto x = (AST::Variable*)ast;
 
-      switch( x->defined->kind ) {
-        case ASTKind::Argument:
-          return &((AST::Argument*)x->defined)->value;
-
-        case ASTKind::VarDefine:
-          return &((AST::VarDefine*)x->defined)->value;
-      }
-
+      
       break;
     }
   }

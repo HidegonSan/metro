@@ -73,6 +73,27 @@ void Sema::expect_all_same_with(std::vector<AST::Base*> const& vec, ValueType co
   Error::check();
 }
 
+Sema::VariableContext* Sema::get_var_context(std::string_view name, bool create) {
+  for( auto&& scope : this->scopelist ) {
+    for( auto&& var : scope.variables ) {
+      if( var.name == name )
+        return &var;
+    }
+  }
+
+  if( create ) {
+    auto& scope = this->get_cur_scope();
+    auto& var = scope.variables.emplace_back();
+
+    var.name = name;
+    var.index = scope.variables.size() - 1;
+
+    return &var;
+  }
+
+  return nullptr;
+}
+
 AST::Function* Sema::find_func(std::string_view name) {
   for( auto&& func : functions) {
     if( func->name == name ) {
@@ -91,92 +112,6 @@ BuiltinFunc const* Sema::find_builtin_func(std::string_view name) {
   }
 
   return nullptr;
-}
-
-ASTVector Sema::find_return(AST::Base* ast) {
-  ASTVector ret;
-
-  switch( ast->kind ) {
-    case AST::Kind::Return: {
-      ret.emplace_back(ast);
-      break;
-    }
-
-    case AST::Kind::Scope: {
-      auto ast_scope = (AST::Scope*)ast;
-
-      for( auto&& x : ast_scope->elements ) {
-        append_vec(ret, find_return(x));
-      }
-
-      break;
-    }
-
-    case AST::Kind::Function: {
-      auto ast_func = (AST::Function*)ast;
-
-      append_vec(ret, find_return(ast_func->code));
-
-      break;
-    }
-  }
-
-  return ret;
-}
-
-ASTVector Sema::get_all_final_expr(AST::Base* ast) {
-  // if( !ast )
-  //   return { };
-  assert(ast != nullptr);
-
-  ASTVector ret;
-
-  switch( ast->kind ) {
-    case AST::Kind::Function:
-      break;
-
-    case AST::Kind::If: {
-      auto if_ast = (AST::If*)ast;
-
-      append_vec(ret, get_all_final_expr(if_ast->if_true));
-      append_vec(ret, get_all_final_expr(if_ast->if_false));
-
-      break;
-    }
-
-    case AST::Kind::Scope: {
-      auto ast_scope = (AST::Scope*)ast;
-
-      if( ast_scope->elements.empty() ) {
-        ret.emplace_back(ast);
-        break;
-      }
-
-      append_vec(ret, get_all_final_expr(*ast_scope->elements.rbegin()));
-      break;
-    }
-
-    default:
-      ret.emplace_back(ast);
-      break;
-  }
-
-  return ret;
-}
-
-ASTVector Sema::get_final_expr_full(AST::Base* ast) {
-  ASTVector ret;
-
-  append_vec(ret, find_return(ast));
-  append_vec(ret, get_all_final_expr(ast));
-
-  ret.erase(std::unique(ret.begin(), ret.end()), ret.end());
-
-  for( auto&& ast : ret )
-    if( ast->kind == ASTKind::Return )
-      ast = ((AST::Return*)ast)->expr;
-
-  return ret;
 }
 
 /*
@@ -199,8 +134,11 @@ ASTVector Sema::get_final_expr_full(AST::Base* ast) {
 
 */
 
-void Sema::get_final_expr(ASTVector& vec, AST::Base* ast) {
-  if( ast->is_expr ) {
+void Sema::get_results(ASTVector& vec, AST::Base* ast, bool last_elem) {
+  if( !ast )
+    return;
+
+  if( last_elem && ast->is_expr ) {
     vec.emplace_back(ast);
     return;
   }
@@ -214,14 +152,21 @@ void Sema::get_final_expr(ASTVector& vec, AST::Base* ast) {
     case ASTKind::Tuple:
     case ASTKind::Callfunc:
     case ASTKind::Compare:
-      vec.emplace_back(ast);
+      if( last_elem )
+        vec.emplace_back(ast);
+
       break;
 
     case ASTKind::Scope: {
       auto x = (AST::Scope*)ast;
 
+      if( last_elem && x->elements.empty() ) {
+        vec.emplace_back(ast);
+        break;
+      }
+
       for( auto&& elem : x->elements ) {
-        get_final_expr(vec, elem);
+        get_results(vec, elem, last_elem && *x->elements.rbegin() == elem);
       }
 
       break;
@@ -230,21 +175,39 @@ void Sema::get_final_expr(ASTVector& vec, AST::Base* ast) {
     case ASTKind::If: {
       auto x = (AST::If*)ast;
 
-      get_final_expr(vec, x->if_true);
-      get_final_expr(vec, x->if_false);
+      get_results(vec, x->if_true, last_elem);
+      get_results(vec, x->if_false, last_elem);
 
       break;
     }
 
     case ASTKind::Return: {
-      vec.emplace_back(ast);
+      auto x = (AST::Return*)ast;
+
+      if( x->expr )
+        get_results(vec, x->expr, true);
+      else
+        vec.emplace_back(ast);
+
       break;
     }
+
+    case ASTKind::Function:
+    case ASTKind::VarDefine:
+      break;
 
     default:
       alertfmt("%d", ast->kind);
       crash;
   }
+}
+
+ASTVector Sema::get_results_wrap(AST::Base* ast) {
+  ASTVector ret;
+
+  get_results(ret, ast, true);
+
+  return ret;
 }
 
 bool Sema::contains_callfunc_in_expr(std::string_view name, AST::Base* ast) {

@@ -29,24 +29,31 @@ private:
   struct VariableContext {
     std::string_view name;
 
-    bool was_type_analyzed = false;
     ValueType type;
+    bool was_type_analyzed;
 
+    size_t index;
 
-  };
-
-  struct Function {
-    std::vector<VariableContext> variables;
-
-
+    VariableContext()
+      : was_type_analyzed(false),
+        index(0)
+    {
+    }
   };
 
   struct ScopeContext {
-    AST::Scope*  scope = nullptr;
-    AST::Base* cur_ast = nullptr;
-    size_t  cur_index = 0;
+    AST::Scope*  ast = nullptr;
+
+    AST::Base* cur_ast = nullptr; //
+    size_t  cur_index = 0;        // Sema::walk()
 
     std::vector<VariableContext> variables;
+  };
+
+  struct Function {
+    std::vector<VariableContext> arguments;
+
+
   };
 
   struct TypeAttr {
@@ -95,6 +102,8 @@ public:
   // // find variable context
   // VariableContext* find_var_context(AST::Base* defined);
 
+  VariableContext* get_var_context(std::string_view name, bool create = false);
+
   //
   // 名前から関数を探す
   AST::Function* find_func(std::string_view name);
@@ -106,18 +115,6 @@ public:
   //
   // 関数の戻り値の型を解析する
   ValueType& analyze_func_return_type(AST::Function* ast);
-
-  //
-  // return 式を探して out に追加する
-  ASTVector find_return(AST::Base* ast);
-
-  //
-  // append all final-expr to paramater out (without return-expr)
-  ASTVector get_all_final_expr(AST::Base* ast);
-
-  //
-  // get all expressions that can be return value of ast
-  ASTVector get_final_expr_full(AST::Base* ast);
 
 
   //
@@ -132,8 +129,8 @@ public:
   static void ast_finder(AST::Base* ast, WalkerFuncPointer walker);
 
 
-  static void get_final_expr(ASTVector& vec, AST::Base* ast);
-
+  static void get_results(ASTVector& vec, AST::Base* ast, bool last_elem = false);
+  static ASTVector get_results_wrap(AST::Base* ast);
 
   //
   // create object from token
@@ -178,4 +175,4 @@ private:
 
 };
 
-}
+} // namespace metro
