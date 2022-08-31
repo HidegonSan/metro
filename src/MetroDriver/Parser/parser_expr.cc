@@ -25,14 +25,12 @@ AST::Base* Parser::factor() {
   }
 
   // stmt
-  if( auto stmt_ast = stmt(); stmt_ast != nullptr ) {
+  if( auto stmt_ast = stmt(); stmt_ast != nullptr )
     return stmt_ast;
-  }
 
   // scope
-  if( cur->str == "{" ) {
+  if( cur->str == "{" )
     return expect_scope();
-  }
 
   // array
   if( eat("[") ) {
@@ -42,6 +40,7 @@ AST::Base* Parser::factor() {
       do {
         ast->elements.emplace_back(expr());
       } while( eat(",") );
+
       expect("]");
     }
 

@@ -28,7 +28,7 @@ ValueType Sema::sema_callfunc(AST::CallFunc* ast) {
   if( find == nullptr ) {
     // doens't exists built-in function
     if( (bfun = find_builtin_func(ast->name)) == nullptr )
-      Error(ErrorKind::Undefined, ast->token, "undefined function name").emit(true);
+      Error(ErrorKind::UndefinedFunction, ast->token, "undefined function name").emit(true);
     else
       ast->callee_builtin = bfun;
   }

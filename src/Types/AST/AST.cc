@@ -7,6 +7,10 @@ bool Base::is_empty_array() const {
   return kind == Kind::Array && ((AST::Array*)this)->elements.empty();
 }
 
+bool Base::is_factor() const {
+  return false;
+}
+
 bool If::closed_with_else() const {
   auto x = if_false;
 

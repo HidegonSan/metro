@@ -64,6 +64,18 @@ AST::Base* Parser::stmt() {
     return ast;
   }
 
+  if( this->eat("return") ) {
+    if( auto tok = this->ate; this->eat(";") )
+      return new AST::Return(tok);
+
+    auto ast = new AST::Return(this->ate);
+
+    ast->expr = this->expr();
+
+    this->expect(";");
+    return ast;
+  }
+
   return nullptr;
 }
 

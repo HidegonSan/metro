@@ -10,6 +10,9 @@
 #include <list>
 #include <map>
 #include "AST.h"
+#include "colors.h"
+
+#define COL_TYPENAME 
 
 namespace metro {
 
@@ -17,13 +20,24 @@ using TypeVector = std::vector<ValueType>;
 using ASTVector = std::vector<AST::Base*>;
 
 class Sema {
-  using ASTKind = AST::Kind;
 
+public:
+  using ASTKind = AST::Kind;
+  using WalkerFuncPointer = bool(*)(AST::Base*);
+
+private:
   struct VariableContext {
-    AST::VarDefine*  defined;
+    std::string_view name;
 
     bool was_type_analyzed = false;
     ValueType type;
+
+
+  };
+
+  struct Function {
+    std::vector<VariableContext> variables;
+
 
   };
 
@@ -32,7 +46,7 @@ class Sema {
     AST::Base* cur_ast = nullptr;
     size_t  cur_index = 0;
 
-    std::map<std::string_view, VariableContext> var_context;
+    std::vector<VariableContext> variables;
   };
 
   struct TypeAttr {
@@ -53,6 +67,8 @@ public:
 
   static Sema* get_instance();
 
+  void analyze();
+
   // == walk ==
   ValueType walk(AST::Base* ast);
 
@@ -71,13 +87,13 @@ public:
   //
   void expect_all_same_with(std::vector<AST::Base*> const& vec, ValueType const& type);
 
-  //
-  // 名前から変数の定義場所を探す
-  AST::Base* find_var_defined(std::string_view name);
+  // //
+  // // 名前から変数の定義場所を探す
+  // AST::Base* find_var_defined(std::string_view name);
 
-  //
-  // find variable context
-  VariableContext* find_var_context(AST::Base* defined);
+  // //
+  // // find variable context
+  // VariableContext* find_var_context(AST::Base* defined);
 
   //
   // 名前から関数を探す
@@ -89,7 +105,7 @@ public:
 
   //
   // 関数の戻り値の型を解析する
-  ValueType analyze_func_return_type(AST::Function* ast);
+  ValueType& analyze_func_return_type(AST::Function* ast);
 
   //
   // return 式を探して out に追加する
@@ -103,17 +119,25 @@ public:
   // get all expressions that can be return value of ast
   ASTVector get_final_expr_full(AST::Base* ast);
 
+
   //
   // 式の中に name と同名の関数呼び出しが含まれているかどうか確認
   //  !!! ast には AST::Expr を渡すこと !!!
   //  !!! 'ast' must AST::Expr !!!
   bool contains_callfunc_in_expr(std::string_view name, AST::Base* ast);
 
+
+  /* TODO: impl */
+  static ASTVector&& get_finder_result();
+  static void ast_finder(AST::Base* ast, WalkerFuncPointer walker);
+
+
+  static void get_final_expr(ASTVector& vec, AST::Base* ast);
+
+
   //
   // create object from token
   static Object* create_obj(Token* token);
-
-  
 
   //
   //  /*  check argument types of call and callee   */

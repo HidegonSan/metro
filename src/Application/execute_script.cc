@@ -60,7 +60,7 @@ Object* Application::execute_script(AppContext::Script& script) {
 
   Sema sema{ (AST::Scope*)ast };
 
-  sema.walk(ast);
+  sema.analyze();
 
   Error::check();
 

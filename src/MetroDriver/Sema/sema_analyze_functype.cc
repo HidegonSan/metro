@@ -30,8 +30,8 @@ fn func() int {
 
 // ---------------------------------------------------- */
 
-ValueType Sema::analyze_func_return_type(AST::Function* func) {
-  ValueType ret;
+ValueType& Sema::analyze_func_return_type(AST::Function* func) {
+  auto& ret = walked[func];
 
   // func->code からすべての last-expr を取得
   auto lastlist = get_final_expr_full(func->code);

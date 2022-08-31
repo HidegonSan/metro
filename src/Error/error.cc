@@ -40,8 +40,6 @@ static std::tuple<std::size_t, std::size_t, std::size_t> get_line_from_pos(AppCo
   return { line_num, begin, end };
 }*/
 
-extern size_t _emitted_err_count;
-
 Error::Error(ErrorKind kind, Token* token, std::string&& msg)
   : kind(kind),
     message(std::forward<std::string>(msg)),
@@ -71,9 +69,8 @@ Error& Error::add_help(AST::Base* ast, std::string&& msg) {
 }
 
 void Error::check() {
-  if( _emitted_err_count >= 1 ) {
+  if( emitted_count >= 1 )
     std::exit(1);
-  }
 }
 
 } // namespace metro

@@ -25,4 +25,23 @@ Object* Evaluator::construct_object_from_type(AST::Type* type) {
   return obj;
 }
 
+Evaluator::ScopeInfo& Evaluator::enter_scope(AST::Scope* ast) {
+  auto& ss = this->scope_stack.emplace_front(ast);
+
+  this->cur_scope = &ss;
+
+  return ss;
+}
+
+void Evaluator::leave_scope() {
+  this->scope_stack.pop_front();
+
+  if( this->scope_stack.empty() ) {
+    this->cur_scope = nullptr;
+    return;
+  }
+
+  this->cur_scope = &*this->scope_stack.begin();
+}
+
 } // namespace metro

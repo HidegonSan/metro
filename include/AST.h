@@ -4,24 +4,13 @@
 #include <vector>
 #include <utility>
 
-namespace metro {
-
-struct Token;
-
-namespace AST {
-
-using namespace std::string_literals;
-using SourceRange = std::pair<Token*, Token*>;
-
-}
-
-}
-
 #include "Types.h"
 
 #include "AST/Kind.h"
 
 #include "AST/Base.h"
+#include "AST/ListBase.h"
+
 #include "AST/None.h"
 #include "AST/Type.h"
 

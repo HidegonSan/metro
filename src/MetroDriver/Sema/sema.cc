@@ -13,12 +13,17 @@ Sema::Sema(AST::Scope* root) {
   __inst = this;
 
   this->root = root;
+}
 
-  // make functions
-  for( auto&& x : root->elems ) {
+void Sema::analyze() {
+  for( auto&& x : root->elements ) {
     if( x->kind == ASTKind::Function ) {
       functions.emplace_back((AST::Function*)x);
     }
+  }
+
+  for( auto&& ast : root->elements ) {
+    walk(ast);
   }
 }
 
@@ -26,4 +31,4 @@ Sema* Sema::get_instance() {
   return __inst;
 }
 
-}
+} // namespace metro

@@ -34,7 +34,6 @@ namespace metro::AST {
     While,
 
     Scope,
-    EmptyScope,
 
     Function,
     Struct,

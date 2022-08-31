@@ -36,6 +36,8 @@ std::ostream& operator << (std::ostream& ost, T const& x) {
   return ost << x.to_string();
 }
 
+//
+// Utils
 namespace Utils {
 
 /* append all elements in param-b into param-a */
@@ -88,10 +90,21 @@ std::string join(std::string const& s, std::vector<T> const& vec, F conv) {
   return ret;
 }
 
+template <std::integral T>
+bool in_range_func(T begin, T end, T val) {
+  return begin <= val && val < end;
+}
+
+auto in_range(auto... args) {
+  return in_range_func<int64_t>(args...);
+}
+
 namespace Strings {
 
 std::u16string to_u16string(std::string const& s);
 std::string to_string(std::u16string const& s);
+
+size_t count_left(std::string& str, char c);
 
 } // namespace Utils::Strings
 

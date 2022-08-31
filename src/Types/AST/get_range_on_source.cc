@@ -59,10 +59,10 @@ SourceRange Return::get_range_on_source() const {
 }
 
 SourceRange Scope::get_range_on_source() const {
-  if( elems.empty() )
+  if( elements.empty() )
     return { token, token->next };
 
-  return { token, (*elems.rbegin())->get_range_on_source().second->next };
+  return { token, (*elements.rbegin())->get_range_on_source().second->next };
 }
 
 SourceRange Struct::get_range_on_source() const {

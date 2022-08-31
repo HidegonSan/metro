@@ -22,27 +22,21 @@ namespace AST {
 }
 
 enum class ErrorKind {
-  Note,
-  Warning,
   InvalidToken,
   InvalidSyntax,
   UninitializedValue,
-  ExpectedToken,
-  ExpectedSemicolon,
+  UnexpectedToken,
+  
   NotAllowed,
   NotMutable,
 
-  Undefined,
   UndefinedVariable,
   UndefinedFunction,
   UndefinedTypeName,
 
+  IfWithoutElse,
   MultipleDefinition,
-  IndefiniteType,
-  UnknownTypeName, // deprecated
   CannotInfer,
-  MayNotBeEvaluated,
-  ValueType,
   TypeMismatch,
 
   TooFewArguments,
@@ -101,7 +95,7 @@ private:
 
   std::vector<Help> helps;
 
-  static void emit_error(Error& err);
+  static size_t emitted_count;
 
 };
 

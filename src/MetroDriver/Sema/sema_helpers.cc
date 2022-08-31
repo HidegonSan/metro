@@ -73,40 +73,6 @@ void Sema::expect_all_same_with(std::vector<AST::Base*> const& vec, ValueType co
   Error::check();
 }
 
-AST::Base* Sema::find_var_defined(std::string_view name) {
-  for( auto&& ctx : scopelist ) {
-    for( int64_t i = ctx.cur_index; i >= 0; i-- ) {
-      auto& x = ctx.scope->elems[i];
-
-      if( x->kind == ASTKind::VarDefine && ((AST::VarDefine*)x)->name == name ) {
-        return x;
-      }
-    }
-  }
-
-  if( cur_func_ast != nullptr ) {
-    for( auto&& arg : cur_func_ast->args ) {
-      if( arg.name == name ) {
-        return &arg;
-      }
-    }
-  }
-
-  return nullptr;
-}
-
-Sema::VariableContext* Sema::find_var_context(AST::Base* defined) {
-  for( auto&& ctx : scopelist ) {
-    for( auto&& pair : ctx.var_context ) {
-      if( pair.second.defined == defined ) {
-        return &pair.second;
-      }
-    }
-  }
-
-  return nullptr;
-}
-
 AST::Function* Sema::find_func(std::string_view name) {
   for( auto&& func : functions) {
     if( func->name == name ) {
@@ -139,7 +105,7 @@ ASTVector Sema::find_return(AST::Base* ast) {
     case AST::Kind::Scope: {
       auto ast_scope = (AST::Scope*)ast;
 
-      for( auto&& x : ast_scope->elems ) {
+      for( auto&& x : ast_scope->elements ) {
         append_vec(ret, find_return(x));
       }
 
@@ -181,12 +147,12 @@ ASTVector Sema::get_all_final_expr(AST::Base* ast) {
     case AST::Kind::Scope: {
       auto ast_scope = (AST::Scope*)ast;
 
-      if( ast_scope->elems.empty() ) {
+      if( ast_scope->elements.empty() ) {
         ret.emplace_back(ast);
         break;
       }
 
-      append_vec(ret, get_all_final_expr(*ast_scope->elems.rbegin()));
+      append_vec(ret, get_all_final_expr(*ast_scope->elements.rbegin()));
       break;
     }
 
@@ -204,15 +170,81 @@ ASTVector Sema::get_final_expr_full(AST::Base* ast) {
   append_vec(ret, find_return(ast));
   append_vec(ret, get_all_final_expr(ast));
 
-  debug(
-    auto s = ret.size();
+  ret.erase(std::unique(ret.begin(), ret.end()), ret.end());
 
-    ret.erase(std::unique(ret.begin(), ret.end()), ret.end());
-
-    assert(s == ret.size());
-  )
+  for( auto&& ast : ret )
+    if( ast->kind == ASTKind::Return )
+      ast = ((AST::Return*)ast)->expr;
 
   return ret;
+}
+
+/*
+
+{
+  if a {
+    return 1;
+  }
+  else {
+    return "aiueo";
+  }
+
+  if true { 123 } else { 3 }
+}
+
+1
+"aiueo"
+123
+3
+
+*/
+
+void Sema::get_final_expr(ASTVector& vec, AST::Base* ast) {
+  if( ast->is_expr ) {
+    vec.emplace_back(ast);
+    return;
+  }
+
+  switch( ast->kind ) {
+    case ASTKind::None:
+    case ASTKind::Boolean:
+    case ASTKind::Value:
+    case ASTKind::Variable:
+    case ASTKind::Array:
+    case ASTKind::Tuple:
+    case ASTKind::Callfunc:
+    case ASTKind::Compare:
+      vec.emplace_back(ast);
+      break;
+
+    case ASTKind::Scope: {
+      auto x = (AST::Scope*)ast;
+
+      for( auto&& elem : x->elements ) {
+        get_final_expr(vec, elem);
+      }
+
+      break;
+    }
+
+    case ASTKind::If: {
+      auto x = (AST::If*)ast;
+
+      get_final_expr(vec, x->if_true);
+      get_final_expr(vec, x->if_false);
+
+      break;
+    }
+
+    case ASTKind::Return: {
+      vec.emplace_back(ast);
+      break;
+    }
+
+    default:
+      alertfmt("%d", ast->kind);
+      crash;
+  }
 }
 
 bool Sema::contains_callfunc_in_expr(std::string_view name, AST::Base* ast) {

@@ -24,14 +24,14 @@ bool Parser::eat(std::string_view str) {
 
 void Parser::expect(std::string_view str) {
   if( !eat(str) ) {
-    Error(ErrorKind::ExpectedToken, cur, "expected '" + std::string(str) + "' before this token")
+    Error(ErrorKind::InvalidSyntax, this->cur->prev, "expected '" + std::string(str) + "' after this token")
       .emit(true);
   }
 }
 
 void Parser::expect_ident() {
   if( cur->kind != TokenKind::Ident ) {
-    Error(ErrorKind::ExpectedToken, cur, "expected identifier")
+    Error(ErrorKind::InvalidSyntax, cur, "expected identifier")
       .emit(true);
   }
 }

@@ -60,7 +60,7 @@ ValueType Sema::walk(AST::Base* ast) {
           Error(ErrorKind::NotMutable, expr->token, "left side is not mutable").emit(true);
         }
 
-        if( std::find(root->elems.begin(), root->elems.end(), var->defined) != root->elems.end() ) {
+        if( std::find(root->elements.begin(), root->elements.end(), var->defined) != root->elements.end() ) {
           if( !find_var_context(var->defined)->was_type_analyzed ) {
             Error(ErrorKind::UninitializedValue, var->token, "uninitialized value").emit(true);
           }
@@ -135,37 +135,48 @@ ValueType Sema::walk(AST::Base* ast) {
       ret = sema_controls(ast);
       break;
 
+    case ASTKind::Return: {
+      auto x = (AST::Return*)ast;
+
+      if( this->cur_func_ast == nullptr )
+        Error(ErrorKind::NotAllowed, x->token, "cannot use 'return' here").emit();
+
+      this->walk(x->expr);
+
+      break;
+    }
+
     case ASTKind::Scope: {
       auto scope = (AST::Scope*)ast;
 
-      if( scope->elems.empty() )
+      if( scope->elements.empty() )
         break;
 
       auto& context = scopelist.emplace_front();
 
       context.scope = scope;
 
-      for(auto&&i:scope->elems){
+      for( auto&& i : scope->elements ) {
+        context.cur_ast = i;
+
         walk(i);
+
+        context.cur_index++;
       }
 
       // get final expressions
       auto lastexpr_list = get_final_expr_full(scope);
 
       for( auto begin = *lastexpr_list.begin(); auto&& last : lastexpr_list ) {
-        context.cur_ast = last;
-
         // first
         if( last == begin ) {
           ret = walk(last);
         }
         else if( auto&& tmp = walk(last); !tmp.equals(ret) ) {
           Error(ErrorKind::TypeMismatch, last,
-            Utils::linkstr("expected '",ret.to_string(),"' but found '",tmp.to_string(),"'"))
+            Utils::linkstr("expected '", ret.to_string(),"' but found '",tmp.to_string(),"'"))
               .emit(true);
         }
-
-        context.cur_index++;
       }
 
       scopelist.pop_front();
@@ -231,7 +242,7 @@ inline ValueType Sema::sema_factor(AST::Base* ast) {
 
       // TODO: find struct
 
-      Error(ErrorKind::Undefined, ast->token, "undefined type name").emit();
+      Error(ErrorKind::UndefinedTypeName, ast->token, "undefined type name").emit();
 
     _found_type:
       alert;
@@ -270,7 +281,7 @@ inline ValueType Sema::sema_factor(AST::Base* ast) {
       auto var = (AST::Variable*)ast;
 
       if( (var->defined = find_var_defined(var->name)) == nullptr ) {
-        Error(ErrorKind::Undefined, ast->token, "undefined variable name").emit(true);
+        Error(ErrorKind::UndefinedVariable, ast->token, "undefined variable name").emit(true);
       }
       else if( arrow_unini != var && var->defined->kind == ASTKind::VarDefine ) {
         if( auto ctx = find_var_context(var->defined); !ctx->was_type_analyzed ) {
