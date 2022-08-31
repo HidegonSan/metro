@@ -23,6 +23,10 @@ struct Source {
 
   std::vector<LineLoc> lineloc_list;
 
+  std::string_view get_line_view(LineLoc const& line) const {
+    return { data.data() + line.begin, line.length };
+  }
+
   Source() { }
   Source(std::string_view _path, std::string&& _data);
 

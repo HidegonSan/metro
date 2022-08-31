@@ -52,7 +52,6 @@ class Error {
   struct Help {
     AST::Base* ast;
     std::string&& msg;
-    Source::LineLoc* lineloc;
 
     explicit Help(AST::Base* ast, std::string&& msg)
       : ast(ast),
