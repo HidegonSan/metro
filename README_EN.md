@@ -17,7 +17,7 @@ make -j
 ### Run
 
 ```bash
-./metro [your script files].
+./metro [your script files]
 ```
 
 ## How to contribute
