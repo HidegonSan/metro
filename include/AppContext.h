@@ -7,8 +7,11 @@
 namespace metro {
 
 struct Token;
+
 namespace AST {
-  struct Base;
+
+struct Base;
+
 }
 
 struct AppContext {
