@@ -117,7 +117,7 @@ void Error::emit(bool exit) {
   //
   // ヘルプを表示
   for( auto&& help : this->helps ) {
-    auto&& range = help.ast->get_range_on_source();
+    auto&& range = help.ast ? help.ast->get_range_on_source() : std::make_pair(help.token, help.token);
 
     std::tie(err_begin, err_end) = std::make_tuple(range.first->pos, range.second->endpos);
 

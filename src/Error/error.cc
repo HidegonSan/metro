@@ -63,6 +63,11 @@ Error::Error(ErrorKind kind, size_t pos, std::string&& msg)
   this->pos = pos;
 }
 
+Error& Error::add_help(Token* token, std::string&& msg) {
+  this->helps.emplace_back(token, std::forward<std::string>(msg));
+  return *this;
+}
+
 Error& Error::add_help(AST::Base* ast, std::string&& msg) {
   this->helps.emplace_back(ast, std::forward<std::string>(msg));
   return *this;

@@ -22,6 +22,8 @@ namespace AST {
 }
 
 enum class ErrorKind {
+  LanguageVersion,
+
   InvalidToken,
   InvalidSyntax,
   UninitializedValue,
@@ -50,11 +52,20 @@ enum class ErrorKind {
 
 class Error {
   struct Help {
+    Token* token;
     AST::Base* ast;
     std::string&& msg;
 
-    explicit Help(AST::Base* ast, std::string&& msg)
-      : ast(ast),
+    explicit Help(Token* token, std::string&& msg)
+      : token(token),
+        ast(nullptr),
+        msg(std::forward<std::string>(msg))
+    {
+    }
+
+    Help(AST::Base* ast, std::string&& msg)
+      : token(nullptr),
+        ast(ast),
         msg(std::forward<std::string>(msg))
     {
     }
@@ -69,6 +80,7 @@ public:
   // add_help
   //   ヘルプを追加する
   //   チェーンでつなげて複数個 追加できる
+  Error& add_help(Token* token, std::string&& msg);
   Error& add_help(AST::Base* ast, std::string&& msg);
 
   //

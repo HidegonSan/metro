@@ -231,6 +231,13 @@ ValueType Sema::walk(AST::Base* ast) {
     case ASTKind::Function: {
       auto func = (AST::Function*)ast;
 
+      if( !func->return_type ) {
+        Error(ErrorKind::LanguageVersion, func->token,
+          "function definition without return-type specification does not implemented yet")
+          .add_help(func->code->token, "insert type name before this token")
+          .emit(true);
+      }
+
       auto&& final_expr_list = get_results_wrap(func->code);
 
       cur_func_ast = func;
@@ -240,7 +247,8 @@ ValueType Sema::walk(AST::Base* ast) {
         walk(&arg);
 
       // return-type
-      ret = analyze_func_return_type(func);
+      // ret = analyze_func_return_type(func);
+      ret = walk(func->return_type);
 
       // code
       walk(func->code);

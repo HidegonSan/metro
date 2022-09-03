@@ -5,8 +5,11 @@
 namespace metro {
 
 AST::Base* Parser::toplevel() {
+
+  //
+  // function
   if( eat("fn") ) {
-    auto ast = new AST::Function(cur);
+    auto ast = new AST::Function(this->ate);
 
     expect_ident();
     ast->name = cur->str;
@@ -31,15 +34,16 @@ AST::Base* Parser::toplevel() {
       expect(")");
     }
 
-    if( this->cur->str != "{" ) {
+    if( this->cur->str != "{" )
       ast->return_type = expect_type();
-    }
 
     ast->code = expect_scope();
 
     return ast;
   }
 
+  //
+  // structure
   if( eat("struct") ) {
     auto x = new AST::Struct(ate);
 
