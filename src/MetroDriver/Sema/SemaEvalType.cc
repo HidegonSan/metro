@@ -5,6 +5,36 @@
 
 namespace metro::semantics {
 
+
+Sema::EvaluatedResult Sema::try_eval_type(AST::Base* ast) {
+  /*
+
+  失敗する可能性があるもの:
+    CallFunc    // 戻り値の型が不明
+
+  */
+
+  using Cond = EvaluatedResult::Condition;
+
+  if( !ast )
+    return Cond::NullPointer;
+
+  switch( ast->kind ) {
+    case ASTKind::Callfunc: {
+      auto x = (AST::CallFunc*)ast;
+
+      
+    }
+  }
+
+  auto ret = EvaluatedResult{ };
+
+  ret.ast = ast;
+  ret.type = this->eval_type(ast);
+
+  return ret;
+}
+
 ValueType Sema::eval_type(AST::Base* ast) {
   if( !ast )
     return { };

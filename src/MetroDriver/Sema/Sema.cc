@@ -16,7 +16,7 @@ Sema::Sema(AST::Scope* root)
 void Sema::analyze() {
 
   this->create_variable_dc();
-
+  this->create_function_dc();
 
 }
 

@@ -3,6 +3,7 @@
 #include <list>
 #include <map>
 #include <vector>
+#include <stdexcept>
 #include <concepts>
 #include <functional>
 
@@ -87,6 +88,29 @@ struct ScopeInfo {
 
 class Sema {
 
+  struct EvaluatedResult {
+    enum class Condition {
+      Completed,
+      Incomplete,
+      NullPointer,
+    };
+
+    AST::Base* ast;
+
+    union {
+      Condition cond;
+      ErrorKind error;
+    };
+
+    ValueType type;
+
+    EvaluatedResult(Condition cond = Condition::Completed)
+      : ast(nullptr),
+        cond(cond)
+    {
+    }
+  };
+
 public:
   explicit Sema(AST::Scope* root);
 
@@ -101,16 +125,29 @@ public:
 
 private:
 
-  void create_variable_dc();
-  void create_function_dc();
+  // for ast_map()
+  void mapfn_begin() {
 
+  }
+
+  // for ast_map()
+  void mapfn_end() {
+
+  }
+
+  void create_variable_dc();
   void deduction_variable_types();
+
+  void create_function_dc();
+  void deduction_func_return_type(FunctionDC& func);
+
 
   VariableDC* get_variable_dc(AST::Variable* ast);
 
   ScopeInfo& get_cur_scope();
 
   ValueType eval_type(AST::Base* ast);
+  EvaluatedResult try_eval_type(AST::Base* ast);
 
   ScopeInfo& enter_scope(AST::Scope* ast);
   void leave_scope();
@@ -145,6 +182,8 @@ private:
 
 
   AST::Scope* root;
+
+  std::vector<FunctionDC> functions;
 
   std::list<AST::Scope*> scope_history;
   std::map<AST::Scope*, ScopeInfo> scope_info_map;

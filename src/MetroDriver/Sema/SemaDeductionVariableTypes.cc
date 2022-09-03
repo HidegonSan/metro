@@ -109,6 +109,13 @@ void Sema::deduction_variable_types() {
   for( auto&& pair : this->scope_info_map ) {
     auto&& [scope, info] = pair;
 
+    for( auto&& dc : info.var_dc_list ) {
+      if( dc.is_argument )
+        continue;
+      
+      
+    }
+
     debug(
       printf("%p\n", scope);
 
