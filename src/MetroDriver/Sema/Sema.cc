@@ -107,9 +107,48 @@ static void ast_map(AST::Base* ast, ASTVector& out, ast_map_fp fp) {
   }
 }
 
-void Sema::init_variable_dc() {
+void Sema::analyze() {
+
+  init_variable_dc();
 
 }
+
+void Sema::init_variable_dc() {
+
+  ASTVector assign_ast_list;
+
+  ast_map(
+    root,
+    assign_ast_list,
+    [] (AST::Base* ast) -> bool {
+      return ast->kind == ASTKind::Assign;
+    }
+  );
+
+
+
+}
+
+void Sema::deduction_variable_types() {
+
+}
+
+AST::VarDefine* Sema::get_var_definition_loc(AST::Variable* ast) {
+
+
+
+}
+
+ScopeInfo& Sema::get_cur_scope() {
+
+}
+
+ValueType Sema::eval_type(AST::Base* ast) {
+
+  if( ast
+
+}
+
 
 } // namespace metro::semantics
 
