@@ -120,6 +120,9 @@ static void ast_map(
     default:
       TODO_IMPL
   }
+
+  if( fp_end )
+    fp_end(ast);
 }
 
 static void get_last_expr(AST::Base* ast, ASTVector& out) {
@@ -179,26 +182,64 @@ void Sema::create_variable_dc() {
 
   ast_map(
     this->root,
-    [] (AST::Base* ast) {
+    [this] (AST::Base* ast) {
       switch( ast->kind ) {
         case ASTKind::VarDefine: {
+          auto x = (AST::VarDefine*)ast;
+          auto& scope = this->get_cur_scope();
+
+          if( scope.var_dc_map.contains(x->name) ) {
+            // shadowing
+            TODO_IMPL
+          }
+
+          auto& dc = scope.var_dc_map[x->name];
+
+          dc.ast = x;
 
           break;
         }
 
-        case ASTKind::Scope: {
-          
+        case ASTKind::Variable: {
+          auto x = (AST::Variable*)ast;
+          auto dc = this->get_variable_dc(x);
+
+          if( !dc )
+            Error(ErrorKind::UndefinedVariable, ast, "undefined variable name")
+              .emit(true);
+
+          this->var_dc_ptr_map[x] = dc;
+
+          break;
         }
-      }
-    },
-    [] (AST::Base* ast) {
-      if( ast->kind == ASTKind::Scope ) {
         
       }
     },
-    [] (AST::Base* ast) {
+    [this] (AST::Base* ast) {
       if( ast->kind == ASTKind::Scope ) {
-        
+        this->enter_scope((AST::Scope*)ast);
+      }
+    },
+    [this] (AST::Base* ast) {
+      switch( ast->kind ) {
+        case ASTKind::Scope:
+          this->leave_scope();
+          break;
+
+        case ASTKind::Assign: {
+          auto x = (AST::Expr*)ast;
+
+          if( x->lhs->kind == ASTKind::Variable ) {
+            auto var = (AST::Variable*)x->lhs;
+            auto dc = this->var_dc_ptr_map[var];
+
+            assert(dc != nullptr);
+
+            dc->candidates.emplace_back(x->rhs);
+          }
+
+          break;
+        }
       }
     }
   );
@@ -213,7 +254,21 @@ void Sema::deduction_variable_types() {
   for( auto&& pair : this->scope_info_map ) {
     auto&& [scope, info] = pair;
 
+    debug(
+      printf("%p\n", scope);
 
+      for( auto&& vardc_pair : info.var_dc_map ) {
+        auto [name, dc] = vardc_pair;
+
+        std::cout
+          << name << std::endl
+          << dc.ast->to_string() << std::endl;
+        
+        for( auto&& x : dc.candidates ) {
+          std::cout << x->to_string() << std::endl;
+        }
+      }
+    )
   }
 
 }
@@ -426,6 +481,20 @@ ValueType Sema::eval_type(AST::Base* ast) {
   }
 
   return ret;
+}
+
+ScopeInfo& Sema::enter_scope(AST::Scope* ast) {
+  auto&& info = this->scope_info_map[ast];
+
+  info.ast = ast;
+
+  this->scope_history.emplace_front(ast);
+
+  return info;
+}
+
+void Sema::leave_scope() {
+  this->scope_history.pop_front();
 }
 
 ASTVector Sema::get_returnable_expr(AST::Base* ast) {

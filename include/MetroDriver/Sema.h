@@ -30,6 +30,12 @@ struct VariableDC {
   bool is_deducted;
   ValueType deducted_type;
 
+  void reset(AST::VarDefine* ast) {
+    this->ast = ast;
+    this->candidates.clear();
+    this->is_deducted = false;
+  }
+
   VariableDC(AST::VarDefine* ast = nullptr)
     : ast(ast),
       is_deducted(false)
@@ -68,6 +74,8 @@ private:
 
   ValueType eval_type(AST::Base* ast);
 
+  ScopeInfo& enter_scope(AST::Scope* ast);
+  void leave_scope();
 
   static ASTVector get_returnable_expr(AST::Base* ast);
 
@@ -82,6 +90,8 @@ private:
   std::map<AST::Scope*, ScopeInfo> scope_info_map;
 
   std::map<AST::Base*, ValueType> caches;
+
+  std::map<AST::Variable*, VariableDC*> var_dc_ptr_map;
   
 };
 
