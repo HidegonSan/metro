@@ -99,6 +99,7 @@ private:
   ScopeInfo& enter_scope(AST::Scope* ast);
   void leave_scope();
 
+  static void get_last_expr(AST::Base* ast, ASTVector& out);
   static ASTVector get_returnable_expr(AST::Base* ast);
 
   //
@@ -116,6 +117,13 @@ private:
   std::map<AST::Variable*, VariableDC*> var_dc_ptr_map;
   
 };
+
+void ast_map(
+  AST::Base* ast,
+  std::function<void(AST::Base*)> fp,
+  std::function<void(AST::Base*)> fp_begin = nullptr,
+  std::function<void(AST::Base*)> fp_end = nullptr
+);
 
 } // namespace metro::semantics
 
