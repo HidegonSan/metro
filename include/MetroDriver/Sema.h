@@ -17,6 +17,9 @@ struct Function;
 
 namespace semantics {
 
+using ASTKind = AST::Kind;
+using ASTVector = std::vector<AST::Base*>;
+
 struct VariableDC {
   AST::Variable* ast;
   std::vector<AST::Base*> candidates;
@@ -27,9 +30,6 @@ struct ScopeInfo {
 };
 
 class Sema {
-
-  using ASTKind = AST::Kind;
-  using ASTVector = std::vector<AST::Base*>;
 
 public:
   explicit Sema(AST::Scope* root)

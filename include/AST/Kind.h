@@ -5,7 +5,6 @@ namespace metro::AST {
     None,
     Type,
     Argument,
-    Member,
 
     Boolean,
     Value,
