@@ -1,3 +1,4 @@
+#include <functional>
 #include "AST.h"
 #include "Error.h"
 #include "Utils.h"
@@ -8,9 +9,19 @@ namespace metro::semantics {
 using ast_map_fp = bool(*)(AST::Base*);
 
 // static void ast_map(AST::Base* ast, ASTVector& out, ast_map_fp fp) {
-static void ast_map(AST::Base* ast, auto fp) {
+
+template <class F = std::function<void(AST::Base*)>>
+static void ast_map(
+  AST::Base* ast,
+  std::function<void(AST::Base*)> fp,
+  std::function<void(AST::Base*)> fp_begin = nullptr,
+  std::function<void(AST::Base*)> fp_end = nullptr) {
+
   if( ast == nullptr )
     return;
+
+  if( fp_begin )
+    fp_begin(ast);
 
   fp(ast);
 
@@ -20,7 +31,7 @@ static void ast_map(AST::Base* ast, auto fp) {
       break;
 
     case ASTKind::Argument:
-      ast_map(((AST::Argument*)ast)->type, fp);
+      ast_map(((AST::Argument*)ast)->type, fp, fp_begin, fp_end);
       break;
 
     case ASTKind::Boolean:
@@ -34,7 +45,7 @@ static void ast_map(AST::Base* ast, auto fp) {
       auto x = (AST::ListBase*)ast;
 
       for( auto&& y : x->elements )
-        ast_map(y, fp);
+        ast_map(y, fp, fp_begin, fp_end);
 
       break;
     }
@@ -43,7 +54,7 @@ static void ast_map(AST::Base* ast, auto fp) {
       auto x = (AST::CallFunc*)ast;
 
       for( auto&& arg : x->args )
-        ast_map(arg, fp);
+        ast_map(arg, fp, fp_begin, fp_end);
 
       break;
     }
@@ -54,35 +65,39 @@ static void ast_map(AST::Base* ast, auto fp) {
     case ASTKind::Div:
     case ASTKind::Add:
     case ASTKind::Sub:
-    case ASTKind::Assign:
-      ast_map(((AST::Expr*)ast)->lhs, fp);
-      ast_map(((AST::Expr*)ast)->rhs, fp);
+    case ASTKind::Assign: {
+      auto x = (AST::Expr*)ast;
+
+      ast_map(x->lhs, fp, fp_begin, fp_end);
+      ast_map(x->rhs, fp, fp_begin, fp_end);
+
       break;
+    }
 
     case ASTKind::Compare: {
       auto x = (AST::Compare*)ast;
 
-      ast_map(x->first, fp);
+      ast_map(x->first, fp, fp_begin, fp_end);
       
       for( auto&& item : x->list )
-        ast_map(item.ast, fp);
+        ast_map(item.ast, fp, fp_begin, fp_end);
 
       break;
     }
 
     case ASTKind::Return:
-      ast_map(((AST::Return*)ast)->expr, fp);
+      ast_map(((AST::Return*)ast)->expr, fp, fp_begin, fp_end);
       break;
     
     case ASTKind::If:
-      ast_map(((AST::If*)ast)->cond, fp);
-      ast_map(((AST::If*)ast)->if_true, fp);
-      ast_map(((AST::If*)ast)->if_false, fp);
+      ast_map(((AST::If*)ast)->cond, fp, fp_begin, fp_end);
+      ast_map(((AST::If*)ast)->if_true, fp, fp_begin, fp_end);
+      ast_map(((AST::If*)ast)->if_false, fp, fp_begin, fp_end);
       break;
     
     case ASTKind::VarDefine:
-      ast_map(((AST::VarDefine*)ast)->type, fp);
-      ast_map(((AST::VarDefine*)ast)->init, fp);
+      ast_map(((AST::VarDefine*)ast)->type, fp, fp_begin, fp_end);
+      ast_map(((AST::VarDefine*)ast)->init, fp, fp_begin, fp_end);
       break;
     
     case ASTKind::For:
@@ -94,10 +109,10 @@ static void ast_map(AST::Base* ast, auto fp) {
       auto x = (AST::Function*)ast;
 
       for(auto&&arg:x->args)
-        ast_map(&arg, fp);
+        ast_map(&arg, fp, fp_begin, fp_end);
       
-      ast_map(x->return_type, fp);
-      ast_map(x->code, fp);
+      ast_map(x->return_type, fp, fp_begin, fp_end);
+      ast_map(x->code, fp, fp_begin, fp_end);
 
       break;
     }
@@ -162,10 +177,30 @@ void Sema::analyze() {
 
 void Sema::create_variable_dc() {
 
-
-
   ast_map(
-    
+    this->root,
+    [] (AST::Base* ast) {
+      switch( ast->kind ) {
+        case ASTKind::VarDefine: {
+
+          break;
+        }
+
+        case ASTKind::Scope: {
+          
+        }
+      }
+    },
+    [] (AST::Base* ast) {
+      if( ast->kind == ASTKind::Scope ) {
+        
+      }
+    },
+    [] (AST::Base* ast) {
+      if( ast->kind == ASTKind::Scope ) {
+        
+      }
+    }
   );
 
 
@@ -199,27 +234,11 @@ ScopeInfo& Sema::get_cur_scope() {
 }
 
 ValueType Sema::eval_type(AST::Base* ast) {
-  if( ast == nullptr )
+  if( !ast )
     return { };
 
   if( this->caches.contains(ast) )
-    return caches[ast];
-
-  auto& ret = caches[ast];
-
-  switch( ast->kind ) {
-
-  }
-
-  return ret;
-
-  if( !ast ) {
-    return { };
-  }
-
-  if( this->caches.contains(ast) ) {
     return this->caches[ast];
-  }
 
   auto& ret = this->caches[ast];
 
@@ -280,20 +299,12 @@ ValueType Sema::eval_type(AST::Base* ast) {
     case ASTKind::Variable: {
       auto x = (AST::Variable*)ast;
 
-      auto var = get_var_context(x->name);
 
-      if( !var ) {
-        Error(ErrorKind::UndefinedVariable, ast->token, "undefined variable name").emit(true);
-      }
-
-      ret = var->type;
       break;
     }
 
     case ASTKind::Callfunc: {
-      ret = sema_callfunc((AST::CallFunc*)ast);
-
-      alertios("callfunc " << ((AST::CallFunc*)ast)->name << ": " << ret.to_string());
+      
 
       break;
     }
@@ -326,42 +337,41 @@ ValueType Sema::eval_type(AST::Base* ast) {
     case ASTKind::VarDefine: {
       auto x = (AST::VarDefine*)ast;
 
-      auto var_ctx = get_var_context(x->name, true);
+      break;
+    }
 
-      // 型の指定、初期化式　どっちもある
-      if( x->type && x->init ) {
-        var_ctx->type = eval_type(x->type);
+    case ASTKind::If: {
+      auto if_x = (AST::If*)ast;
 
-        // 指定された型と初期化式の型が一致しない
-        if( auto init_type = eval_type(x->init); !var_ctx->type.equals(init_type) ) {
-          Error(ErrorKind::TypeMismatch, x->init, "expected '" + var_ctx->type.to_string() + "' but found '" + init_type.to_string() + "'")
-            .add_help(x->type, "specified here")
-            .emit();
-        }
+      if( !eval_type(if_x->cond).equals(ValueType::Kind::Bool) ) {
+        Error(ErrorKind::TypeMismatch, if_x->cond, "condition must be boolean")
+          .emit();
       }
 
-      // 型の指定のみ
-      else if( x->type ) {
-        var_ctx->type = eval_type(x->type);
-      }
+      ret = eval_type(if_x->if_true);
 
-      // 初期化式のみ
-      else if( x->init ) {
-        var_ctx->type = eval_type(x->init);
-      }
-
-      // どっちもない
-      else {
-        TODO_IMPL
+      if( if_x->if_false && !ret.equals(eval_type(if_x->if_false)) ) {
+        Error(ErrorKind::TypeMismatch, if_x->token, "if-expr type mismatch")
+          .emit();
       }
 
       break;
     }
 
-    case ASTKind::If:
-    case ASTKind::For:
-      ret = sema_controls(ast);
+    case ASTKind::For: {
+      auto for_x = (AST::For*)ast;
+
+      eval_type(for_x->init);
+
+      if( !eval_type(for_x->cond).equals(ValueType::Kind::Bool) ) {
+        Error(ErrorKind::TypeMismatch, for_x->cond, "condition must be boolean").emit();
+      }
+
+      eval_type(for_x->counter);
+      eval_type(for_x->code);
+
       break;
+    }
 
     case ASTKind::Return: {
       auto x = (AST::Return*)ast;
@@ -390,22 +400,9 @@ ValueType Sema::eval_type(AST::Base* ast) {
           .emit(true);
       }
 
-      auto&& final_expr_list = get_returnable_expr(func->code);
+      // auto&& final_expr_list = get_returnable_expr(func->code);
 
-      cur_func_ast = func;
-
-      // arguments
-      for( auto&& arg : func->args )
-        this->eval_type(&arg);
-
-      // return-type
-      // ret = analyze_func_return_type(func);
-      ret = eval_type(func->return_type);
-
-      // code
-      eval_type(func->code);
-
-      cur_func_ast = nullptr;
+      TODO_IMPL
 
       break;
     }
@@ -437,7 +434,7 @@ ASTVector Sema::get_returnable_expr(AST::Base* ast) {
   // "return"
   ast_map(
     ast,
-    [&ret] (auto x) { if( x->kind == ASTKind::Return ) ret.emplace_back(x); }
+    [&ret] (AST::Base* ast) { if( ast->kind == ASTKind::Return ) ret.emplace_back(ast); }
   );
 
   // last

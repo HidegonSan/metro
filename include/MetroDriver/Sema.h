@@ -30,7 +30,7 @@ struct VariableDC {
   bool is_deducted;
   ValueType deducted_type;
 
-  explicit VariableDC(AST::VarDefine* ast)
+  VariableDC(AST::VarDefine* ast = nullptr)
     : ast(ast),
       is_deducted(false)
   {
