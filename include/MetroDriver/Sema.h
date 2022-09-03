@@ -26,6 +26,15 @@ using ASTVector = std::vector<AST::Base*>;
 struct VariableDC {
   AST::VarDefine* ast;
   std::vector<AST::Base*> candidates;
+
+  bool is_deducted;
+  ValueType deducted_type;
+
+  explicit VariableDC(AST::VarDefine* ast)
+    : ast(ast),
+      is_deducted(false)
+  {
+  }
 };
 
 struct ScopeInfo {
@@ -49,15 +58,22 @@ public:
 
 private:
 
-  void init_variable_dc();
+  void create_variable_dc();
 
   void deduction_variable_types();
 
-  AST::VarDefine* get_var_definition_loc(AST::Variable* ast);
+  VariableDC* get_variable_dc(AST::Variable* ast);
 
   ScopeInfo& get_cur_scope();
 
   ValueType eval_type(AST::Base* ast);
+
+
+  static ASTVector get_returnable_expr(AST::Base* ast);
+
+  //
+  // create object from token
+  static Object* create_obj(Token* token);
 
 
   AST::Scope* root;

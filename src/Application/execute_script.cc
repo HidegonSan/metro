@@ -6,7 +6,8 @@
 
 #include "MetroDriver/lexer.h"
 #include "MetroDriver/parser.h"
-#include "MetroDriver/sema.h"
+// #include "MetroDriver/sema.h"
+#include "MetroDriver/Sema.h"
 #include "MetroDriver/evaluator.h"
 
 #include "Application.h"
@@ -58,7 +59,13 @@ Object* Application::execute_script(AppContext::Script& script) {
 
   assert(ast->kind == AST::Kind::Scope);
 
+/*
   Sema sema{ (AST::Scope*)ast };
+
+  sema.analyze();
+  */
+
+  semantics::Sema sema{ (AST::Scope*)ast };
 
   sema.analyze();
 
