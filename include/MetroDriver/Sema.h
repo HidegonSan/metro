@@ -24,21 +24,26 @@ using ASTKind = AST::Kind;
 using ASTVector = std::vector<AST::Base*>;
 
 struct VariableDC {
+  bool is_argument;
+
+  std::string_view name;
+
   AST::VarDefine* ast;
-  std::vector<AST::Base*> candidates;
+  AST::Argument* ast_arg;
 
   bool is_deducted;
-  ValueType deducted_type;
+  ValueType var_type;
 
-  void reset(AST::VarDefine* ast) {
-    this->ast = ast;
-    this->candidates.clear();
-    this->is_deducted = false;
-  }
+  AST::Type* specified_type;
 
-  VariableDC(AST::VarDefine* ast = nullptr)
-    : ast(ast),
-      is_deducted(false)
+  std::vector<AST::Base*> candidates;
+
+  VariableDC()
+    : is_argument(false),
+      ast(nullptr),
+      ast_arg(nullptr),
+      is_deducted(false),
+      specified_type(nullptr)
   {
   }
 };
@@ -46,7 +51,24 @@ struct VariableDC {
 struct ScopeInfo {
   AST::Scope* ast;
 
-  std::map<std::string_view, VariableDC> var_dc_map;
+  std::vector<VariableDC> var_dc_list;
+
+  VariableDC* find_var(std::string_view name) {
+    for( auto&& dc : this->var_dc_list ) {
+      if( dc.name == name )
+        return &dc;
+    }
+
+    return nullptr;
+  }
+
+  VariableDC& append_var(std::string_view name) {
+    auto& dc = this->var_dc_list.emplace_back();
+
+    dc.name = name;
+
+    return dc;
+  }
 };
 
 class Sema {

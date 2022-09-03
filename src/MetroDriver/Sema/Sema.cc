@@ -10,7 +10,6 @@ using ast_map_fp = bool(*)(AST::Base*);
 
 // static void ast_map(AST::Base* ast, ASTVector& out, ast_map_fp fp) {
 
-template <class F = std::function<void(AST::Base*)>>
 static void ast_map(
   AST::Base* ast,
   std::function<void(AST::Base*)> fp,
@@ -78,7 +77,7 @@ static void ast_map(
       auto x = (AST::Compare*)ast;
 
       ast_map(x->first, fp, fp_begin, fp_end);
-      
+
       for( auto&& item : x->list )
         ast_map(item.ast, fp, fp_begin, fp_end);
 
@@ -88,18 +87,18 @@ static void ast_map(
     case ASTKind::Return:
       ast_map(((AST::Return*)ast)->expr, fp, fp_begin, fp_end);
       break;
-    
+
     case ASTKind::If:
       ast_map(((AST::If*)ast)->cond, fp, fp_begin, fp_end);
       ast_map(((AST::If*)ast)->if_true, fp, fp_begin, fp_end);
       ast_map(((AST::If*)ast)->if_false, fp, fp_begin, fp_end);
       break;
-    
+
     case ASTKind::VarDefine:
       ast_map(((AST::VarDefine*)ast)->type, fp, fp_begin, fp_end);
       ast_map(((AST::VarDefine*)ast)->init, fp, fp_begin, fp_end);
       break;
-    
+
     case ASTKind::For:
     case ASTKind::Loop:
     case ASTKind::While:
@@ -110,7 +109,7 @@ static void ast_map(
 
       for(auto&&arg:x->args)
         ast_map(&arg, fp, fp_begin, fp_end);
-      
+
       ast_map(x->return_type, fp, fp_begin, fp_end);
       ast_map(x->code, fp, fp_begin, fp_end);
 
@@ -188,14 +187,23 @@ void Sema::create_variable_dc() {
           auto x = (AST::VarDefine*)ast;
           auto& scope = this->get_cur_scope();
 
-          if( scope.var_dc_map.contains(x->name) ) {
+          if( scope.find_var(x->name) ) {
             // shadowing
             TODO_IMPL
           }
 
-          auto& dc = scope.var_dc_map[x->name];
+          auto& dc = scope.append_var(x->name);
 
           dc.ast = x;
+
+          if( x->type ) {
+            dc.is_deducted = true;
+            dc.specified_type = x->type;
+          }
+
+          if( x->init ) {
+            dc.candidates.emplace_back(x->init);
+          }
 
           break;
         }
@@ -216,8 +224,26 @@ void Sema::create_variable_dc() {
       }
     },
     [this] (AST::Base* ast) {
-      if( ast->kind == ASTKind::Scope ) {
-        this->enter_scope((AST::Scope*)ast);
+      switch( ast->kind ) {
+        case ASTKind::Scope:
+          this->enter_scope((AST::Scope*)ast);
+          break;
+
+        case ASTKind::Function: {
+          auto x = (AST::Function*)ast;
+          auto& scope = this->scope_info_map[x->code];
+
+          for( auto&& arg : x->args ) {
+            auto&& dc = scope.append_var(arg.name);
+
+            dc.is_argument = true;
+            dc.ast_arg = &arg;
+            dc.is_deducted = true;
+            dc.specified_type = arg.type;
+          }
+
+          break;
+        }
       }
     },
     [this] (AST::Base* ast) {
@@ -257,13 +283,18 @@ void Sema::deduction_variable_types() {
     debug(
       printf("%p\n", scope);
 
-      for( auto&& vardc_pair : info.var_dc_map ) {
-        auto [name, dc] = vardc_pair;
+      for( auto&& dc : info.var_dc_list ) {
+        auto&& name = dc.name;
 
-        std::cout
-          << name << std::endl
-          << dc.ast->to_string() << std::endl;
-        
+        if( dc.is_argument ) {
+          std::cout << "arg: " << name << std::endl;
+        }
+        else {
+          std::cout
+            << name << std::endl
+            << dc.ast->to_string() << std::endl;
+        }
+
         for( auto&& x : dc.candidates ) {
           std::cout << x->to_string() << std::endl;
         }
@@ -275,10 +306,9 @@ void Sema::deduction_variable_types() {
 
 VariableDC* Sema::get_variable_dc(AST::Variable* ast) {
   for( auto&& scope : this->scope_history ) {
-    auto&& v_map = this->scope_info_map[scope].var_dc_map;
-
-    if( v_map.contains(ast->name) )
-      return &v_map[ast->name];
+    if( auto dc = this->scope_info_map[scope].find_var(ast->name); dc ) {
+      return dc;
+    }
   }
 
   return nullptr;
