@@ -17,8 +17,11 @@ Error(...)
 namespace metro {
 
 struct Token;
+
 namespace AST {
+
 struct Base;
+
 }
 
 enum class ErrorKind {

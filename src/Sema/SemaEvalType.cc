@@ -23,7 +23,18 @@ Sema::EvaluatedResult Sema::try_eval_type(AST::Base* ast) {
     case ASTKind::Callfunc: {
       auto x = (AST::CallFunc*)ast;
 
-      
+      auto func = find_func(x->name);
+
+      if( !func )
+        Error(ErrorKind::UndefinedFunction,
+          x->token,
+          "undefined function name")
+          .emit(true);
+
+      if( !func->dc.is_deducted )
+        return Cond::Incomplete;
+
+      break;
     }
   }
 
@@ -34,6 +45,8 @@ Sema::EvaluatedResult Sema::try_eval_type(AST::Base* ast) {
 
   return ret;
 }
+
+// --- //
 
 ValueType Sema::eval_type(AST::Base* ast) {
   if( !ast )

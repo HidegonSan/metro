@@ -5,6 +5,14 @@
 
 namespace metro::semantics {
 
+VariableDC* Sema::get_variable_dc(AST::Variable* ast) {
+  for( auto&& scope : this->scope_history )
+    if( auto dc = this->scope_info_map[scope].find_var(ast->name); dc )
+      return dc;
+
+  return nullptr;
+}
+
 void Sema::create_variable_dc() {
 
   ast_map(
@@ -138,14 +146,6 @@ void Sema::deduction_variable_types() {
     )
   }
 
-}
-
-VariableDC* Sema::get_variable_dc(AST::Variable* ast) {
-  for( auto&& scope : this->scope_history )
-    if( auto dc = this->scope_info_map[scope].find_var(ast->name); dc )
-      return dc;
-
-  return nullptr;
 }
 
 } // namespace metro::semantics

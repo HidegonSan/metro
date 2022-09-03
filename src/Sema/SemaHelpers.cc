@@ -5,6 +5,14 @@
 
 namespace metro::semantics {
 
+FunctionContext* Sema::find_func(std::string_view name) {
+  for( auto&& func : this->functions )
+    if( func.name == name )
+      return &func;
+
+  return nullptr;
+}
+
 ScopeInfo& Sema::get_cur_scope() {
   return this->scope_info_map[*this->scope_history.begin()];
 }

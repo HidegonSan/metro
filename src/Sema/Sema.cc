@@ -15,8 +15,17 @@ Sema::Sema(AST::Scope* root)
 
 void Sema::analyze() {
 
+  alert;
   this->create_variable_dc();
+
+  alert;
   this->create_function_dc();
+
+  alert;
+
+  for( auto&& func : this->functions ) {
+    this->deduction_func_return_type(func);
+  }
 
 }
 

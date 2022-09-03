@@ -14,11 +14,10 @@ SOURCES	= src \
 	src/Builtin \
 	src/Error \
 	src/GC \
-	src/MetroDriver \
-	src/MetroDriver/Evaluator \
-	src/MetroDriver/Lexer \
-	src/MetroDriver/Parser \
-	src/MetroDriver/Sema \
+	src/Evaluator \
+	src/Lexer \
+	src/Parser \
+	src/Sema \
 	src/SyntaxAnalyzer \
 	src/Types/ \
 	src/Types/AST \

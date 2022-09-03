@@ -11,30 +11,31 @@ void Sema::create_function_dc() {
     if( elem->kind == ASTKind::Function ) {
       auto&& ast = (AST::Function*)elem;
 
-      auto& func = this->functions.emplace_back();
+      auto& ctx = this->functions.emplace_back(ast);
 
-      func.ast = ast;
-      func.name = ast->name;
+      auto& dc = ctx.dc;
 
       if( ast->return_type ) {
-        func.is_deducted = true;
-        func.specified_type = ast->return_type;
+        dc.is_deducted = true;
+        dc.specified_type = ast->return_type;
       }
 
-      func.candidates = this->get_returnable_expr(ast->code);
+      dc.candidates = this->get_returnable_expr(ast->code);
     }
   }
 
 }
 
-void Sema::deduction_func_return_type(FunctionDC& func) {
+void Sema::deduction_func_return_type(FunctionContext& func) {
 
-  TypeVector tmp;
+  std::vector<EvaluatedResult> tmp;
 
-  for( auto&& ast : func.candidates ) {
-    auto&& result = this->try_eval_type(ast);
+  auto& dc = func.dc;
 
+  for( auto&& ast : dc.candidates ) {
+    auto& result = tmp.emplace_back(this->try_eval_type(ast));
 
+    
   }
 
 

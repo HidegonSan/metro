@@ -6,15 +6,23 @@
 #include <stdexcept>
 #include <concepts>
 #include <functional>
+#include "Error.h"
 
 namespace metro {
 
+struct Token;
+struct Object;
 struct ValueType;
 
 namespace AST {
 
+enum class Kind;
+
 struct Base;
+struct Type;
+struct Argument;
 struct Variable;
+
 struct VarDefine;
 struct Scope;
 struct Function;
@@ -27,7 +35,7 @@ using ASTKind = AST::Kind;
 using ASTVector = std::vector<AST::Base*>;
 using TypeVector = std::vector<ValueType>;
 
-template <std::derived_from<AST::Base> T>
+template <class T>
 struct TypeCandidates {
   T* ast;
   std::vector<AST::Base*> candidates;
@@ -37,8 +45,8 @@ struct TypeCandidates {
 
   ValueType result;
 
-  TypeCandidates()
-    : ast(nullptr)
+  TypeCandidates(T* ast = nullptr)
+    : ast(ast)
   {
   }
 };
@@ -57,10 +65,18 @@ struct VariableDC : TypeCandidates<AST::VarDefine> {
   }
 };
 
-struct FunctionDC : TypeCandidates<AST::Function> {
+struct FunctionContext {
+  using FunctionDC = TypeCandidates<AST::Function>;
+
   std::string_view name;
 
-  FunctionDC() { }
+  FunctionDC  dc;
+
+  FunctionContext(AST::Function* func)
+    : name(func->name),
+      dc(func)
+  {
+  }
 };
 
 struct ScopeInfo {
@@ -96,13 +112,12 @@ class Sema {
     };
 
     AST::Base* ast;
+    ValueType type;
 
     union {
       Condition cond;
       ErrorKind error;
     };
-
-    ValueType type;
 
     EvaluatedResult(Condition cond = Condition::Completed)
       : ast(nullptr),
@@ -139,7 +154,10 @@ private:
   void deduction_variable_types();
 
   void create_function_dc();
-  void deduction_func_return_type(FunctionDC& func);
+  void deduction_func_return_type(FunctionContext& func);
+
+
+  FunctionContext* find_func(std::string_view name);
 
 
   VariableDC* get_variable_dc(AST::Variable* ast);
@@ -183,7 +201,7 @@ private:
 
   AST::Scope* root;
 
-  std::vector<FunctionDC> functions;
+  std::vector<FunctionContext> functions;
 
   std::list<AST::Scope*> scope_history;
   std::map<AST::Scope*, ScopeInfo> scope_info_map;
