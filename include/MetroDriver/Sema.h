@@ -3,6 +3,8 @@
 #include <list>
 #include <map>
 #include <vector>
+#include <concepts>
+#include <functional>
 
 namespace metro {
 
@@ -22,30 +24,42 @@ namespace semantics {
 
 using ASTKind = AST::Kind;
 using ASTVector = std::vector<AST::Base*>;
+using TypeVector = std::vector<ValueType>;
 
-struct VariableDC {
+template <std::derived_from<AST::Base> T>
+struct TypeCandidates {
+  T* ast;
+  std::vector<AST::Base*> candidates;
+
+  bool is_deducted;
+  AST::Type* specified_type;
+
+  ValueType result;
+
+  TypeCandidates()
+    : ast(nullptr)
+  {
+  }
+};
+
+struct VariableDC : TypeCandidates<AST::VarDefine> {
   bool is_argument;
 
   std::string_view name;
 
-  AST::VarDefine* ast;
   AST::Argument* ast_arg;
-
-  bool is_deducted;
-  ValueType var_type;
-
-  AST::Type* specified_type;
-
-  std::vector<AST::Base*> candidates;
 
   VariableDC()
     : is_argument(false),
-      ast(nullptr),
-      ast_arg(nullptr),
-      is_deducted(false),
-      specified_type(nullptr)
+      ast_arg(nullptr)
   {
   }
+};
+
+struct FunctionDC : TypeCandidates<AST::Function> {
+  std::string_view name;
+
+  FunctionDC() { }
 };
 
 struct ScopeInfo {
@@ -74,19 +88,21 @@ struct ScopeInfo {
 class Sema {
 
 public:
-  explicit Sema(AST::Scope* root)
-    : root(root)
-  {
-  }
+  explicit Sema(AST::Scope* root);
 
   Sema(Sema&&) = delete;
   Sema(Sema const&) = delete;
 
   void analyze();
 
+  ValueType* get_cache(AST::Base* ast);
+
+  static Sema* get_instance();
+
 private:
 
   void create_variable_dc();
+  void create_function_dc();
 
   void deduction_variable_types();
 
@@ -106,6 +122,27 @@ private:
   // create object from token
   static Object* create_obj(Token* token);
 
+  static void ast_map(
+    AST::Base* ast,
+    std::function<void(AST::Base*)> fp,
+    std::function<void(AST::Base*)> fp_begin = nullptr,
+    std::function<void(AST::Base*)> fp_end = nullptr
+  );
+
+  //
+  //  /*  check argument types of call and callee   */
+  //
+  // args:
+  //   fn_args   : argument types in function
+  //   call_args : argument types in call
+  //
+  // return:
+  //   >=0 : position to detected mismatching type
+  //    -1 : too few arguments to call
+  //    -2 : too many arguments to call
+  //    -3 : success
+  static int check_arguments(TypeVector const& fn_args, TypeVector const& call_args);
+
 
   AST::Scope* root;
 
@@ -117,13 +154,6 @@ private:
   std::map<AST::Variable*, VariableDC*> var_dc_ptr_map;
   
 };
-
-void ast_map(
-  AST::Base* ast,
-  std::function<void(AST::Base*)> fp,
-  std::function<void(AST::Base*)> fp_begin = nullptr,
-  std::function<void(AST::Base*)> fp_end = nullptr
-);
 
 } // namespace metro::semantics
 

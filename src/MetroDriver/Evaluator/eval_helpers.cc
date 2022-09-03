@@ -1,5 +1,5 @@
 #include "MetroDriver/evaluator.h"
-#include "MetroDriver/sema.h"
+#include "MetroDriver/Sema.h"
 #include "GC.h"
 
 namespace metro {
@@ -8,7 +8,7 @@ Object* Evaluator::construct_object_from_type(AST::Type* type) {
   auto obj = new Object;
 
   alert;
-  obj->type = Sema::get_instance()->walk(type);
+  obj->type = *semantics::Sema::get_instance()->get_cache(type);
 
   alertios(obj->type.to_string());
 

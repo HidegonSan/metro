@@ -1,4 +1,3 @@
-#include <functional>
 #include "AST.h"
 #include "Error.h"
 #include "Utils.h"
@@ -41,9 +40,10 @@ void Sema::create_variable_dc() {
           auto x = (AST::Variable*)ast;
           auto dc = this->get_variable_dc(x);
 
-          if( !dc )
+          if( !dc ) {
             Error(ErrorKind::UndefinedVariable, ast, "undefined variable name")
               .emit(true);
+          }
 
           this->var_dc_ptr_map[x] = dc;
 

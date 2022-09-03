@@ -1,4 +1,3 @@
-#include <functional>
 #include "AST.h"
 #include "Error.h"
 #include "Utils.h"
@@ -6,118 +5,22 @@
 
 namespace metro::semantics {
 
-void ast_map(
-  AST::Base* ast,
-  std::function<void(AST::Base*)> fp,
-  std::function<void(AST::Base*)> fp_begin = nullptr,
-  std::function<void(AST::Base*)> fp_end = nullptr) {
+ScopeInfo& Sema::get_cur_scope() {
+  return this->scope_info_map[*this->scope_history.begin()];
+}
 
-  if( !ast )
-    return;
+ScopeInfo& Sema::enter_scope(AST::Scope* ast) {
+  auto&& info = this->scope_info_map[ast];
 
-  if( fp_begin )
-    fp_begin(ast);
+  info.ast = ast;
 
-  fp(ast);
+  this->scope_history.emplace_front(ast);
 
-  switch( ast->kind ) {
-    case ASTKind::None:
-    case ASTKind::Type:
-      break;
+  return info;
+}
 
-    case ASTKind::Argument:
-      ast_map(((AST::Argument*)ast)->type, fp, fp_begin, fp_end);
-      break;
-
-    case ASTKind::Boolean:
-    case ASTKind::Value:
-    case ASTKind::Variable:
-      break;
-
-    case ASTKind::Array:
-    case ASTKind::Tuple:
-    case ASTKind::Scope: {
-      auto x = (AST::ListBase*)ast;
-
-      for( auto&& y : x->elements )
-        ast_map(y, fp, fp_begin, fp_end);
-
-      break;
-    }
-
-    case ASTKind::Callfunc: {
-      auto x = (AST::CallFunc*)ast;
-
-      for( auto&& arg : x->args )
-        ast_map(arg, fp, fp_begin, fp_end);
-
-      break;
-    }
-
-    case ASTKind::Subscript:
-    case ASTKind::MemberAccess:
-    case ASTKind::Mul:
-    case ASTKind::Div:
-    case ASTKind::Add:
-    case ASTKind::Sub:
-    case ASTKind::Assign: {
-      auto x = (AST::Expr*)ast;
-
-      ast_map(x->lhs, fp, fp_begin, fp_end);
-      ast_map(x->rhs, fp, fp_begin, fp_end);
-
-      break;
-    }
-
-    case ASTKind::Compare: {
-      auto x = (AST::Compare*)ast;
-
-      ast_map(x->first, fp, fp_begin, fp_end);
-
-      for( auto&& item : x->list )
-        ast_map(item.ast, fp, fp_begin, fp_end);
-
-      break;
-    }
-
-    case ASTKind::Return:
-      ast_map(((AST::Return*)ast)->expr, fp, fp_begin, fp_end);
-      break;
-
-    case ASTKind::If:
-      ast_map(((AST::If*)ast)->cond, fp, fp_begin, fp_end);
-      ast_map(((AST::If*)ast)->if_true, fp, fp_begin, fp_end);
-      ast_map(((AST::If*)ast)->if_false, fp, fp_begin, fp_end);
-      break;
-
-    case ASTKind::VarDefine:
-      ast_map(((AST::VarDefine*)ast)->type, fp, fp_begin, fp_end);
-      ast_map(((AST::VarDefine*)ast)->init, fp, fp_begin, fp_end);
-      break;
-
-    case ASTKind::For:
-    case ASTKind::Loop:
-    case ASTKind::While:
-      TODO_IMPL
-
-    case ASTKind::Function: {
-      auto x = (AST::Function*)ast;
-
-      for(auto&&arg:x->args)
-        ast_map(&arg, fp, fp_begin, fp_end);
-
-      ast_map(x->return_type, fp, fp_begin, fp_end);
-      ast_map(x->code, fp, fp_begin, fp_end);
-
-      break;
-    }
-
-    default:
-      TODO_IMPL
-  }
-
-  if( fp_end )
-    fp_end(ast);
+void Sema::leave_scope() {
+  this->scope_history.pop_front();
 }
 
 void Sema::get_last_expr(AST::Base* ast, ASTVector& out) {
@@ -161,24 +64,6 @@ void Sema::get_last_expr(AST::Base* ast, ASTVector& out) {
       out.emplace_back(ast);
       break;
   }
-}
-
-ScopeInfo& Sema::get_cur_scope() {
-  return this->scope_info_map[*this->scope_history.begin()];
-}
-
-ScopeInfo& Sema::enter_scope(AST::Scope* ast) {
-  auto&& info = this->scope_info_map[ast];
-
-  info.ast = ast;
-
-  this->scope_history.emplace_front(ast);
-
-  return info;
-}
-
-void Sema::leave_scope() {
-  this->scope_history.pop_front();
 }
 
 ASTVector Sema::get_returnable_expr(AST::Base* ast) {
@@ -230,6 +115,37 @@ Object* Sema::create_obj(Token* token) {
   }
 
   return obj;
+}
+
+int Sema::check_arguments(TypeVector const& fn_args, TypeVector const& call_args) {
+  if( fn_args.empty() ) {
+    if( !call_args.empty() )
+      return -2;
+  }
+  else if( fn_args.rbegin()->kind == ValueType::Kind::Args ) {
+    if( call_args.size() < (signed)fn_args.size() - 1 )
+      return -2;
+  }
+  else if( fn_args.size() < call_args.size() ) {
+    return -2;
+  }
+  else if( fn_args.size() > call_args.size() ) {
+    return -1;
+  }
+
+  size_t i = 0;
+
+  for( auto it = fn_args.begin(); auto&& arg : call_args ) {
+    if( it == fn_args.end() || it->kind == ValueType::Kind::Args )
+      break;
+
+    if( ! it++ ->equals(arg) )
+      return i;
+
+    i++;
+  }
+
+  return -3;
 }
 
 } // namespace metro::semantics
