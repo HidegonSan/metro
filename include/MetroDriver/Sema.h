@@ -110,6 +110,7 @@ class Sema {
     enum class Condition {
       Completed,
       Incomplete,
+      Error
     };
 
     ValueType type;
@@ -121,6 +122,12 @@ class Sema {
     EvalResult(ValueType const& type = { })
       : type(type),
         cond(Condition::Completed)
+    {
+    }
+
+    EvalResult(Error&& err)
+      : cond(Condition::Error),
+        error(new Error(std::move(err)))
     {
     }
 
@@ -144,34 +151,22 @@ public:
 
 private:
 
-  // for ast_map()
-  void mapfn_begin() {
-
-  }
-
-  // for ast_map()
-  void mapfn_end() {
-
-  }
-
   void create_variable_dc();
   void deduction_variable_types();
 
   void create_function_dc();
   void deduction_func_return_type(FunctionContext& func);
 
-
   FunctionContext* find_func(std::string_view name);
-
 
   VariableDC* get_variable_dc(AST::Variable* ast);
 
   ScopeInfo& get_cur_scope();
 
-  // ValueType eval_type(AST::Base* ast);
-
   // try evaluate a type of ast
-  EvalResult eval_type(AST::Base* ast);
+  EvalResult try_eval_type(AST::Base* ast);
+
+  ValueType eval_type(AST::Base* ast);
 
   ScopeInfo& enter_scope(AST::Scope* ast);
   void leave_scope();

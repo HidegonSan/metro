@@ -7,45 +7,41 @@ namespace metro::semantics {
 
 // --- //
 
-/*
-Sema::EvaluatedResult Sema::try_eval_type(AST::Base* ast) {
-  using Cond = EvaluatedResult::Condition;
+Sema::EvalResult Sema::try_eval_type(AST::Base* ast) {
+  using Cond = EvalResult::Condition;
 
   switch( ast->kind ) {
+    case 
+
+    //
+    // call function
     case ASTKind::Callfunc: {
       auto x = (AST::CallFunc*)ast;
 
       auto func = this->find_func(x->name);
 
+      // function not found
       if( !func ) {
-        Error(ErrorKind::UndefinedFunction,
-          x->token,
-          "undefined function name")
-          .emit(true);
+        return
+          Error(ErrorKind::UndefinedFunction,
+            x->token,
+            "undefined function name");
       }
 
+      // return type is not deducted yet
       if( !func->dc.is_deducted )
         return Cond::Incomplete;
 
-      for( auto&& arg : x->args ) {
-        auto&& res = this->try_eval_type(arg);
-
-        if( res.cond != Cond::Completed )
-          return res;
-
-
-      }
-
       break;
     }
+
+
   }
 
   return this->eval_type(ast);
 }
-*/
 
-// ValueType Sema::eval_type(AST::Base* ast) {
-Sema::EvalResult Sema::eval_type(AST::Base* ast) {
+Sema::EvalResult Sema::try_eval_type(AST::Base* ast) {
   using Cond = EvalResult::Condition;
 
   if( !ast )

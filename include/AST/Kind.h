@@ -1,40 +1,42 @@
 #pragma once
 
 namespace metro::AST {
-  enum class Kind {
-    None,
-    Type,
-    Argument,
 
-    Boolean,
-    Value,
-    Variable,
+enum class Kind {
+  None,
+  Type,
+  Argument,
 
-    Array,
-    Tuple,
-    // EmptyArray, // TODO: impl
+  Boolean,
+  Value,
+  Variable,
 
-    Callfunc,
-    Subscript,
-    MemberAccess,
+  Array,
+  Tuple,
+  // EmptyArray, // TODO: impl
 
-    Mul,
-    Div,
-    Add,
-    Sub,
-    Compare,
-    Assign,
+  Callfunc,
+  Subscript,
+  MemberAccess,
 
-    Return,
-    If,
-    VarDefine,
-    For,
-    Loop,
-    While,
+  Mul,
+  Div,
+  Add,
+  Sub,
+  Compare,
+  Assign,
 
-    Scope,
+  Return,
+  If,
+  VarDefine,
+  For,
+  Loop,
+  While,
 
-    Function,
-    Struct,
-  };
-}
+  Scope,
+
+  Function,
+  Struct,
+};
+
+} // namespace metro::AST
