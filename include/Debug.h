@@ -14,6 +14,7 @@
     {alert;fprintf(stderr,"\n#crashed at " __FILE__ ":%d\n",__LINE__);exit(1);}
 #else
   #define  alert              0
+  #define  alertphase(s)      0
   #define  alertmsg(...)      0
   #define  alertfmt(...)      0
   #define  alertios(...)      0

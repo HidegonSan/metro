@@ -15,11 +15,38 @@ Sema::EvalResult Sema::try_eval_type(AST::Base* ast) {
   using Cond = EvalResult::Condition;
 
   switch( ast->kind ) {
+    case ASTKind::Type: {
+      auto x = (AST::Type*)ast;
+
+      ValueType out;
+
+      if( !this->get_type_from_name(out, x->name) )
+        Error(ErrorKind::UndefinedTypeName, x, "unknown type name")
+          .emit(true);
+
+      for( auto&& e : x->elems )
+        this->try_eval_type(e);
+
+      return out;
+    }
+
+    case ASTKind::Argument:
+      _try_eval_r(((AST::Argument*)ast)->type);
+      break;
+
     case ASTKind::None:
     case ASTKind::Boolean:
     case ASTKind::Value:
-    case ASTKind::Variable:
       break;
+
+    case ASTKind::Variable: {
+      auto x = (AST::Variable*)ast;
+
+      if( !this->var_dc_ptr_map[x]->is_deducted )
+        return Cond::Incomplete;
+
+      break;
+    }
 
     case ASTKind::Array:
     case ASTKind::Tuple: {
@@ -60,6 +87,19 @@ Sema::EvalResult Sema::try_eval_type(AST::Base* ast) {
 
       for( auto&& item : x->list )
         _try_eval_r(item.ast);
+
+      break;
+    }
+
+    case ASTKind::Assign: {
+      auto x = (AST::Expr*)ast;
+
+      auto&& rhs = this->try_eval_type(x->rhs);
+
+      if( !is_lvalue(x->lhs) ) {
+        Error(ErrorKind::TypeMismatch, x->lhs, "expected lvalue expression")
+          .emit();
+      }
 
       break;
     }
@@ -121,23 +161,9 @@ ValueType Sema::eval_type(AST::Base* ast) {
     case ASTKind::Type: {
       auto type = (AST::Type*)ast;
 
-      alertios("type->name = " << type->name);
-
-      for( auto&& pair : ValueType::name_table ) {
-        if( type->name == pair.first ) {
-          alert;
-          ret = pair.second;
-          goto _found_type;
-        }
-      }
-
-      // TODO: find struct
-
-      Error(ErrorKind::UndefinedTypeName, ast->token, "undefined type name")
-        .emit(true);
-
-    _found_type:
-      alert;
+      if( !this->get_type_from_name(ret, type->name) )
+        Error(ErrorKind::UndefinedTypeName, ast->token, "undefined type name")
+          .emit(true);
 
       ret.arr_depth = type->arr_depth;
       ret.have_elements = type->have_elements;
@@ -145,9 +171,8 @@ ValueType Sema::eval_type(AST::Base* ast) {
       ret.is_mutable = type->is_mutable;
       ret.is_reference = type->is_reference;
 
-      for( auto&& sub : type->elems ) {
+      for( auto&& sub : type->elems )
         ret.elems.emplace_back(this->eval_type(sub));
-      }
 
       break;
     }
@@ -155,7 +180,7 @@ ValueType Sema::eval_type(AST::Base* ast) {
     case ASTKind::Argument: {
       auto argument = (AST::Argument*)ast;
 
-      ret = eval_type(argument->type);
+      ret = this->eval_type(argument->type);
 
       break;
     }
@@ -172,6 +197,7 @@ ValueType Sema::eval_type(AST::Base* ast) {
     case ASTKind::Variable: {
       auto x = (AST::Variable*)ast;
 
+      ret = this->var_dc_ptr_map[x]->type;
 
       break;
     }
@@ -206,6 +232,10 @@ ValueType Sema::eval_type(AST::Base* ast) {
       auto x = (AST::Expr*)ast;
 
       TODO_IMPL
+
+
+
+      ret = this->eval_type(x->rhs);
 
       break;
     }

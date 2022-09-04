@@ -33,7 +33,6 @@ void Sema::create_variable_dc() {
           dc.ast = x;
 
           if( x->type ) {
-            dc.is_deducted = true;
             dc.specified_type = x->type;
           }
 
@@ -111,12 +110,12 @@ void Sema::create_variable_dc() {
 }
 
 void Sema::deduction_variable_type(VariableDC& dc) {
-
-  if( dc.is_argument )
+  if( dc.is_argument || dc.is_deducted )
     return;
 
-  if( dc.is_deducted && dc.specified_type ) {
+  if( dc.specified_type ) {
     dc.type = this->eval_type(dc.ast->type);
+    dc.is_deducted = true;
     return;
   }
 
@@ -135,19 +134,12 @@ void Sema::deduction_variable_type(VariableDC& dc) {
       else {
         dc.type = res.type;
         dc.is_deducted = true;
+
+        this->deduction_updated = true;
       }
     }
   }
-
-  if( !dc.is_deducted ) {
-    Error(ErrorKind::CannotInfer, dc.ast, "cannot deduction the type of variable")
-      .emit(true);
-  }
-
-  alertios("variable '" << dc.name << "': " << dc.type);
-
 }
-
 
 } // namespace metro::semantics
 

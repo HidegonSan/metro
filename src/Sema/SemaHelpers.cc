@@ -5,7 +5,20 @@
 
 namespace metro::semantics {
 
-FunctionContext* Sema::find_func(std::string_view name) {
+bool Sema::get_type_from_name(ValueType& out, std::string_view name) {
+  for( auto&& [s, vt] : ValueType::name_table ) {
+    if( name == s ) {
+      out = vt;
+      return true;
+    }
+  }
+
+  // todo: find struct
+
+  return false;
+}
+
+FunctionInfo* Sema::find_func(std::string_view name) {
   for( auto&& func : this->functions )
     if( func.name == name )
       return &func;
@@ -29,6 +42,18 @@ ScopeInfo& Sema::enter_scope(AST::Scope* ast) {
 
 void Sema::leave_scope() {
   this->scope_history.pop_front();
+}
+
+bool Sema::is_lvalue(AST::Base* ast) {
+  if( !ast )
+    return false;
+
+  switch( ast->kind ) {
+    case ASTKind::Variable:
+      return true;
+  }
+
+  return false;
 }
 
 void Sema::get_last_expr(AST::Base* ast, ASTVector& out) {

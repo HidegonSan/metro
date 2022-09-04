@@ -26,7 +26,7 @@ void Sema::create_function_dc() {
 
 }
 
-void Sema::deduction_func_return_type(FunctionContext& func) {
+void Sema::deduction_func_return_type(FunctionInfo& func) {
 
   std::vector<EvalResult> tmp;
 
@@ -37,7 +37,7 @@ void Sema::deduction_func_return_type(FunctionContext& func) {
   for( auto&& ast : dc.candidates ) {
     auto& result = tmp.emplace_back(this->try_eval_type(ast));
 
-    alertios(ast->to_string());
+    alertios(result.type.to_string() << ": " << ast->to_string());
   }
 
 

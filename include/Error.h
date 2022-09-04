@@ -51,6 +51,8 @@ enum class ErrorKind {
   EmptyStruct,
 
   StackOverflow,
+
+  ApplicationBug,
 };
 
 class Error {

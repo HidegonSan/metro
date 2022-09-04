@@ -65,14 +65,14 @@ struct VariableDC : TypeCandidates<AST::VarDefine> {
   }
 };
 
-struct FunctionContext {
+struct FunctionInfo {
   using FunctionDC = TypeCandidates<AST::Function>;
 
   std::string_view name;
 
   FunctionDC  dc;
 
-  FunctionContext(AST::Function* func)
+  FunctionInfo(AST::Function* func)
     : name(func->name),
       dc(func)
   {
@@ -148,9 +148,14 @@ private:
   void deduction_variable_type(VariableDC& dc);
 
   void create_function_dc();
-  void deduction_func_return_type(FunctionContext& func);
+  void deduction_func_return_type(FunctionInfo& func);
 
-  FunctionContext* find_func(std::string_view name);
+  bool get_type_from_name(ValueType& out, std::string_view name);
+
+  // TODO
+  // StructInfo* find_struct(std::string_view name);
+
+  FunctionInfo* find_func(std::string_view name);
 
   VariableDC* get_variable_dc(AST::Variable* ast);
 
@@ -163,6 +168,8 @@ private:
 
   ScopeInfo& enter_scope(AST::Scope* ast);
   void leave_scope();
+
+  static bool is_lvalue(AST::Base* ast);
 
   static void get_last_expr(AST::Base* ast, ASTVector& out);
   static ASTVector get_returnable_expr(AST::Base* ast);
@@ -195,12 +202,14 @@ private:
 
   AST::Scope* root;
 
-  std::vector<FunctionContext> functions;
+  std::vector<FunctionInfo> functions;
 
   std::list<AST::Scope*> scope_history;
   std::map<AST::Scope*, ScopeInfo> scope_info_map;
 
   std::map<AST::Base*, ValueType> caches;
+
+  bool deduction_updated{ };
 
   std::map<AST::Variable*, VariableDC*> var_dc_ptr_map;
   

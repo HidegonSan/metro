@@ -13,6 +13,7 @@ namespace metro {
 size_t Error::emitted_count{ 0 };
 
 static char const* err_kind_string_table[] = {
+  "version error",
   "invalid token",
   "invalid syntax",
   "uninitialized value",
@@ -31,6 +32,7 @@ static char const* err_kind_string_table[] = {
   "invalid arguments",
   "empty struct",
   "stack overflow",
+  "application bug"
 };
 
 auto trim_view_lines(AppContext::Script const* script, size_t err_begin, size_t err_end) {
@@ -134,6 +136,17 @@ void Error::emit(bool exit) {
   emitted_count += 1;
 
   if( exit || emitted_count >= 10 ) {
+    std::exit(1);
+  }
+
+  if( kind == ErrorKind::ApplicationBug ) {
+    std::cerr
+      << COL_RED
+      << "please post this bug in anywhere\n"
+      << "  GitHub: https://github.com/bomkei/metro\n"
+      << "  Discord: https://discord.gg/PPujBK4fdu\n"
+      << COL_DEFAULT;
+
     std::exit(1);
   }
 }
