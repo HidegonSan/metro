@@ -5,7 +5,7 @@
 #include "Types.h"
 
 #include "MetroDriver/lexer.h"
-#include "MetroDriver/parser.h"
+#include "MetroDriver/Parser.h"
 // #include "MetroDriver/sema.h"
 #include "MetroDriver/Sema.h"
 #include "MetroDriver/evaluator.h"

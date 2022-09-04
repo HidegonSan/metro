@@ -24,7 +24,7 @@ namespace metro {
     AST::Base* assign();
 
     AST::Base* expr();
-    AST::Base* stmt();
+    AST::Base* controls();
 
     AST::Base* toplevel();
 

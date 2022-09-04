@@ -1,28 +1,30 @@
 #include "Types.h"
-#include "MetroDriver/parser.h"
+#include "MetroDriver/Parser.h"
 #include "Error.h"
 
 namespace metro {
 
-AST::Base* Parser::stmt() {
-  if( eat("if") ) {
+AST::Base* Parser::controls() {
+  //
+  // if
+  if( this->eat("if") ) {
     auto ast = new AST::If(ate);
 
-    ast->cond = expr();
-    ast->if_true = expect_scope();
+    ast->cond = this->expr();
+    ast->if_true = this->expect_scope();
 
-    if( eat("else") ) {
-      if( cur->str == "if" ) {
-        ast->if_false = expr();
-      }
-      else {
-        ast->if_false = expect_scope();
-      }
+    if( this->eat("else") ) {
+      if( cur->str == "if" )
+        ast->if_false = this->expr();
+      else
+        ast->if_false = this->expect_scope();
     }
 
     return ast;
   }
 
+  //
+  // for
   if( eat("for") ) {
     auto ast = new AST::For(ate);
 

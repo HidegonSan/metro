@@ -15,4 +15,4 @@ Lexer::Lexer(Source const& src)
 {
 }
 
-}
+} // namespace metro

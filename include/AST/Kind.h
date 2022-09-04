@@ -3,17 +3,16 @@
 namespace metro::AST {
 
 enum class Kind {
-  None,
   Type,
   Argument,
 
+  None,
   Boolean,
   Value,
   Variable,
 
   Array,
   Tuple,
-  // EmptyArray, // TODO: impl
 
   Callfunc,
   Subscript,

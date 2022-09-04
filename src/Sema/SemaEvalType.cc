@@ -3,6 +3,10 @@
 #include "Utils.h"
 #include "MetroDriver/Sema.h"
 
+#define _try_eval_r(_ast) \
+  if( auto&& res = this->try_eval_type(_ast); _ast && res.fail() ) \
+    return res;
+
 namespace metro::semantics {
 
 // --- //
@@ -11,7 +15,21 @@ Sema::EvalResult Sema::try_eval_type(AST::Base* ast) {
   using Cond = EvalResult::Condition;
 
   switch( ast->kind ) {
-    case 
+    case ASTKind::None:
+    case ASTKind::Boolean:
+    case ASTKind::Value:
+    case ASTKind::Variable:
+      break;
+
+    case ASTKind::Array:
+    case ASTKind::Tuple: {
+      auto x = (AST::ListBase*)ast;
+
+      for( auto&& elem : x->elements )
+        _try_eval_r(elem);
+
+      break;
+    }
 
     //
     // call function
@@ -35,13 +53,45 @@ Sema::EvalResult Sema::try_eval_type(AST::Base* ast) {
       break;
     }
 
+    case ASTKind::Compare: {
+      auto x = (AST::Compare*)ast;
 
+      _try_eval_r(x->first);
+
+      for( auto&& item : x->list )
+        _try_eval_r(item.ast);
+
+      break;
+    }
+
+    case ASTKind::Return:
+      _try_eval_r(((AST::Return*)ast)->expr);
+      break;
+    
+    case ASTKind::If: {
+      auto x = (AST::If*)ast;
+
+      _try_eval_r(x->cond);
+      _try_eval_r(x->if_true);
+      _try_eval_r(x->if_false);
+
+      break;
+    }
+
+    case ASTKind::VarDefine: {
+      auto x = (AST::VarDefine*)ast;
+
+      _try_eval_r(x->type);
+      _try_eval_r(x->init);
+
+      break;
+    }
   }
 
   return this->eval_type(ast);
 }
 
-Sema::EvalResult Sema::try_eval_type(AST::Base* ast) {
+ValueType Sema::eval_type(AST::Base* ast) {
   using Cond = EvalResult::Condition;
 
   if( !ast )
@@ -50,9 +100,7 @@ Sema::EvalResult Sema::try_eval_type(AST::Base* ast) {
   if( this->caches.contains(ast) )
     return this->caches[ast];
 
-  auto& result = this->caches[ast];
-
-  auto& ret = result.type;
+  auto& ret = this->caches[ast];
 
   switch( ast->kind ) {
     case ASTKind::None:
@@ -97,7 +145,7 @@ Sema::EvalResult Sema::try_eval_type(AST::Base* ast) {
     case ASTKind::Argument: {
       auto argument = (AST::Argument*)ast;
 
-      result = eval_type(argument->type);
+      ret = eval_type(argument->type);
 
       break;
     }

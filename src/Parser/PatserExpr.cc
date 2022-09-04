@@ -4,6 +4,35 @@
 
 namespace metro {
 
+AST::Base* Parser::atom() {
+  if( eat("true") ) {
+    return new AST::Boolean(ate, true);
+  }
+
+  if( eat("false") ) {
+    return new AST::Boolean(ate, false);
+  }
+
+  if( eat("none") ) {
+    return new AST::None(ate);
+  }
+
+  switch( cur->kind ) {
+    case TokenKind::Int:
+    case TokenKind::Float:
+    case TokenKind::Char:
+    case TokenKind::String:
+      next();
+      return new AST::Value(cur->prev);
+
+    case TokenKind::Ident:
+      next();
+      return new AST::Variable(cur->prev);
+  }
+
+  return nullptr;
+}
+
 AST::Base* Parser::factor() {
 
   // bracket
@@ -24,9 +53,9 @@ AST::Base* Parser::factor() {
     return x;
   }
 
-  // stmt
-  if( auto stmt_ast = stmt(); stmt_ast != nullptr )
-    return stmt_ast;
+  // controls
+  if( auto ast = this->controls(); ast )
+    return ast;
 
   // scope
   if( cur->str == "{" )

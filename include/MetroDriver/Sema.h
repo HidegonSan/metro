@@ -108,7 +108,7 @@ class Sema {
 
   struct EvalResult {
     enum class Condition {
-      Completed,
+      Success,
       Incomplete,
       Error
     };
@@ -119,9 +119,13 @@ class Sema {
 
     std::shared_ptr<Error> error;
 
+    bool fail() const {
+      return this->cond != Condition::Success;
+    }
+
     EvalResult(ValueType const& type = { })
       : type(type),
-        cond(Condition::Completed)
+        cond(Condition::Success)
     {
     }
 
@@ -207,7 +211,7 @@ private:
   std::list<AST::Scope*> scope_history;
   std::map<AST::Scope*, ScopeInfo> scope_info_map;
 
-  std::map<AST::Base*, EvalResult> caches;
+  std::map<AST::Base*, ValueType> caches;
 
   std::map<AST::Variable*, VariableDC*> var_dc_ptr_map;
   
