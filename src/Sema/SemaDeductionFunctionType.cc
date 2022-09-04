@@ -28,12 +28,12 @@ void Sema::create_function_dc() {
 
 void Sema::deduction_func_return_type(FunctionContext& func) {
 
-  std::vector<EvaluatedResult> tmp;
+  std::vector<EvalResult> tmp;
 
   auto& dc = func.dc;
 
   for( auto&& ast : dc.candidates ) {
-    auto& result = tmp.emplace_back(this->try_eval_type(ast));
+    auto& result = tmp.emplace_back(this->eval_type(ast));
 
     
   }

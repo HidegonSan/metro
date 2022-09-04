@@ -3,9 +3,11 @@
 #include <list>
 #include <map>
 #include <vector>
+#include <memory>
 #include <stdexcept>
 #include <concepts>
 #include <functional>
+
 #include "Error.h"
 
 namespace metro {
@@ -104,24 +106,26 @@ struct ScopeInfo {
 
 class Sema {
 
-  struct EvaluatedResult {
+  struct EvalResult {
     enum class Condition {
       Completed,
       Incomplete,
-      NullPointer,
     };
 
-    AST::Base* ast;
     ValueType type;
 
-    union {
-      Condition cond;
-      ErrorKind error;
-    };
+    Condition cond;
 
-    EvaluatedResult(Condition cond = Condition::Completed)
-      : ast(nullptr),
-        cond(cond)
+    std::shared_ptr<Error> error;
+
+    EvalResult(ValueType const& type = { })
+      : type(type),
+        cond(Condition::Completed)
+    {
+    }
+
+    EvalResult(Condition cond)
+      : cond(cond)
     {
     }
   };
@@ -164,8 +168,10 @@ private:
 
   ScopeInfo& get_cur_scope();
 
-  ValueType eval_type(AST::Base* ast);
-  EvaluatedResult try_eval_type(AST::Base* ast);
+  // ValueType eval_type(AST::Base* ast);
+
+  // try evaluate a type of ast
+  EvalResult eval_type(AST::Base* ast);
 
   ScopeInfo& enter_scope(AST::Scope* ast);
   void leave_scope();
@@ -206,7 +212,7 @@ private:
   std::list<AST::Scope*> scope_history;
   std::map<AST::Scope*, ScopeInfo> scope_info_map;
 
-  std::map<AST::Base*, ValueType> caches;
+  std::map<AST::Base*, EvalResult> caches;
 
   std::map<AST::Variable*, VariableDC*> var_dc_ptr_map;
   

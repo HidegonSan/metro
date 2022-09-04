@@ -5,57 +5,58 @@
 
 namespace metro::semantics {
 
+// --- //
 
+/*
 Sema::EvaluatedResult Sema::try_eval_type(AST::Base* ast) {
-  /*
-
-  失敗する可能性があるもの:
-    CallFunc    // 戻り値の型が不明
-
-  */
-
   using Cond = EvaluatedResult::Condition;
-
-  if( !ast )
-    return Cond::NullPointer;
 
   switch( ast->kind ) {
     case ASTKind::Callfunc: {
       auto x = (AST::CallFunc*)ast;
 
-      auto func = find_func(x->name);
+      auto func = this->find_func(x->name);
 
-      if( !func )
+      if( !func ) {
         Error(ErrorKind::UndefinedFunction,
           x->token,
           "undefined function name")
           .emit(true);
+      }
 
       if( !func->dc.is_deducted )
         return Cond::Incomplete;
+
+      for( auto&& arg : x->args ) {
+        auto&& res = this->try_eval_type(arg);
+
+        if( res.cond != Cond::Completed )
+          return res;
+
+
+      }
 
       break;
     }
   }
 
-  auto ret = EvaluatedResult{ };
-
-  ret.ast = ast;
-  ret.type = this->eval_type(ast);
-
-  return ret;
+  return this->eval_type(ast);
 }
+*/
 
-// --- //
+// ValueType Sema::eval_type(AST::Base* ast) {
+Sema::EvalResult Sema::eval_type(AST::Base* ast) {
+  using Cond = EvalResult::Condition;
 
-ValueType Sema::eval_type(AST::Base* ast) {
   if( !ast )
     return { };
 
   if( this->caches.contains(ast) )
     return this->caches[ast];
 
-  auto& ret = this->caches[ast];
+  auto& result = this->caches[ast];
+
+  auto& ret = result.type;
 
   switch( ast->kind ) {
     case ASTKind::None:
@@ -89,7 +90,9 @@ ValueType Sema::eval_type(AST::Base* ast) {
       ret.is_reference = type->is_reference;
 
       for( auto&& sub : type->elems ) {
-        ret.elems.emplace_back(eval_type(sub));
+        auto&& res = this->eval_type(sub);
+
+        ret.elems.emplace_back(res.type);
       }
 
       break;
@@ -98,7 +101,7 @@ ValueType Sema::eval_type(AST::Base* ast) {
     case ASTKind::Argument: {
       auto argument = (AST::Argument*)ast;
 
-      ret = eval_type(argument->type);
+      result = eval_type(argument->type);
 
       break;
     }
@@ -120,7 +123,28 @@ ValueType Sema::eval_type(AST::Base* ast) {
     }
 
     case ASTKind::Callfunc: {
-      
+      auto x = (AST::CallFunc*)ast;
+
+      auto func = this->find_func(x->name);
+
+      if( !func ) {
+        Error(ErrorKind::UndefinedFunction,
+          x->token,
+          "undefined function name")
+          .emit(true);
+      }
+
+      if( !func->dc.is_deducted )
+        return Cond::Incomplete;
+
+      for( auto&& arg : x->args ) {
+        auto&& res = this->eval_type(arg);
+
+        if( res.cond != Cond::Completed )
+          return res;
+
+
+      }
 
       break;
     }
@@ -159,32 +183,33 @@ ValueType Sema::eval_type(AST::Base* ast) {
     case ASTKind::If: {
       auto if_x = (AST::If*)ast;
 
-      if( !eval_type(if_x->cond).equals(ValueType::Kind::Bool) ) {
+      if( !eval_type(if_x->cond).type.equals(ValueType::Kind::Bool) ) {
         Error(ErrorKind::TypeMismatch, if_x->cond, "condition must be boolean")
           .emit();
       }
 
-      ret = eval_type(if_x->if_true);
-
-      if( if_x->if_false && !ret.equals(eval_type(if_x->if_false)) ) {
-        Error(ErrorKind::TypeMismatch, if_x->token, "if-expr type mismatch")
-          .emit();
-      }
+      result = eval_type(if_x->if_true);
+    
+      if( if_x->if_false )
+        if( auto&& tmp = this->eval_type(if_x->if_false); !ret.equals(tmp.type) )
+          Error(ErrorKind::TypeMismatch, if_x->token, "if-expr type mismatch")
+            .emit();
 
       break;
     }
 
     case ASTKind::For: {
-      auto for_x = (AST::For*)ast;
+      auto x = (AST::For*)ast;
 
-      eval_type(for_x->init);
+      this->eval_type(x->init);
 
-      if( !eval_type(for_x->cond).equals(ValueType::Kind::Bool) ) {
-        Error(ErrorKind::TypeMismatch, for_x->cond, "condition must be boolean").emit();
-      }
+      auto&& cond = this->eval_type(x->cond);
 
-      eval_type(for_x->counter);
-      eval_type(for_x->code);
+      if( !cond.type.equals(ValueType::Kind::Bool) )
+        Error(ErrorKind::TypeMismatch, x->cond, "condition must be boolean").emit();
+
+      this->eval_type(x->counter);
+      this->eval_type(x->code);
 
       break;
     }
@@ -192,6 +217,7 @@ ValueType Sema::eval_type(AST::Base* ast) {
     case ASTKind::Return: {
       auto x = (AST::Return*)ast;
 
+      this->eval_type(x->expr);
 
       break;
     }
@@ -202,6 +228,23 @@ ValueType Sema::eval_type(AST::Base* ast) {
       // 空のスコープ
       if( scope->elements.empty() )
         break;
+
+      auto&& finals = this->get_returnable_expr(scope);
+
+      for( auto&& elem : scope->elements )
+        this->eval_type(elem);
+
+      result = this->eval_type(*scope->elements.begin());
+
+      for( auto it = scope->elements.begin() + 1; it != scope->elements.end(); it++ )
+        if( auto&& tmp = this->eval_type(*it); !tmp.type.equals(result.type) )
+          Error(ErrorKind::TypeMismatch, *it,
+            Utils::linkstr(
+              "expected '", result.type.to_string(),
+              "' but found '", tmp.type.to_string(), "'"
+            )
+          )
+           .emit();
 
       break;
     }
@@ -236,7 +279,7 @@ ValueType Sema::eval_type(AST::Base* ast) {
 
       // TODO: check operator
 
-      ret = lhs;
+      ret = lhs.type;
       break;
     }
   }

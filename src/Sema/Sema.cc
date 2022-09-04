@@ -31,7 +31,7 @@ void Sema::analyze() {
 
 ValueType* Sema::get_cache(AST::Base* ast) {
   if( this->caches.contains(ast) )
-    return &this->caches[ast];
+    return &this->caches[ast].type;
 
   return nullptr;
 }
