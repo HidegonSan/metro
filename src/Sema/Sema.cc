@@ -21,8 +21,13 @@ void Sema::analyze() {
   alert;
   this->create_function_dc();
 
-  alert;
+  // deduction variable types
+  for( auto&& [scope, info] : this->scope_info_map ) {
+    for( auto&& var : info.var_dc_list )
+      this->deduction_variable_type(var);
+  }
 
+  // deduction function return types
   for( auto&& func : this->functions ) {
     this->deduction_func_return_type(func);
   }
@@ -31,7 +36,7 @@ void Sema::analyze() {
 
 ValueType* Sema::get_cache(AST::Base* ast) {
   if( this->caches.contains(ast) )
-    return &this->caches[ast].type;
+    return &this->caches[ast];
 
   return nullptr;
 }

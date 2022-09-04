@@ -110,43 +110,44 @@ void Sema::create_variable_dc() {
 
 }
 
-void Sema::deduction_variable_types() {
+void Sema::deduction_variable_type(VariableDC& dc) {
 
-  this->create_variable_dc();
+  if( dc.is_argument )
+    return;
 
-  for( auto&& pair : this->scope_info_map ) {
-    auto&& [scope, info] = pair;
-
-    for( auto&& dc : info.var_dc_list ) {
-      if( dc.is_argument )
-        continue;
-      
-      
-    }
-
-    debug(
-      printf("%p\n", scope);
-
-      for( auto&& dc : info.var_dc_list ) {
-        auto&& name = dc.name;
-
-        if( dc.is_argument ) {
-          std::cout << "arg: " << name << std::endl;
-        }
-        else {
-          std::cout
-            << name << std::endl
-            << dc.ast->to_string() << std::endl;
-        }
-
-        for( auto&& x : dc.candidates ) {
-          std::cout << x->to_string() << std::endl;
-        }
-      }
-    )
+  if( dc.is_deducted && dc.specified_type ) {
+    dc.type = this->eval_type(dc.ast->type);
+    return;
   }
 
+  for( auto&& c : dc.candidates ) {
+    auto&& res = this->try_eval_type(c);
+
+    if( !res.fail() ) {
+      if( dc.is_deducted ) {
+        if( !dc.type.equals(res.type) ) {
+          Error(ErrorKind::TypeMismatch, c,
+            Utils::linkstr("expected '", dc.type.to_string(),
+              "' but found '", res.type.to_string(), "'"))
+                .emit();
+        }
+      }
+      else {
+        dc.type = res.type;
+        dc.is_deducted = true;
+      }
+    }
+  }
+
+  if( !dc.is_deducted ) {
+    Error(ErrorKind::CannotInfer, dc.ast, "cannot deduction the type of variable")
+      .emit(true);
+  }
+
+  alertios("variable '" << dc.name << "': " << dc.type);
+
 }
+
 
 } // namespace metro::semantics
 

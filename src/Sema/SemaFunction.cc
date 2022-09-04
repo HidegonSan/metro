@@ -37,7 +37,7 @@ void Sema::deduction_func_return_type(FunctionContext& func) {
   for( auto&& ast : dc.candidates ) {
     auto& result = tmp.emplace_back(this->try_eval_type(ast));
 
-    
+    alertios(ast->to_string());
   }
 
 

@@ -40,10 +40,10 @@ Sema::EvalResult Sema::try_eval_type(AST::Base* ast) {
 
       // function not found
       if( !func ) {
-        return
-          Error(ErrorKind::UndefinedFunction,
-            x->token,
-            "undefined function name");
+        Error(ErrorKind::UndefinedFunction,
+          x->token,
+          "undefined function name")
+            .emit(true);
       }
 
       // return type is not deducted yet
@@ -83,6 +83,18 @@ Sema::EvalResult Sema::try_eval_type(AST::Base* ast) {
 
       _try_eval_r(x->type);
       _try_eval_r(x->init);
+
+      break;
+    }
+
+    default: {
+      if( !ast->is_expr )
+        crash;
+
+      auto x = (AST::Expr*)ast;
+
+      _try_eval_r(x->lhs);
+      _try_eval_r(x->rhs);
 
       break;
     }
@@ -134,9 +146,7 @@ ValueType Sema::eval_type(AST::Base* ast) {
       ret.is_reference = type->is_reference;
 
       for( auto&& sub : type->elems ) {
-        auto&& res = this->eval_type(sub);
-
-        ret.elems.emplace_back(res.type);
+        ret.elems.emplace_back(this->eval_type(sub));
       }
 
       break;
@@ -171,26 +181,10 @@ ValueType Sema::eval_type(AST::Base* ast) {
 
       auto func = this->find_func(x->name);
 
-      if( !func ) {
-        Error(ErrorKind::UndefinedFunction,
-          x->token,
-          "undefined function name")
-          .emit(true);
-      }
-
-      if( !func->dc.is_deducted )
-        return Cond::Incomplete;
-
-      for( auto&& arg : x->args ) {
+      for( auto&& arg : x->args )
         auto&& res = this->eval_type(arg);
 
-        if( res.cond != Cond::Completed )
-          return res;
-
-
-      }
-
-      break;
+      return func->dc.type;
     }
 
     case ASTKind::Compare: {
@@ -227,15 +221,14 @@ ValueType Sema::eval_type(AST::Base* ast) {
     case ASTKind::If: {
       auto if_x = (AST::If*)ast;
 
-      if( !eval_type(if_x->cond).type.equals(ValueType::Kind::Bool) ) {
+      if( !this->eval_type(if_x->cond).equals(ValueType::Kind::Bool) )
         Error(ErrorKind::TypeMismatch, if_x->cond, "condition must be boolean")
           .emit();
-      }
 
-      result = eval_type(if_x->if_true);
+      ret = this->eval_type(if_x->if_true);
     
       if( if_x->if_false )
-        if( auto&& tmp = this->eval_type(if_x->if_false); !ret.equals(tmp.type) )
+        if( !ret.equals(this->eval_type(if_x->if_false)) )
           Error(ErrorKind::TypeMismatch, if_x->token, "if-expr type mismatch")
             .emit();
 
@@ -249,7 +242,7 @@ ValueType Sema::eval_type(AST::Base* ast) {
 
       auto&& cond = this->eval_type(x->cond);
 
-      if( !cond.type.equals(ValueType::Kind::Bool) )
+      if( !cond.equals(ValueType::Kind::Bool) )
         Error(ErrorKind::TypeMismatch, x->cond, "condition must be boolean").emit();
 
       this->eval_type(x->counter);
@@ -278,37 +271,21 @@ ValueType Sema::eval_type(AST::Base* ast) {
       for( auto&& elem : scope->elements )
         this->eval_type(elem);
 
-      result = this->eval_type(*scope->elements.begin());
+      ret = this->eval_type(*scope->elements.begin());
 
-      for( auto it = scope->elements.begin() + 1; it != scope->elements.end(); it++ )
-        if( auto&& tmp = this->eval_type(*it); !tmp.type.equals(result.type) )
+      for( auto it = finals.begin() + 1; it != finals.end(); it++ )
+        if( auto&& t = this->eval_type(*it); !ret.equals(t) )
           Error(ErrorKind::TypeMismatch, *it,
-            Utils::linkstr(
-              "expected '", result.type.to_string(),
-              "' but found '", tmp.type.to_string(), "'"
-            )
-          )
-           .emit();
+            Utils::linkstr( "expected '", ret.to_string(),
+              "' but found '", t.to_string(), "'"))
+              .emit();
 
       break;
     }
 
-    case ASTKind::Function: {
-      auto func = (AST::Function*)ast;
-
-      if( !func->return_type ) {
-        Error(ErrorKind::LanguageVersion, func->token,
-          "function definition without return-type specification does not implemented yet")
-          .add_help(func->code->token, "insert type name before this token")
-          .emit(true);
-      }
-
-      // auto&& final_expr_list = get_returnable_expr(func->code);
-
-      TODO_IMPL
-
+    case ASTKind::Function:
+    case ASTKind::Struct:
       break;
-    }
 
     default: {
       if( !ast->is_expr ) {
@@ -323,7 +300,7 @@ ValueType Sema::eval_type(AST::Base* ast) {
 
       // TODO: check operator
 
-      ret = lhs.type;
+      ret = lhs;
       break;
     }
   }

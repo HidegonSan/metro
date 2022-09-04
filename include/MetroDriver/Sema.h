@@ -8,8 +8,6 @@
 #include <concepts>
 #include <functional>
 
-#include "Error.h"
-
 namespace metro {
 
 struct Token;
@@ -45,7 +43,7 @@ struct TypeCandidates {
   bool is_deducted;
   AST::Type* specified_type;
 
-  ValueType result;
+  ValueType type;
 
   TypeCandidates(T* ast = nullptr)
     : ast(ast)
@@ -110,14 +108,11 @@ class Sema {
     enum class Condition {
       Success,
       Incomplete,
-      Error
     };
 
     ValueType type;
 
     Condition cond;
-
-    std::shared_ptr<Error> error;
 
     bool fail() const {
       return this->cond != Condition::Success;
@@ -126,12 +121,6 @@ class Sema {
     EvalResult(ValueType const& type = { })
       : type(type),
         cond(Condition::Success)
-    {
-    }
-
-    EvalResult(Error&& err)
-      : cond(Condition::Error),
-        error(new Error(std::move(err)))
     {
     }
 
@@ -156,7 +145,7 @@ public:
 private:
 
   void create_variable_dc();
-  void deduction_variable_types();
+  void deduction_variable_type(VariableDC& dc);
 
   void create_function_dc();
   void deduction_func_return_type(FunctionContext& func);

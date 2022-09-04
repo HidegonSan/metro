@@ -1,21 +1,18 @@
 #include "Types.h"
-#include "MetroDriver/parser.h"
+#include "MetroDriver/Parser.h"
 #include "Error.h"
 
 namespace metro {
 
 AST::Base* Parser::atom() {
-  if( eat("true") ) {
+  if( eat("true") )
     return new AST::Boolean(ate, true);
-  }
 
-  if( eat("false") ) {
+  if( eat("false") )
     return new AST::Boolean(ate, false);
-  }
 
-  if( eat("none") ) {
+  if( eat("none") )
     return new AST::None(ate);
-  }
 
   switch( cur->kind ) {
     case TokenKind::Int:
