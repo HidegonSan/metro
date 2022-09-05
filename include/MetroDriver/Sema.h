@@ -46,7 +46,9 @@ struct TypeCandidates {
   ValueType type;
 
   TypeCandidates(T* ast = nullptr)
-    : ast(ast)
+    : ast(ast),
+      is_deducted(false),
+      specified_type(nullptr)
   {
   }
 };

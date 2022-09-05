@@ -161,9 +161,7 @@ ValueType Sema::eval_type(AST::Base* ast) {
     case ASTKind::Type: {
       auto type = (AST::Type*)ast;
 
-      if( !this->get_type_from_name(ret, type->name) )
-        Error(ErrorKind::UndefinedTypeName, ast->token, "undefined type name")
-          .emit(true);
+      assert( this->get_type_from_name(ret, type->name) );
 
       ret.arr_depth = type->arr_depth;
       ret.have_elements = type->have_elements;
@@ -216,10 +214,10 @@ ValueType Sema::eval_type(AST::Base* ast) {
     case ASTKind::Compare: {
       auto cmp = (AST::Compare*)ast;
 
-      eval_type(cmp->first);
+      this->eval_type(cmp->first);
 
       for( auto&& item : cmp->list ) {
-        eval_type(item.ast);
+        this->eval_type(item.ast);
       }
 
       ret = ValueType::Kind::Bool;

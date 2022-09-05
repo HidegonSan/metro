@@ -25,26 +25,38 @@ void Sema::analyze() {
   do {
     this->deduction_updated = false;
 
-    for( auto&& [scope, info] : this->scope_info_map ) {
+    for( auto&& [scope, info] : this->scope_info_map )
       for( auto&& var : info.var_dc_list )
         this->deduction_variable_type(var);
-    }
   } while( this->deduction_updated );
 
-  for( auto&& [scope, info] : this->scope_info_map ) {
-    for( auto&& var : info.var_dc_list ) {
-      if( !var.is_deducted ) {
+  // final
+  for( auto&& [scope, info] : this->scope_info_map )
+    for( auto&& var : info.var_dc_list )
+      if( !var.is_deducted )
          Error(ErrorKind::CannotInfer, var.ast, "cannot deduction the type of variable")
           .emit(true);
-      }
-    }
-  }
 
   // deduction function return types
   alertphase("Sema: deduction the return types of functions");
-  for( auto&& func : this->functions ) {
-    this->deduction_func_return_type(func);
-  }
+  do {
+    this->deduction_updated = false;
+
+    for( auto&& func : this->functions )
+      this->deduction_func_return_type(func);
+  } while( this->deduction_updated );
+
+  for( auto&& func : this->functions )
+    if( !func.dc.is_deducted )
+      Error(ErrorKind::CannotInfer, func.dc.ast->token->next,
+        "cannot deduction the type of function '" + std::string(func.name) + "'")
+        .emit(true);
+
+  debug(
+    for( auto&& func : this->functions ) {
+      alertios("function '" << func.name << "': return=" << func.dc.type.to_string());
+    }
+  )
 
 
 

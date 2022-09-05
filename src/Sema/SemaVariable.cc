@@ -119,6 +119,8 @@ void Sema::deduction_variable_type(VariableDC& dc) {
     return;
   }
 
+  alert;
+
   for( auto&& c : dc.candidates ) {
     auto&& res = this->try_eval_type(c);
 
