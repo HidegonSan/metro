@@ -15,16 +15,32 @@ VariableDC* Sema::get_variable_dc(AST::Variable* ast) {
 
 void Sema::create_variable_dc() {
 
+  auto mapfn_var = [this] (AST::Variable* ast, bool allow_un) {
+    auto dc = this->get_variable_dc(ast);
+
+    if( !dc ) {
+      Error(ErrorKind::UndefinedVariable, ast, "undefined variable name")
+        .emit(true);
+    }
+
+    if( !allow_un && !dc->is_argument && dc->candidates.empty() ) {
+      Error(ErrorKind::UninitializedValue, ast, "uninitialized variable")
+        .emit(true);
+    }
+
+    this->var_dc_ptr_map[ast] = dc;
+  };
+
   ast_map(
     this->root,
-    [this] (AST::Base* ast) {
+    [&] (AST::Base* ast) {
       switch( ast->kind ) {
         case ASTKind::VarDefine: {
           auto x = (AST::VarDefine*)ast;
           auto& scope = this->get_cur_scope();
 
           if( scope.find_var(x->name) ) {
-            // shadowing
+            // todo: shadowing
             TODO_IMPL
           }
 
@@ -44,19 +60,28 @@ void Sema::create_variable_dc() {
         }
 
         case ASTKind::Variable: {
-          auto x = (AST::Variable*)ast;
-          auto dc = this->get_variable_dc(x);
+          mapfn_var((AST::Variable*)ast, false);
+          break;
+        }
 
-          if( !dc ) {
-            Error(ErrorKind::UndefinedVariable, ast, "undefined variable name")
-              .emit(true);
+        case ASTKind::Assign: {
+          auto x = (AST::Expr*)ast;
+
+          if( x->lhs->kind == ASTKind::Variable ) {
+            auto var = (AST::Variable*)x->lhs;
+
+            mapfn_var(var, true);
+
+            auto dc = this->get_variable_dc(var);
+
+            // assert(dc != nullptr);
+
+            dc->candidates.emplace_back(x->rhs);
           }
-
-          this->var_dc_ptr_map[x] = dc;
 
           break;
         }
-        
+
       }
     },
     [this] (AST::Base* ast) {
@@ -85,23 +110,9 @@ void Sema::create_variable_dc() {
     [this] (AST::Base* ast) {
       switch( ast->kind ) {
         case ASTKind::Scope:
-          this->leave_scope();
+          this->leave_scope((AST::Scope*)ast);
           break;
 
-        case ASTKind::Assign: {
-          auto x = (AST::Expr*)ast;
-
-          if( x->lhs->kind == ASTKind::Variable ) {
-            auto var = (AST::Variable*)x->lhs;
-            auto dc = this->var_dc_ptr_map[var];
-
-            assert(dc != nullptr);
-
-            dc->candidates.emplace_back(x->rhs);
-          }
-
-          break;
-        }
       }
     }
   );

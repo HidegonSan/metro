@@ -1,6 +1,6 @@
-#include "Types.h"
-#include "MetroDriver/Parser.h"
+#include "AST.h"
 #include "Error.h"
+#include "MetroDriver/Parser.h"
 
 namespace metro {
 
@@ -63,6 +63,8 @@ AST::Base* Parser::controls() {
       ast->init = expr();
     }
 
+    this->expect_semi();
+
     return ast;
   }
 
@@ -74,7 +76,8 @@ AST::Base* Parser::controls() {
 
     ast->expr = this->expr();
 
-    this->expect(";");
+    this->expect_semi();
+
     return ast;
   }
 

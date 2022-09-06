@@ -14,6 +14,8 @@ struct Token;
 struct Object;
 struct ValueType;
 
+class Error;
+
 namespace AST {
 
 enum class Kind;
@@ -74,11 +76,7 @@ struct FunctionInfo {
 
   FunctionDC  dc;
 
-  FunctionInfo(AST::Function* func)
-    : name(func->name),
-      dc(func)
-  {
-  }
+  explicit FunctionInfo(AST::Function* func);
 };
 
 struct ScopeInfo {
@@ -105,6 +103,8 @@ struct ScopeInfo {
 };
 
 class Sema {
+
+  friend class TypeEvaluator;
 
   struct EvalResult {
     enum class Condition {
@@ -139,6 +139,7 @@ public:
   Sema(Sema const&) = delete;
 
   void analyze();
+  void semantics_checker();
 
   ValueType* get_cache(AST::Base* ast);
 
@@ -152,6 +153,8 @@ private:
   void create_function_dc();
   void deduction_func_return_type(FunctionInfo& func);
 
+  void check_semantics(AST::Base* ast);
+
   bool get_type_from_name(ValueType& out, std::string_view name);
 
   // TODO
@@ -163,13 +166,19 @@ private:
 
   ScopeInfo& get_cur_scope();
 
+  //
+  // check if have any problem in ast
+  // true = no problem
+  // false = have any error
+  bool check_ast(AST::Base* ast, std::vector<Error>& err);
+
   // try evaluate a type of ast
   EvalResult try_eval_type(AST::Base* ast);
 
   ValueType eval_type(AST::Base* ast);
 
   ScopeInfo& enter_scope(AST::Scope* ast);
-  void leave_scope();
+  void leave_scope(AST::Scope* ast);
 
   static bool is_lvalue(AST::Base* ast);
 
@@ -214,6 +223,8 @@ private:
   bool deduction_updated{ };
 
   std::map<AST::Variable*, VariableDC*> var_dc_ptr_map;
+
+  std::map<AST::VarDefine*, bool> var_assignmented_flag;
   
 };
 

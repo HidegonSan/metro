@@ -1,6 +1,6 @@
-#include "Types.h"
-#include "MetroDriver/Parser.h"
+#include "AST.h"
 #include "Error.h"
+#include "MetroDriver/Parser.h"
 
 namespace metro {
 
@@ -24,8 +24,9 @@ bool Parser::eat(std::string_view str) {
 
 void Parser::expect(std::string_view str) {
   if( !eat(str) ) {
-    Error(ErrorKind::InvalidSyntax, this->cur->prev, "expected '" + std::string(str) + "' after this token")
-      .emit(true);
+    Error(ErrorKind::InvalidSyntax, this->cur->prev,
+      "expected '" + std::string(str) + "' after this token")
+        .emit(true);
   }
 }
 
@@ -39,79 +40,62 @@ void Parser::expect_ident() {
 AST::Scope* Parser::expect_scope() {
   auto ast = new AST::Scope(cur);
 
-  expect("{");
+  this->expect("{");
 
-  if( eat("}") )
+  if( this->eat("}") )
     return ast;
 
-  while( check() ) {
-    auto item = expr();
+  do {
+    auto item = this->expr();
 
     ast->append(item);
 
-    if( eat(";") ) {
-      if( eat("}") ) {
+    auto&& prevstr = this->cur->prev->str;
+
+    if( this->eat("}") ) {
+      if( prevstr == ";" )
         ast->append(new AST::None(nullptr));
-        break;
-      }
-    }
-    else if( !eat("}") ) {
-      if( is_need_semi(item) ) {
-        expect_semi();
-      }
-    }
-    else {
+      
       break;
     }
-  }
+    else if( prevstr != ";" && prevstr != "}" ) {
+      this->expect_semi();
+    }
+  } while( this->check() );
 
   return ast;
 }
 
 AST::Type* Parser::expect_type() {
-  auto ast = new AST::Type(cur);
+  auto ast = new AST::Type(this->cur);
 
-  expect_ident();
-  ast->name = cur->str;
+  this->expect_ident();
+  ast->name = this->cur->str;
 
-  next();
+  this->next();
 
-  if( eat("<") ) {
+  if( this->eat("<") ) {
     ast->have_elements = true;
 
     do {
-      ast->elems.emplace_back(expect_type());
-    } while( eat(",") );
+      ast->elems.emplace_back(this->expect_type());
+    } while( this->eat(",") );
 
     if( cur->str == ">>" ) {
       cur->str = ">";
       cur->insert(TokenKind::Punctuator, 1, ">");
     }
 
-    expect(">");
+    this->expect(">");
   }
 
-  while( eat("[]") )
+  while( this->eat("[]") )
     ast->arr_depth++;
 
-  ast->is_mutable = eat("mut");
-  ast->is_reference = eat("&");
+  ast->is_mutable = this->eat("mut");
+  ast->is_reference = this->eat("&");
 
   return ast;
-}
-
-bool Parser::is_need_semi(AST::Base* ast) {
-  using AST::Kind;
-
-  switch( ast->kind ) {
-    case Kind::If:
-    case Kind::Function:
-    case Kind::Struct:
-    case Kind::Scope:
-      return false;
-  }
-
-  return true;
 }
 
 void Parser::expect_semi() {

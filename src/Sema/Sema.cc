@@ -7,6 +7,12 @@ namespace metro::semantics {
 
 static Sema* _inst;
 
+FunctionInfo::FunctionInfo(AST::Function* func)
+  : name(func->name),
+    dc(func)
+{
+}
+
 Sema::Sema(AST::Scope* root)
   : root(root)
 {
@@ -58,8 +64,16 @@ void Sema::analyze() {
     }
   )
 
+}
 
+void Sema::semantics_checker() {
+  this->enter_scope(root);
 
+  for( auto&& func : this->functions ) {
+    this->check_semantics(func.dc.ast);
+  }
+
+  this->leave_scope(root);
 }
 
 ValueType* Sema::get_cache(AST::Base* ast) {
@@ -71,6 +85,44 @@ ValueType* Sema::get_cache(AST::Base* ast) {
 
 Sema* Sema::get_instance() {
   return _inst;
+}
+
+void Sema::check_semantics(AST::Base* ast) {
+  switch( ast->kind ) {
+    case ASTKind::Array:
+    case ASTKind::Tuple: {
+      auto x = (AST::ListBase*)ast;
+
+
+      break;
+    }
+
+    case ASTKind::Variable: {
+      auto x = (AST::Variable*)ast;
+
+      auto dc = this->var_dc_ptr_map[x];
+
+      auto is_assignmented = this->var_assignmented_flag[dc->ast];
+
+      if( !is_assignmented ) {
+        Error(ErrorKind::UninitializedValue, x, "used uninitialized variable")
+          .emit();
+      }
+
+      break;
+    }
+
+    case ASTKind::Assign: {
+      auto x = (AST::Expr*)ast;
+
+      auto&& dest = this->eval_type(x->lhs);
+
+      if( !dest.is_mutable ) {
+        Error(ErrorKind::NotMutable, x->token, "expected lvalue expression at left side")
+          .emit();
+      }
+    }
+  }
 }
 
 } // namespace metro::semantics

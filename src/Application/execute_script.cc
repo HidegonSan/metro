@@ -43,6 +43,9 @@ Object* Application::execute_script(AppContext::Script& script) {
 
   auto token = lexer.lex();
 
+  if( token->kind == TokenKind::End )
+    return Object::none;
+
   Error::check();
 
   Parser parser{ token };

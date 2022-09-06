@@ -40,7 +40,11 @@ ScopeInfo& Sema::enter_scope(AST::Scope* ast) {
   return info;
 }
 
-void Sema::leave_scope() {
+void Sema::leave_scope(AST::Scope* ast) {
+  if( ast != *this->scope_history.begin() ) {
+    crash;
+  }
+
   this->scope_history.pop_front();
 }
 

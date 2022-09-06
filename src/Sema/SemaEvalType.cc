@@ -9,6 +9,28 @@
 
 namespace metro::semantics {
 
+bool Sema::check_ast(AST::Base* ast, std::vector<Error>& err) {
+  ast_map(
+    ast,
+    [&] (AST::Base* ast) {
+      switch( ast->kind ) {
+        case ASTKind::Callfunc: {
+          auto x = (AST::CallFunc*)ast;
+          auto find = this->find_func(x->name);
+
+          if( !find ) {
+            
+          }
+
+          break;
+        }
+      }
+    }
+  );
+
+  return err.empty();
+}
+
 // --- //
 
 Sema::EvalResult Sema::try_eval_type(AST::Base* ast) {
@@ -42,8 +64,10 @@ Sema::EvalResult Sema::try_eval_type(AST::Base* ast) {
     case ASTKind::Variable: {
       auto x = (AST::Variable*)ast;
 
-      if( !this->var_dc_ptr_map[x]->is_deducted )
-        return Cond::Incomplete;
+      if( !this->var_dc_ptr_map[x]->is_deducted ) {
+
+        // return Cond::Incomplete;
+      }
 
       break;
     }
@@ -99,6 +123,10 @@ Sema::EvalResult Sema::try_eval_type(AST::Base* ast) {
       if( !is_lvalue(x->lhs) ) {
         Error(ErrorKind::TypeMismatch, x->lhs, "expected lvalue expression")
           .emit();
+      }
+
+      if( x->lhs->kind == ASTKind::Variable ) {
+        
       }
 
       break;
@@ -205,13 +233,14 @@ ValueType Sema::eval_type(AST::Base* ast) {
 
       auto func = this->find_func(x->name);
 
-      for( auto&& arg : x->args )
-        auto&& res = this->eval_type(arg);
+      // for( auto&& arg : x->args )
+      //   auto&& res = this->eval_type(arg);
 
       return func->dc.type;
     }
 
     case ASTKind::Compare: {
+      /*
       auto cmp = (AST::Compare*)ast;
 
       this->eval_type(cmp->first);
@@ -219,8 +248,10 @@ ValueType Sema::eval_type(AST::Base* ast) {
       for( auto&& item : cmp->list ) {
         this->eval_type(item.ast);
       }
+      */
 
       ret = ValueType::Kind::Bool;
+
       break;
     }
 
@@ -228,10 +259,6 @@ ValueType Sema::eval_type(AST::Base* ast) {
     // assignment
     case ASTKind::Assign: {
       auto x = (AST::Expr*)ast;
-
-      TODO_IMPL
-
-
 
       ret = this->eval_type(x->rhs);
 
@@ -296,17 +323,24 @@ ValueType Sema::eval_type(AST::Base* ast) {
 
       auto&& finals = this->get_returnable_expr(scope);
 
-      for( auto&& elem : scope->elements )
-        this->eval_type(elem);
+      this->enter_scope(scope);
 
-      ret = this->eval_type(*scope->elements.begin());
+      // eval all elements
+      // for( auto&& elem : scope->elements )
+      //   this->eval_type(elem);
 
+      ret = this->eval_type(*scope->elements.rbegin());
+
+/*
       for( auto it = finals.begin() + 1; it != finals.end(); it++ )
         if( auto&& t = this->eval_type(*it); !ret.equals(t) )
           Error(ErrorKind::TypeMismatch, *it,
             Utils::linkstr( "expected '", ret.to_string(),
               "' but found '", t.to_string(), "'"))
               .emit();
+*/
+
+      this->leave_scope(scope);
 
       break;
     }
