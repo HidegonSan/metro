@@ -4,18 +4,16 @@
 #include "Utils.h"
 #include "Types.h"
 
-#include "MetroDriver/lexer.h"
+#include "MetroDriver/Lexer.h"
 #include "MetroDriver/Parser.h"
-// #include "MetroDriver/sema.h"
 #include "MetroDriver/Sema.h"
-#include "MetroDriver/evaluator.h"
+#include "MetroDriver/Evaluator.h"
 
 #include "Application.h"
 #include "Error.h"
 #include "Debug.h"
 
 namespace metro {
-
 AppContext::Script Application::open_script_file(char const* path) {
   std::ifstream ifs{ path };
   AppContext::Script script;
