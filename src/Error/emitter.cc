@@ -1,5 +1,6 @@
 #include <iostream>
 #include <iomanip>
+#include <map>
 #include "Application.h"
 #include "Error.h"
 #include "Utils.h"
@@ -12,27 +13,29 @@ namespace metro {
 
 size_t Error::emitted_count{ 0 };
 
-static char const* err_kind_string_table[] = {
-  "version error",
-  "invalid token",
-  "invalid syntax",
-  "uninitialized value",
-  "unexpected token",
-  "not allowed expression",
-  "not mutable",
-  "undefined variable name",
-  "undefined function name",
-  "undefined type name",
-  "'if' without 'else'",
-  "multiple definition",
-  "cannot infer type",
-  "type mismatch",
-  "too few arguments",
-  "too many arguments",
-  "invalid arguments",
-  "empty struct",
-  "stack overflow",
-  "application bug"
+//static char const* err_kind_string_table[] = {
+std::map<ErrorKind, char const*> err_kind_str_map {
+  { ErrorKind::LanguageVersion, "version error" },
+  { ErrorKind::InvalidToken, "invalid token" },
+  { ErrorKind::InvalidSyntax, "invalid syntax" },
+  { ErrorKind::UninitializedValue, "uninitialized value" },
+  { ErrorKind::UnexpectedToken, "unexpected token" },
+  { ErrorKind::NotAllowed, "not allowed expression" },
+  { ErrorKind::NotMutable, "not mutable" },
+  { ErrorKind::UndefinedVariable, "undefined variable name" },
+  { ErrorKind::UndefinedFunction, "undefined function name" },
+  { ErrorKind::UndefinedTypeName, "undefined type name" },
+  { ErrorKind::IfWithoutElse, "'if' without 'else'" },
+  { ErrorKind::MultipleDefinition, "multiple definition" },
+  { ErrorKind::CannotInfer, "cannot infer type" },
+  { ErrorKind::TypeMismatch, "type mismatch" },
+  { ErrorKind::TooFewArguments, "too few arguments" },
+  { ErrorKind::TooManyArguments, "too many arguments" },
+  { ErrorKind::InvalidArguments, "invalid arguments" },
+  { ErrorKind::EmptyStruct, "empty struct" },
+  { ErrorKind::StackOverflow, "stack overflow" },
+  { ErrorKind::ApplicationBug, "application bug" },
+  { ErrorKind::UnusedVariable, "unused variable" }
 };
 
 auto trim_view_lines(AppContext::Script const* script, size_t err_begin, size_t err_end) {
@@ -95,15 +98,25 @@ void Error::emit(bool exit) {
     err_begin = err_end = this->pos;
   }
 
-  // ソースコード切り取り ( エラー表示用 )
+  debug( assert(err_kind_str_map.contains(kind)); )
+
+  auto&& errkindtext = err_kind_str_map[kind];
   auto&& view_lines = trim_view_lines(this->script, err_begin, err_end);
 
-  // エラーの種類を表す文字列
-  auto errkindtext = err_kind_string_table[static_cast<u32>(kind)];
+  // warning
+  if( this->is_warn ) {
+    std::cerr
+      << "\033[35;1m" << "warning: " << errkindtext << std::endl;
+  }
+  // error
+  else {
+    auto&& errkindtext = err_kind_str_map[kind];
 
-  // エラー
+    std::cerr
+      << "\033[31;1m" << "Error: " << errkindtext << std::endl;
+  }
+
   std::cerr
-    << "\033[31;1m" << "Error: " << errkindtext << std::endl
     << COL_CYAN << "  --> in " << script->source.path << COL_DEFAULT << std::endl
     << "       | " << std::endl;
 

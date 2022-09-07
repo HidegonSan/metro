@@ -15,20 +15,23 @@ VariableDC* Sema::get_variable_dc(AST::Variable* ast) {
 
 void Sema::create_variable_dc() {
 
-  auto mapfn_var = [this] (AST::Variable* ast, bool allow_un) {
+  auto mapfn_var = [this] (AST::Variable* ast, bool allow_un) -> std::pair<bool, VariableDC*> {
     auto dc = this->get_variable_dc(ast);
 
     if( !dc ) {
       Error(ErrorKind::UndefinedVariable, ast, "undefined variable name")
         .emit(true);
+      return { false, nullptr };
     }
 
     if( !allow_un && !dc->is_argument && dc->candidates.empty() ) {
       Error(ErrorKind::UninitializedValue, ast, "uninitialized variable")
         .emit(true);
+      return { false, dc };
     }
 
     this->var_dc_ptr_map[ast] = dc;
+    return { true, dc };
   };
 
   ast_map(
@@ -60,7 +63,9 @@ void Sema::create_variable_dc() {
         }
 
         case ASTKind::Variable: {
-          mapfn_var((AST::Variable*)ast, false);
+          if( auto&& [x, y] = mapfn_var((AST::Variable*)ast, false); x && y )
+            y->used_map[(AST::Variable*)ast] = true;
+
           break;
         }
 

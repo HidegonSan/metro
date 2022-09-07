@@ -50,9 +50,13 @@ enum class ErrorKind {
 
   EmptyStruct,
 
+  // runtime
   StackOverflow,
 
   ApplicationBug,
+
+  // warnings
+  UnusedVariable,
 };
 
 class Error {
@@ -81,6 +85,16 @@ public:
   Error(ErrorKind kind, AST::Base* ast, std::string&& msg);
   Error(ErrorKind kind, size_t pos, std::string&& msg);
 
+  Error& set_warn() {
+    this->is_warn = true;
+    return *this;
+  }
+
+  Error& no_msg() {
+    this->message.clear();
+    return *this;
+  }
+
   //
   // add_help
   //   ヘルプを追加する
@@ -102,6 +116,8 @@ public:
 private:
   ErrorKind kind;
   std::string&& message;
+
+  bool is_warn;
 
   AppContext::Script const* script;
 

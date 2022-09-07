@@ -62,6 +62,9 @@ struct VariableDC : TypeCandidates<AST::VarDefine> {
 
   AST::Argument* ast_arg;
 
+  // use std::map for prevent duplication
+  std::map<AST::Variable*, bool> used_map;
+
   VariableDC()
     : is_argument(false),
       ast_arg(nullptr)
