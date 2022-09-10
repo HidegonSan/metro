@@ -31,6 +31,15 @@ struct Function;
 
 } // namespace metro::AST
 
+class Compiler {
 
+public:
+
+
+private:
+
+
+
+};
 
 } // namespace metro

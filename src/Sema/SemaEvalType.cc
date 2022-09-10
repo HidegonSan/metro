@@ -200,6 +200,8 @@ ValueType Sema::eval_type(AST::Base* ast) {
       for( auto&& sub : type->elems )
         ret.elems.emplace_back(this->eval_type(sub));
 
+      alertios(ret.to_string());
+
       break;
     }
 

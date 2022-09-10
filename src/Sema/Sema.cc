@@ -38,14 +38,19 @@ void Sema::analyze() {
 
   // final
   for( auto&& [scope, info] : this->scope_info_map )
-    for( auto&& var : info.var_dc_list )
+    for( auto&& var : info.var_dc_list ) {
+      AST::Base* ast = var.is_argument ? (AST::Base*)var.ast_arg : var.ast;
+
       if( var.used_map.empty() )
-        Error(ErrorKind::UnusedVariable, var.ast, "unused variable")
+        alert,
+        Error(ErrorKind::UnusedVariable, ast, "unused variable")
           .set_warn()
           .emit();
       else if( !var.is_deducted )
-          Error(ErrorKind::CannotInfer, var.ast, "cannot deduction the type of variable")
-            .emit(true);
+        alert,
+        Error(ErrorKind::CannotInfer, ast, "cannot deduction the type of variable")
+          .emit(true);
+    }
 
   // deduction function return types
   alertphase("Sema: deduction the return types of functions");

@@ -104,7 +104,7 @@ void Sema::create_variable_dc() {
 
             dc.is_argument = true;
             dc.ast_arg = &arg;
-            dc.is_deducted = true;
+            // dc.is_deducted = true;
             dc.specified_type = arg.type;
           }
 
@@ -126,23 +126,31 @@ void Sema::create_variable_dc() {
 }
 
 void Sema::deduction_variable_type(VariableDC& dc) {
-  if( dc.is_argument || dc.is_deducted )
+  if( dc.is_deducted )
     return;
 
   if( dc.specified_type ) {
-    dc.type = this->eval_type(dc.ast->type);
+    dc.type = this->eval_type(dc.is_argument ? dc.ast_arg->type : dc.ast->type);
     dc.is_deducted = true;
     return;
   }
 
   alert;
 
+  alertios(dc.name);
+
   for( auto&& c : dc.candidates ) {
+    alert;
+
     auto&& res = this->try_eval_type(c);
 
     if( !res.fail() ) {
+      alert;
+
       if( dc.is_deducted ) {
         if( !dc.type.equals(res.type) ) {
+          alert;
+          
           Error(ErrorKind::TypeMismatch, c,
             Utils::linkstr("expected '", dc.type.to_string(),
               "' but found '", res.type.to_string(), "'"))
@@ -150,6 +158,8 @@ void Sema::deduction_variable_type(VariableDC& dc) {
         }
       }
       else {
+        alert;
+
         dc.type = res.type;
         dc.is_deducted = true;
 

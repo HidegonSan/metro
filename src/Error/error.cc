@@ -13,7 +13,6 @@ Error::Error(ErrorKind kind, Token* token, std::string&& msg)
     ast(nullptr),
     pos(0)
 {
-  debug(assert(token);)
   this->script = Application::get_running_script();
 }
 
