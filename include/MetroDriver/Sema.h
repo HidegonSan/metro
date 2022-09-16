@@ -8,6 +8,12 @@
 #include <concepts>
 #include <functional>
 
+#include "Utils.h"
+
+#if METRO_DEBUG
+  #include "AST.h"
+#endif
+
 namespace metro {
 
 struct Token;
@@ -42,10 +48,27 @@ struct TypeCandidates {
   T* ast;
   std::vector<AST::Base*> candidates;
 
-  bool is_deducted;
+  bool is_deducted{ };
   AST::Type* specified_type;
 
   ValueType type;
+
+#if METRO_DEBUG
+  virtual std::string to_string() const {
+    return Utils::linkstr(
+      "{ TypeCandidates<", typeid(T).name(), "> at ", (void*)this, ": ",
+      "ast=", (void*)ast, ", ",
+      "candidates={",
+        Utils::join(", ", candidates, [](auto&x){return Utils::format("%p", x);}),
+        "}, ",
+      "is_deducted=", is_deducted, ", ",
+      "specified_type=",
+        specified_type ? specified_type->to_string() : "null", ", ",
+      "type=", type.to_string(),
+      "}"
+    );
+  }
+#endif
 
   TypeCandidates(T* ast = nullptr)
     : ast(ast),
@@ -56,14 +79,17 @@ struct TypeCandidates {
 };
 
 struct VariableDC : TypeCandidates<AST::VarDefine> {
-  bool is_argument;
-
   std::string_view name;
 
-  AST::Argument* ast_arg;
+  bool is_argument{ };
+  AST::Argument* ast_arg{ };
 
   // use std::map for prevent duplication
   std::map<AST::Variable*, bool> used_map;
+
+#if METRO_DEBUG
+  std::string to_string() const override;
+#endif
 
   VariableDC()
     : is_argument(false),
@@ -80,6 +106,10 @@ struct FunctionInfo {
   FunctionDC  dc;
 
   explicit FunctionInfo(AST::Function* func);
+
+#if METRO_DEBUG
+  std::string to_string() const;
+#endif
 };
 
 struct ScopeInfo {
@@ -229,6 +259,8 @@ private:
 
   std::map<AST::VarDefine*, bool> var_assignmented_flag;
   
+  void print_self();
+
 };
 
 } // namespace metro::semantics

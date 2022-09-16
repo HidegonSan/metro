@@ -37,26 +37,12 @@ Sema::EvalResult Sema::try_eval_type(AST::Base* ast) {
   using Cond = EvalResult::Condition;
 
   switch( ast->kind ) {
-    case ASTKind::Type: {
-      auto x = (AST::Type*)ast;
-
-      ValueType out;
-
-      if( !this->get_type_from_name(out, x->name) )
-        Error(ErrorKind::UndefinedTypeName, x, "unknown type name")
-          .emit(true);
-
-      for( auto&& e : x->elems )
-        this->try_eval_type(e);
-
-      return out;
-    }
-
     case ASTKind::Argument:
       _try_eval_r(((AST::Argument*)ast)->type);
       break;
 
     case ASTKind::None:
+    case ASTKind::Type:
     case ASTKind::Boolean:
     case ASTKind::Value:
       break;
@@ -66,7 +52,7 @@ Sema::EvalResult Sema::try_eval_type(AST::Base* ast) {
 
       if( !this->var_dc_ptr_map[x]->is_deducted ) {
 
-        // return Cond::Incomplete;
+        return Cond::Incomplete;
       }
 
       break;

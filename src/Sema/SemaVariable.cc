@@ -97,16 +97,24 @@ void Sema::create_variable_dc() {
 
         case ASTKind::Function: {
           auto x = (AST::Function*)ast;
-          auto& scope = this->scope_info_map[x->code];
+
+          assert(x->code->kind == ASTKind::Scope);
+          auto& scope = this->enter_scope(x->code);
 
           for( auto&& arg : x->args ) {
             auto&& dc = scope.append_var(arg.name);
 
             dc.is_argument = true;
             dc.ast_arg = &arg;
-            // dc.is_deducted = true;
             dc.specified_type = arg.type;
+
+            // dc.type = this->eval_type(arg.type);
+            // dc.is_deducted = true;
+
+            alertios(dc.name << " " << dc.type);
           }
+
+          this->leave_scope(x->code);
 
           break;
         }
@@ -126,18 +134,19 @@ void Sema::create_variable_dc() {
 }
 
 void Sema::deduction_variable_type(VariableDC& dc) {
+  alert;
+
+  alertios(dc.name);
+  alertios(dc.to_string());
+
   if( dc.is_deducted )
     return;
 
   if( dc.specified_type ) {
-    dc.type = this->eval_type(dc.is_argument ? dc.ast_arg->type : dc.ast->type);
+    dc.type = this->eval_type(dc.specified_type);
     dc.is_deducted = true;
     return;
   }
-
-  alert;
-
-  alertios(dc.name);
 
   for( auto&& c : dc.candidates ) {
     alert;
@@ -150,7 +159,7 @@ void Sema::deduction_variable_type(VariableDC& dc) {
       if( dc.is_deducted ) {
         if( !dc.type.equals(res.type) ) {
           alert;
-          
+
           Error(ErrorKind::TypeMismatch, c,
             Utils::linkstr("expected '", dc.type.to_string(),
               "' but found '", res.type.to_string(), "'"))

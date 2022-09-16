@@ -117,7 +117,7 @@ private:
   ErrorKind kind;
   std::string&& message;
 
-  bool is_warn;
+  bool is_warn{ };
 
   AppContext::Script const* script;
 

@@ -21,6 +21,7 @@ void Sema::create_function_dc() {
         alert;
         dc.is_deducted = true;
         dc.specified_type = ast->return_type;
+        dc.type = this->eval_type(ast->return_type);
       }
 
       dc.candidates = this->get_returnable_expr(ast->code);
@@ -46,13 +47,14 @@ void Sema::deduction_func_return_type(FunctionInfo& func) {
     auto&& res = this->try_eval_type(dc.specified_type);
 
     if( !res.fail() ) {
+      alert;
+
       dc.type = res.type;
       dc.is_deducted = true;
       return;
     }
-    else {
-      TODO_IMPL
-    }
+
+    crash;
   }
 
   alert;
@@ -60,23 +62,23 @@ void Sema::deduction_func_return_type(FunctionInfo& func) {
   alertios("function '" << func.name << "'");
 
   for( auto&& ast : dc.candidates ) {
-    auto&& result = this->try_eval_type(ast);
+    auto&& res = this->try_eval_type(ast);
 
-    alertios(ast->to_string());
+    alertios("tdc of func '" << func.name << "': " << ast->to_string());
 
-    if( result.fail() )
+    if( res.fail() )
       continue;
 
     if( dc.is_deducted ) {
-      if( !dc.type.equals(result.type) ) {
+      if( !dc.type.equals(res.type) ) {
         Error(ErrorKind::TypeMismatch, ast,
           Utils::linkstr("expected '", dc.type.to_string(),
-            "' but found '", result.type.to_string(), "'"))
+            "' but found '", res.type.to_string(), "'"))
               .emit();
       }
     }
     else {
-      dc.type = result.type;
+      dc.type = res.type;
       dc.is_deducted = true;
 
       this->deduction_updated = true;

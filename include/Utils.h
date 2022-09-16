@@ -7,6 +7,8 @@
 #include <sstream>
 #include <string>
 #include <vector>
+#include <list>
+#include <map>
 
 #include "Debug.h"
 #include "macro.h"
@@ -88,6 +90,34 @@ std::string join(std::string const& s, std::vector<T> const& vec, F conv) {
   }
 
   return ret;
+}
+
+template <class T, class F = std::function<std::string(T)>>
+std::string join(std::string const& s, std::list<T> const& list, F conv) {
+  std::string ret;
+
+  for( auto last = &*list.rbegin(); auto&& x : list ) {
+    ret += conv(x);
+    if( last != &x ) ret += s;
+  }
+
+  return ret;
+}
+
+template <
+  class T,
+  class U,
+  class TF = std::function<std::string(T)>,
+  class UF = std::function<std::string(U)>
+  >
+std::string map_to_str(std::map<T, U> const& map, TF tf, UF uf) {
+  std::string ret{ "{ " };
+
+  for( auto&& [t, u] : map ) {
+    ret += linkstr("{", tf(t), ": ", uf(u), "} ");
+  }
+
+  return ret + "}";
 }
 
 template <std::integral T>
