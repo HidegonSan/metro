@@ -132,6 +132,11 @@ Sema::EvalResult Sema::try_eval_type(AST::Base* ast) {
       break;
     }
 
+    case ASTKind::Scope: {
+      _try_eval_r(*((AST::Scope*)ast)->elements.rbegin());
+      break;
+    }
+
     case ASTKind::VarDefine: {
       auto x = (AST::VarDefine*)ast;
 
@@ -163,8 +168,8 @@ ValueType Sema::eval_type(AST::Base* ast) {
   if( !ast )
     return { };
 
-  if( this->caches.contains(ast) )
-    return this->caches[ast];
+  // if( this->caches.contains(ast) )
+  //   return this->caches[ast];
 
   auto& ret = this->caches[ast];
 

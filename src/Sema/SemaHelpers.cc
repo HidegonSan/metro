@@ -109,7 +109,7 @@ ASTVector Sema::get_returnable_expr(AST::Base* ast) {
   // "return"
   ast_map(
     ast,
-    [&ret] (AST::Base* ast) { if( ast->kind == ASTKind::Return ) ret.emplace_back(ast); }
+    [&] (AST::Base* ast) { if( ast->kind == ASTKind::Return ) ret.emplace_back(ast); }
   );
 
   // last
