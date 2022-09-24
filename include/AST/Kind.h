@@ -2,7 +2,7 @@
 
 namespace metro::AST {
 
-enum class Kind {
+enum class Kind : int {
   Type,
   Argument,
 

@@ -72,7 +72,7 @@ Object* Application::execute_script(AppContext::Script& script) {
 
   Error::check();
 
-  return nullptr;
+  // return nullptr;
   // ---------------
 
   Evaluator evaluator;

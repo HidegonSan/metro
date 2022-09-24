@@ -65,7 +65,7 @@ void Sema::analyze() {
   } while( this->deduction_updated );
 
   // final
-  for( auto&& [scope, info] : this->scope_info_map )
+  for( auto&& [scope, info] : this->scope_info_map ) {
     for( auto&& var : info.var_dc_list ) {
       auto ast = var.is_argument ? (AST::Base*)var.ast_arg : var.ast;
 
@@ -81,6 +81,9 @@ void Sema::analyze() {
           .emit(true);
       }
     }
+  }
+  
+
 
   // deduction function return types
   alertphase("Sema: deduction the return types of functions");

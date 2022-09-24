@@ -9,162 +9,77 @@
 
 namespace metro::semantics {
 
-bool Sema::check_ast(AST::Base* ast, std::vector<Error>& err) {
-  ast_map(
-    ast,
-    [&] (AST::Base* ast) {
-      switch( ast->kind ) {
-        case ASTKind::Callfunc: {
-          auto x = (AST::CallFunc*)ast;
-          auto find = this->find_func(x->name);
-
-          if( !find ) {
-            
-          }
-
-          break;
-        }
-      }
-    }
-  );
-
-  return err.empty();
-}
-
-// --- //
-
 Sema::EvalResult Sema::try_eval_type(AST::Base* ast) {
   using Cond = EvalResult::Condition;
 
-  switch( ast->kind ) {
-    case ASTKind::Argument:
-      _try_eval_r(((AST::Argument*)ast)->type);
-      break;
+  try {
+    ast_map(
+      ast,
+      [&] (AST::Base* ast) {
+        switch( ast->kind ) {
+          case ASTKind::Variable: {
+            auto x = (AST::Variable*)ast;
 
-    case ASTKind::None:
-    case ASTKind::Type:
-    case ASTKind::Boolean:
-    case ASTKind::Value:
-      break;
+            if( !this->var_dc_ptr_map[x]->is_deducted ) {
+              throw Cond::Incomplete;
+            }
 
-    case ASTKind::Variable: {
-      auto x = (AST::Variable*)ast;
+            break;
+          }
 
-      if( !this->var_dc_ptr_map[x]->is_deducted ) {
+          case ASTKind::Callfunc: {
+            auto x = (AST::CallFunc*)ast;
 
-        return Cond::Incomplete;
+            auto func = this->find_func(x->name);
+
+            // function not found
+            if( !func ) {
+              Error(ErrorKind::UndefinedFunction,
+                x->token,
+                "undefined function name")
+                  .emit(true);
+            }
+
+            // return type is not deducted yet
+            if( !func->dc.is_deducted )
+              throw Cond::Incomplete;
+
+            break;
+          }
+
+          case ASTKind::Assign: {
+            auto x = (AST::Expr*)ast;
+
+            auto&& rhs = this->try_eval_type(x->rhs);
+
+            if( !is_lvalue(x->lhs) ) {
+              Error(ErrorKind::TypeMismatch, x->lhs, "expected lvalue expression")
+                .emit();
+            }
+
+
+
+            break;
+          }
+
+        }
       }
-
-      break;
-    }
-
-    case ASTKind::Array:
-    case ASTKind::Tuple: {
-      auto x = (AST::ListBase*)ast;
-
-      for( auto&& elem : x->elements )
-        _try_eval_r(elem);
-
-      break;
-    }
-
-    //
-    // call function
-    case ASTKind::Callfunc: {
-      auto x = (AST::CallFunc*)ast;
-
-      auto func = this->find_func(x->name);
-
-      // function not found
-      if( !func ) {
-        Error(ErrorKind::UndefinedFunction,
-          x->token,
-          "undefined function name")
-            .emit(true);
-      }
-
-      // return type is not deducted yet
-      if( !func->dc.is_deducted )
-        return Cond::Incomplete;
-
-      break;
-    }
-
-    case ASTKind::Compare: {
-      auto x = (AST::Compare*)ast;
-
-      _try_eval_r(x->first);
-
-      for( auto&& item : x->list )
-        _try_eval_r(item.ast);
-
-      break;
-    }
-
-    case ASTKind::Assign: {
-      auto x = (AST::Expr*)ast;
-
-      auto&& rhs = this->try_eval_type(x->rhs);
-
-      if( !is_lvalue(x->lhs) ) {
-        Error(ErrorKind::TypeMismatch, x->lhs, "expected lvalue expression")
-          .emit();
-      }
-
-      if( x->lhs->kind == ASTKind::Variable ) {
-        
-      }
-
-      break;
-    }
-
-    case ASTKind::Return:
-      _try_eval_r(((AST::Return*)ast)->expr);
-      break;
-    
-    case ASTKind::If: {
-      auto x = (AST::If*)ast;
-
-      _try_eval_r(x->cond);
-      _try_eval_r(x->if_true);
-      _try_eval_r(x->if_false);
-
-      break;
-    }
-
-    case ASTKind::Scope: {
-      _try_eval_r(*((AST::Scope*)ast)->elements.rbegin());
-      break;
-    }
-
-    case ASTKind::VarDefine: {
-      auto x = (AST::VarDefine*)ast;
-
-      _try_eval_r(x->type);
-      _try_eval_r(x->init);
-
-      break;
-    }
-
-    default: {
-      if( !ast->is_expr )
-        crash;
-
-      auto x = (AST::Expr*)ast;
-
-      _try_eval_r(x->lhs);
-      _try_eval_r(x->rhs);
-
-      break;
-    }
+    );
+  }
+  catch( EvalResult const& res ) {
+    return res;
+  }
+  catch( EvalResult::Condition cond ) {
+    return cond;
+  }
+  catch( ... ) {
+    crash;
   }
 
   return this->eval_type(ast);
 }
 
 ValueType Sema::eval_type(AST::Base* ast) {
-  using Cond = EvalResult::Condition;
-
   if( !ast )
     return { };
 
@@ -233,19 +148,7 @@ ValueType Sema::eval_type(AST::Base* ast) {
     }
 
     case ASTKind::Compare: {
-      /*
-      auto cmp = (AST::Compare*)ast;
-
-      this->eval_type(cmp->first);
-
-      for( auto&& item : cmp->list ) {
-        this->eval_type(item.ast);
-      }
-      */
-
-      ret = ValueType::Kind::Bool;
-
-      break;
+      return ValueType::Kind::Bool;
     }
 
     //

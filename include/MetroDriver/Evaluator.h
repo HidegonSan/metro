@@ -82,7 +82,7 @@ private:
   ScopeInfo* cur_scope;
   CallStack* cur_call_stack;
 
-  std::vector<Object*> global_var;
+  // std::vector<Object*> global_var;
 
   std::list<ScopeInfo> scope_stack;
   std::list<CallStack> call_stack;

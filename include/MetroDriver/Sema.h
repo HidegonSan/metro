@@ -199,12 +199,6 @@ private:
 
   ScopeInfo& get_cur_scope();
 
-  //
-  // check if have any problem in ast
-  // true = no problem
-  // false = have any error
-  bool check_ast(AST::Base* ast, std::vector<Error>& err);
-
   // try evaluate a type of ast
   EvalResult try_eval_type(AST::Base* ast);
 
@@ -259,6 +253,8 @@ private:
 
   std::map<AST::VarDefine*, bool> var_assignmented_flag;
   
+  std::map<AST::Value*, Object*> objects;
+
   void print_self();
 
 };

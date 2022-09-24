@@ -8,8 +8,9 @@ Object** Evaluator::eval_lvalue(AST::Base* ast) {
 
   switch( ast->kind ) {
     case ASTKind::Variable: {
-      auto x = (AST::Variable*)ast;
+      auto var = (AST::Variable*)ast;
 
+      
       
       break;
     }
@@ -177,6 +178,8 @@ Object* Evaluator::eval(AST::Base* ast) {
 
         x->value = val;
       }
+
+
 
       break;
     }
