@@ -49,9 +49,9 @@ Object* Application::execute_script(AppContext::Script& script) {
   // auto ast = parser.parse();
   auto ast = parser.expr();
 
-  debug(std::cout << ast->to_string() << std::endl;)
+  debug(std::cout << ast->to_string() << std::endl;);
 
-      script.ast = ast;
+  script.ast = ast;
 
   Error::check();
 

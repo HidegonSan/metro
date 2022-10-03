@@ -1,41 +1,32 @@
-#include "Application.h"
 #include "Types/Object.h"
-#include "Utils.h"
+
+#include "Application.h"
 #include "Debug.h"
+#include "Utils.h"
 
 namespace metro {
 
 Object* Object::none = new Object(ValueType::Kind::None);
 
 Object::Object(ValueType type)
-  : type(type),
-    ref_count(0),
-    is_weak(false),
-    v_int(0)
-{
-  debug(
-    alert;
-    alertctor(Object);
-  )
+    : type(type), ref_count(0), is_weak(false), v_int(0) {
+  debug(alert; alertctor(Object);)
 }
 
-Object::~Object() {
-  debug(
-    alert;
-    alertdtor(Object);
-  )
-}
+Object::~Object() { debug(alert; alertdtor(Object);) }
 
 //
 // convert to string
 std::string Object::to_string() const {
   static bool str_q = false;
 
-  if( type.arr_depth != 0 ) {
-    return "[" + Utils::join(", ", list, [] (auto& p) { return p->to_string(); }) + "]";
+  if (type.arr_depth != 0) {
+    return "[" +
+           Utils::join(", ", list, [](auto& p) { return p->to_string(); }) +
+           "]";
   }
 
-  switch( type.kind ) {
+  switch (type.kind) {
     // int
     case ValueType::Kind::Int:
       return std::to_string(v_int);
@@ -44,7 +35,8 @@ std::string Object::to_string() const {
     case ValueType::Kind::Float: {
       auto ret = std::to_string(v_float);
 
-      while( ret.length() > 1 && (*ret.rbegin() == '0' || *ret.rbegin() == '.') ) {
+      while (ret.length() > 1 &&
+             (*ret.rbegin() == '0' || *ret.rbegin() == '.')) {
         ret.pop_back();
       }
 
@@ -61,8 +53,7 @@ std::string Object::to_string() const {
 
     // string
     case ValueType::Kind::String: {
-      if( str_q )
-        return '"' + Utils::Strings::to_string(v_str) + '"';
+      if (str_q) return '"' + Utils::Strings::to_string(v_str) + '"';
 
       return Utils::Strings::to_string(v_str);
     }
@@ -72,7 +63,9 @@ std::string Object::to_string() const {
       auto bak = str_q;
 
       str_q = true;
-      auto ret = "(" + Utils::join(", ", list, [] (auto& p) { return p->to_string(); }) + ")";
+      auto ret =
+          "(" +
+          Utils::join(", ", list, [](auto& p) { return p->to_string(); }) + ")";
 
       str_q = bak;
       return ret;
@@ -84,10 +77,8 @@ std::string Object::to_string() const {
 
     // struct
     case ValueType::Kind::UserDef: {
-
       break;
     }
-
   }
 
   TODO_IMPL
@@ -95,8 +86,8 @@ std::string Object::to_string() const {
 
 //
 // clone
-Object* Object::clone() const {
-  return new Object(*this);
-}
+Object* Object::clone() const { return new Object(*this); }
 
-} // namespace metro
+std::string MeLong::to_string() const { return std::to_string(this->v_long); }
+
+}  // namespace metro

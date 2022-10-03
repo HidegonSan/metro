@@ -28,7 +28,7 @@ struct Object {
   Object(ValueType type = ValueType::Kind::None);
   virtual ~Object();
 
-  std::string to_string() const;
+  virtual std::string to_string() const;
 
   Object* clone() const;
 };
@@ -37,6 +37,8 @@ struct MeLong : Object {
   int64_t v_long;
 
   MeLong(int64_t v = 0) : Object(ValueType::Kind::Int), v_long(v) {}
+
+  std::string to_string() const;
 };
 
 }  // namespace metro

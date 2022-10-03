@@ -1,4 +1,4 @@
-#include "Evaluator.h"
+#include "MetroDriver/Evaluator.h"
 
 #include "AST.h"
 
@@ -10,9 +10,13 @@ Evaluator::~Evaluator() {}
 Object* Evaluator::eval(AST::Base* ast) {
   switch (ast->kind) {
     case ASTKind::Value: {
-      return this->_constructed_value_obj[ast->token];
+      alert;
+      return this->construct_value(ast->token);
     }
   }
+
+  alert;
+  TODO_IMPL
 }
 
 Object*& Evaluator::construct_value(Token* token) {

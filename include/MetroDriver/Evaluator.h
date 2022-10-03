@@ -12,8 +12,11 @@
 namespace metro {
 
 namespace AST {  // forward declare
+
+enum class Kind : int;
+
 struct Base;
-}
+}  // namespace AST
 
 struct Token;
 struct Object;
