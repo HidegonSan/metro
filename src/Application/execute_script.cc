@@ -1,31 +1,30 @@
-#include <iostream>
-#include <fstream>
 #include <cassert>
-#include "Utils.h"
-#include "Types.h"
+#include <fstream>
+#include <iostream>
 
+#include "Application.h"
+#include "Debug.h"
+#include "Error.h"
+#include "MetroDriver/Evaluator.h"
 #include "MetroDriver/Lexer.h"
 #include "MetroDriver/Parser.h"
 #include "MetroDriver/Sema.h"
-#include "MetroDriver/Evaluator.h"
-
-#include "Application.h"
-#include "Error.h"
-#include "Debug.h"
+#include "Types.h"
+#include "Utils.h"
 
 namespace metro {
 AppContext::Script Application::open_script_file(char const* path) {
-  std::ifstream ifs{ path };
+  std::ifstream ifs{path};
   AppContext::Script script;
 
   script.source.path = path;
 
-  if( ifs.fail() ) {
+  if (ifs.fail()) {
     std::cout << "cannot open file: " << path << std::endl;
     exit(1);
   }
 
-  for( std::string line; std::getline(ifs, line); ) {
+  for (std::string line; std::getline(ifs, line);) {
     script.source.data += line + '\n';
   }
 
@@ -37,36 +36,34 @@ AppContext::Script Application::open_script_file(char const* path) {
 Object* Application::execute_script(AppContext::Script& script) {
   running_script.push_front(&script);
 
-  Lexer lexer{ script.source };
+  Lexer lexer{script.source};
 
   auto token = lexer.lex();
 
-  if( token->kind == TokenKind::End )
-    return Object::none;
+  if (token->kind == TokenKind::End) return Object::none;
 
   Error::check();
 
-  Parser parser{ token };
+  Parser parser{token};
 
-  auto ast = parser.parse();
+  // auto ast = parser.parse();
+  auto ast = parser.expr();
 
-  debug(
-    std::cout << ast->to_string() << std::endl;
-  )
+  debug(std::cout << ast->to_string() << std::endl;)
 
-  script.ast = ast;
+      script.ast = ast;
 
   Error::check();
 
-  assert(ast->kind == AST::Kind::Scope);
+  // assert(ast->kind == AST::Kind::Scope);
 
-/*
-  Sema sema{ (AST::Scope*)ast };
+  /*
+    Sema sema{ (AST::Scope*)ast };
 
-  sema.analyze();
-  */
+    sema.analyze();
+    */
 
-  semantics::Sema sema{ (AST::Scope*)ast };
+  semantics::Sema sema{(AST::Scope*)ast};
 
   sema.analyze();
 
@@ -86,4 +83,4 @@ Object* Application::execute_script(AppContext::Script& script) {
   return obj;
 }
 
-} // namespace metro
+}  // namespace metro
