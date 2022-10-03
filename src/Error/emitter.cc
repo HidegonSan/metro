@@ -72,7 +72,7 @@ auto trim_view_lines(AppContext::Script const* script, size_t err_begin, size_t 
   return ret;
 }
 
-void Error::emit(bool exit) {
+Error& Error::emit(bool exit) {
   i64
     view_begin = 0,
     view_end   = script->source.data.length(),
@@ -155,13 +155,15 @@ void Error::emit(bool exit) {
   if( kind == ErrorKind::ApplicationBug ) {
     std::cerr
       << COL_RED
-      << "please post this bug in anywhere\n"
+      << "this error is bug!! please tell to developer...\n"
       << "  GitHub: https://github.com/bomkei/metro\n"
       << "  Discord: https://discord.gg/PPujBK4fdu\n"
       << COL_DEFAULT;
 
     std::exit(1);
   }
+
+  return *this;
 }
 
 } // namespace metro

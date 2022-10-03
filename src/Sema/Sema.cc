@@ -82,7 +82,21 @@ void Sema::analyze() {
       }
     }
   }
-  
+
+  debug(
+    for( auto&& [scope, info] : this->scope_info_map ) {
+      alert;
+
+      std::cout
+        << std::endl
+        << (void*)scope << std::endl;
+
+      for( auto&& vardc : info.var_dc_list ) {
+        std::cout << vardc.to_string() << std::endl;
+      }
+
+    }
+  )
 
 
   // deduction function return types

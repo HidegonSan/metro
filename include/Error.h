@@ -105,7 +105,11 @@ public:
   //
   // emit
   //   出力する
-  void emit(bool exit = false);
+  Error& emit(bool exit = false);
+
+  void exit() {
+    std::exit(1);
+  }
 
   //
   // check

@@ -5,18 +5,24 @@
 
 namespace metro::semantics {
 
-VariableDC* Sema::get_variable_dc(AST::Variable* ast) {
-  for( auto&& scope : this->scope_history )
-    if( auto dc = this->scope_info_map[scope].find_var(ast->name); dc )
-      return dc;
+std::tuple<VariableDC*, ScopeInfo*, size_t> Sema::get_variable_dc(AST::Variable* ast) {
+  for( size_t i = 0; auto&& scope : this->scope_history ) {
+    auto& scope_info = this->scope_info_map[scope];
 
-  return nullptr;
+    if( auto dc = scope_info.find_var(ast->name); dc )
+      return { dc, &scope_info, 0 };
+
+    i++;
+  }
+
+  // return { nullptr, nullptr, 0 };
+  return { };
 }
 
 void Sema::create_variable_dc() {
 
   auto mapfn_var = [this] (AST::Variable* ast, bool allow_un) -> std::pair<bool, VariableDC*> {
-    auto dc = this->get_variable_dc(ast);
+    auto [dc, scope_info, index] = this->get_variable_dc(ast);
 
     if( !dc ) {
       Error(ErrorKind::UndefinedVariable, ast, "undefined variable name")
@@ -29,6 +35,8 @@ void Sema::create_variable_dc() {
         .emit(true);
       return { false, dc };
     }
+
+    
 
     this->var_dc_ptr_map[ast] = dc;
     return { true, dc };
@@ -77,7 +85,7 @@ void Sema::create_variable_dc() {
 
             mapfn_var(var, true);
 
-            auto dc = this->get_variable_dc(var);
+            auto [dc, scope_info, offs] = this->get_variable_dc(var);
 
             // assert(dc != nullptr);
 

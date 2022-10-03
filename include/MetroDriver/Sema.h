@@ -195,7 +195,8 @@ private:
 
   FunctionInfo* find_func(std::string_view name);
 
-  VariableDC* get_variable_dc(AST::Variable* ast);
+  // VariableDC* get_variable_dc(AST::Variable* ast);
+  std::tuple<VariableDC*, ScopeInfo*, size_t> get_variable_dc(AST::Variable* ast);
 
   ScopeInfo& get_cur_scope();
 
