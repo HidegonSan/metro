@@ -4,8 +4,6 @@
 
 #pragma once
 
-// #include "AST.h"
-
 namespace metro {
 
 struct Token;
@@ -17,10 +15,10 @@ struct Base;
 struct Scope;
 struct Type;
 
-}
+}  // namespace AST
 
 class Parser {
-public:
+ public:
   explicit Parser(Token* token);
 
   AST::Base* atom();
@@ -41,7 +39,7 @@ public:
 
   AST::Base* parse();
 
-private:
+ private:
   bool check();
   void next();
   bool eat(std::string_view str);
@@ -53,9 +51,8 @@ private:
 
   void expect_semi();
 
-  Token*  cur;
-  Token*  ate;
+  Token* cur;
+  Token* ate;
 };
 
-} // namespace metro
-
+}  // namespace metro
