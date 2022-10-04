@@ -88,6 +88,7 @@ std::string Object::to_string() const {
 // clone
 Object* Object::clone() const { return new Object(*this); }
 
+// MeLong
 std::string MeLong::to_string() const { return std::to_string(this->v_long); }
 
 }  // namespace metro

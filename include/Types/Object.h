@@ -36,7 +36,17 @@ struct Object {
 struct MeLong : Object {
   int64_t v_long;
 
+  // ctor
   MeLong(int64_t v = 0) : Object(ValueType::Kind::Int), v_long(v) {}
+
+  std::string to_string() const;
+};
+
+struct MeString : Object {
+  std::wstring value;
+
+  MeString(std::wstring const& v = L"")
+      : Object(ValueType::Kind::String), value(v) {}
 
   std::string to_string() const;
 };

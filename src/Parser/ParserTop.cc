@@ -5,10 +5,9 @@
 namespace metro {
 
 AST::Base* Parser::toplevel() {
-
   //
   // function
-  if( eat("fn") ) {
+  if (eat("fn")) {
     auto ast = new AST::Function(this->ate);
 
     expect_ident();
@@ -17,7 +16,7 @@ AST::Base* Parser::toplevel() {
     next();
     expect("(");
 
-    if( !eat(")") ) {
+    if (!eat(")")) {
       do {
         auto& arg = ast->args.emplace_back(cur);
 
@@ -29,13 +28,12 @@ AST::Base* Parser::toplevel() {
         expect(":");
 
         arg.type = expect_type();
-      } while( eat(",") );
+      } while (eat(","));
 
       expect(")");
     }
 
-    if( this->cur->str != "{" )
-      ast->return_type = expect_type();
+    if (this->cur->str != "{") ast->return_type = expect_type();
 
     ast->code = expect_scope();
 
@@ -44,7 +42,7 @@ AST::Base* Parser::toplevel() {
 
   //
   // structure
-  if( eat("struct") ) {
+  if (eat("struct")) {
     auto x = new AST::Struct(ate);
 
     this->expect_ident();
@@ -53,7 +51,7 @@ AST::Base* Parser::toplevel() {
     this->next();
     this->expect("{");
 
-    if( this->eat("}") ) {
+    if (this->eat("}")) {
       Error(ErrorKind::EmptyStruct, cur, "empty struct is not valid").emit();
       return x;
     }
@@ -66,10 +64,10 @@ AST::Base* Parser::toplevel() {
       member.token = cur;
 
       this->next();
-      this->expect(":"); // TODO: If not eaten, add template type
+      this->expect(":");  // TODO: If not eaten, add template type
 
       member.type = this->expect_type();
-    } while( eat(",") );
+    } while (eat(","));
 
     this->expect("}");
 
@@ -79,4 +77,4 @@ AST::Base* Parser::toplevel() {
   return expr();
 }
 
-} // namespace metro
+}  // namespace metro

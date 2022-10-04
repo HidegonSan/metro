@@ -7,14 +7,14 @@ namespace metro {
 AST::Base* Parser::controls() {
   //
   // if
-  if( this->eat("if") ) {
+  if (this->eat("if")) {
     auto ast = new AST::If(ate);
 
     ast->cond = this->expr();
     ast->if_true = this->expect_scope();
 
-    if( this->eat("else") ) {
-      if( cur->str == "if" )
+    if (this->eat("else")) {
+      if (cur->str == "if")
         ast->if_false = this->expr();
       else
         ast->if_false = this->expect_scope();
@@ -25,20 +25,20 @@ AST::Base* Parser::controls() {
 
   //
   // for
-  if( eat("for") ) {
+  if (eat("for")) {
     auto ast = new AST::For(ate);
 
-    if( !eat(";") ) {
+    if (!eat(";")) {
       ast->init = expr();
       expect(";");
     }
 
-    if( !eat(";") ) {
+    if (!eat(";")) {
       ast->cond = expr();
       expect(";");
     }
 
-    if( cur->str != "{" ) {
+    if (cur->str != "{") {
       ast->counter = expr();
     }
 
@@ -47,30 +47,10 @@ AST::Base* Parser::controls() {
     return ast;
   }
 
-  if( eat("let") ) {
-    auto ast = new AST::VarDefine(ate);
-
-    expect_ident();
-    ast->name = cur->str;
-
-    next();
-
-    if( eat(":") ) {
-      ast->type = expect_type();
-    }
-
-    if( eat("=") ) {
-      ast->init = expr();
-    }
-
-    this->expect_semi();
-
-    return ast;
-  }
-
-  if( this->eat("return") ) {
-    if( auto tok = this->ate; this->eat(";") )
-      return new AST::Return(tok);
+  //
+  // return
+  if (this->eat("return")) {
+    if (auto tok = this->ate; this->eat(";")) return new AST::Return(tok);
 
     auto ast = new AST::Return(this->ate);
 
@@ -84,4 +64,4 @@ AST::Base* Parser::controls() {
   return nullptr;
 }
 
-} // namespace metro
+}  // namespace metro
