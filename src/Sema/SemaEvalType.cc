@@ -137,8 +137,66 @@ ValueType Sema::eval_type(AST::Base* ast) {
 
       auto func = this->find_func(x->name);
 
-      // for( auto&& arg : x->args )
-      //   auto&& res = this->eval_type(arg);
+      if (!func) {
+        for (auto&& bfun : BuiltinFunc::builtin_functions) {
+          if (bfun.name == x->name) {
+            x->callee_builtin = &bfun;
+
+            if (bfun.arg_types.empty()) {
+              if (!x->args.empty())
+                Error(ErrorKind::TooManyArguments, x, "too many arguments")
+                    .emit(true);
+
+              return bfun.ret_type;
+            }
+
+            size_t counter{};
+            std::vector<ValueType> args;
+
+            for (auto&& arg : x->args) {
+              args.emplace_back(this->eval_type(arg));
+            }
+
+            for (auto formal_iter = bfun.arg_types.begin();
+                 auto&& actual : args) {
+              if (formal_iter == bfun.arg_types.end()) {
+                Error(ErrorKind::TooManyArguments, ast, "too many arguments")
+                    .emit();
+
+                return bfun.ret_type;
+              }
+
+              if (formal_iter->equals(ValueType::Kind::Args)) {
+                return bfun.ret_type;
+              }
+
+              if (!formal_iter->equals(actual)) {
+                Error(ErrorKind::TypeMismatch, x->args[counter],
+                      "expected '" + formal_iter->to_string() +
+                          "' but found '" + actual.to_string() + "'")
+                    .emit(true);
+              }
+
+              counter++;
+            }
+
+            if (counter < args.size()) {
+              if (!args[counter + 1].equals(ValueType::Kind::Args))
+                Error(ErrorKind::TooFewArguments, x, "too few arguments")
+                    .emit(true);
+            }
+
+            return bfun.ret_type;
+          }
+        }
+
+        Error(ErrorKind::UndefinedFunction, x->token, "undefined function name")
+            .emit(true);
+      }
+
+      // todo: check arguments
+
+      TODO_IMPL
 
       return func->dc.type;
     }

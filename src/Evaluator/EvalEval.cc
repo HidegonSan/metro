@@ -1,17 +1,9 @@
-#include "MetroDriver/Evaluator.h"
-
 #include "AST.h"
 #include "GC.h"
+#include "MetroDriver/Evaluator.h"
 #include "MetroDriver/Sema.h"
 
 namespace metro {
-
-Evaluator::ScopeInfo::~ScopeInfo() {
-  // todo: reduce ref_count in varibales
-}
-
-Evaluator::Evaluator() {}
-Evaluator::~Evaluator() {}
 
 Object* Evaluator::eval(AST::Base* ast) {
   if (!ast) return nullptr;
@@ -19,21 +11,6 @@ Object* Evaluator::eval(AST::Base* ast) {
   switch (ast->kind) {
     case ASTKind::None:
       break;
-
-    case ASTKind::VarDefine: {
-      auto x = (AST::VarDefine*)ast;
-      auto& cur_scope = this->get_cur_scope();
-
-      auto& pobj = cur_scope.variables.emplace_back();
-
-      if (x->init) {
-        pobj = this->eval(x->init);
-      } else if (x->type) {
-        pobj = new Object(*semantics::Sema::get_instance()->get_cache(x->type));
-      }
-
-      break;
-    }
 
     case ASTKind::Value: {
       alert;
@@ -48,6 +25,37 @@ Object* Evaluator::eval(AST::Base* ast) {
       auto& scope = this->get_cur_scope();
 
       return scope.variables[x->index];
+    }
+
+    case ASTKind::Callfunc: {
+      auto x = (AST::CallFunc*)ast;
+
+      if (x->callee_builtin) {
+        std::vector<Object*> args;
+
+        for (auto&& arg : x->args) {
+          args.emplace_back(this->eval(arg));
+        }
+
+        return x->callee_builtin->func(args);
+      }
+
+      break;
+    }
+
+    case ASTKind::VarDefine: {
+      auto x = (AST::VarDefine*)ast;
+      auto& cur_scope = this->get_cur_scope();
+
+      auto& pobj = cur_scope.variables.emplace_back();
+
+      if (x->init) {
+        pobj = this->eval(x->init);
+      } else if (x->type) {
+        pobj = new Object(*semantics::Sema::get_instance()->get_cache(x->type));
+      }
+
+      break;
     }
 
     case ASTKind::Scope: {
@@ -103,42 +111,6 @@ Object* Evaluator::eval(AST::Base* ast) {
   }
 
   return Object::none;
-}
-
-Object*& Evaluator::construct_value(Token* token) {
-  alert;
-
-  auto& ret = this->_constructed_value_obj[token];
-
-  if (ret != nullptr) return ret;
-
-  switch (token->kind) {
-    case TokenKind::Int: {
-      ret = new MeLong(std::atoi(token->str.data()));
-      break;
-    }
-
-    default:
-      TODO_IMPL
-  }
-
-#if METRO_DEBUG
-  assert(ret != nullptr);
-#endif
-
-  alert;
-
-  return ret;
-}
-
-Evaluator::ScopeInfo& Evaluator::enter_scope(AST::Scope* ast) {
-  return this->_scope_list.emplace_front(ast);
-}
-
-void Evaluator::leave_scope() { this->_scope_list.pop_front(); }
-
-Evaluator::ScopeInfo& Evaluator::get_cur_scope() {
-  return *this->_scope_list.begin();
 }
 
 }  // namespace metro
