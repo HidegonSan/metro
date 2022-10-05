@@ -46,8 +46,8 @@ Object* Application::execute_script(AppContext::Script& script) {
 
   Parser parser{token};
 
-  // auto ast = parser.parse();
-  auto ast = parser.expr();
+  auto ast = parser.parse();
+  // auto ast = parser.expr();
 
   debug(std::cout << ast->to_string() << std::endl;);
 

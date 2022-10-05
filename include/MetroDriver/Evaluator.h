@@ -6,6 +6,7 @@
 
 #include <list>
 #include <map>
+#include <vector>
 
 // #include "AST.h"
 
@@ -16,6 +17,8 @@ namespace AST {  // forward declare
 enum class Kind : int;
 
 struct Base;
+struct Scope;
+
 }  // namespace AST
 
 struct Token;
@@ -23,6 +26,13 @@ struct Object;
 
 class Evaluator {
   using ASTKind = AST::Kind;
+
+  struct ScopeInfo {
+    AST::Scope* ast;
+    std::vector<Object*> variables;
+
+    explicit ScopeInfo(AST::Scope* ast) : ast(ast) {}
+  };
 
  public:
   Evaluator();
@@ -37,6 +47,13 @@ class Evaluator {
 
  private:
   std::map<Token*, Object*> _constructed_value_obj;
+
+  std::list<ScopeInfo> _scope_list;
+
+  ScopeInfo& enter_scope(AST::Scope* ast);
+  void leave_scope();
+
+  ScopeInfo& get_cur_scope();
 
 #if METRO_DEBUG
   struct _dbg_t {
