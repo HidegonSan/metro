@@ -55,14 +55,6 @@ Object* Application::execute_script(AppContext::Script& script) {
 
   Error::check();
 
-  // assert(ast->kind == AST::Kind::Scope);
-
-  /*
-    Sema sema{ (AST::Scope*)ast };
-
-    sema.analyze();
-    */
-
   semantics::Sema sema{(AST::Scope*)ast};
 
   sema.analyze();

@@ -82,15 +82,18 @@ void Sema::analyze() {
     for (auto&& vardc : info.var_dc_list) {
       std::cout << vardc.to_string() << std::endl;
     }
-  })
+  });
 
-      // deduction function return types
-      alertphase("Sema: deduction the return types of functions");
+  // deduction function return types
+  alertphase("Sema: deduction the return types of functions");
   do {
     this->deduction_updated = false;
 
     for (auto&& func : this->functions) this->deduction_func_return_type(func);
   } while (this->deduction_updated);
+
+  alert;
+  this->eval_type(this->root);
 
   for (auto&& func : this->functions)
     if (!func.dc.is_deducted)
@@ -103,10 +106,12 @@ void Sema::analyze() {
              : this->functions) {
     alertios("function '" << func.name
                           << "': return=" << func.dc.type.to_string());
-  })
+  });
 }
 
 void Sema::semantics_checker() {
+  this->eval_type(this->root);
+
   this->enter_scope(root);
 
   for (auto&& func : this->functions) {

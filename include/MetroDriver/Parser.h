@@ -29,6 +29,7 @@ class Parser {
 
   AST::Base* mul();
   AST::Base* add();
+  AST::Base* shift();
   AST::Base* compare();
   AST::Base* assign();
 

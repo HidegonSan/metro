@@ -11,6 +11,7 @@ Error(...)
 #pragma once
 
 #include <vector>
+
 #include "AppContext.h"
 #include "source.h"
 
@@ -29,9 +30,10 @@ enum class ErrorKind {
 
   InvalidToken,
   InvalidSyntax,
+  InvalidOperator,
   UninitializedValue,
   UnexpectedToken,
-  
+
   NotAllowed,
   NotMutable,
 
@@ -57,6 +59,8 @@ enum class ErrorKind {
 
   // warnings
   UnusedVariable,
+
+  Suggestion,
 };
 
 class Error {
@@ -66,21 +70,13 @@ class Error {
     std::string&& msg;
 
     explicit Help(Token* token, std::string&& msg)
-      : token(token),
-        ast(nullptr),
-        msg(std::forward<std::string>(msg))
-    {
-    }
+        : token(token), ast(nullptr), msg(std::forward<std::string>(msg)) {}
 
     Help(AST::Base* ast, std::string&& msg)
-      : token(nullptr),
-        ast(ast),
-        msg(std::forward<std::string>(msg))
-    {
-    }
+        : token(nullptr), ast(ast), msg(std::forward<std::string>(msg)) {}
   };
 
-public:
+ public:
   explicit Error(ErrorKind kind, Token* token, std::string&& msg);
   Error(ErrorKind kind, AST::Base* ast, std::string&& msg);
   Error(ErrorKind kind, size_t pos, std::string&& msg);
@@ -107,9 +103,7 @@ public:
   //   出力する
   Error& emit(bool exit = false);
 
-  void exit() {
-    std::exit(1);
-  }
+  void exit() { std::exit(1); }
 
   //
   // check
@@ -117,22 +111,21 @@ public:
   //   エラーが出力されたかどうかを確認し、されていたらアプリを終了する
   static void check();
 
-private:
+ private:
   ErrorKind kind;
   std::string&& message;
 
-  bool is_warn{ };
+  bool is_warn{};
 
   AppContext::Script const* script;
 
-  Token*      token;
-  AST::Base*  ast;
-  size_t      pos;
+  Token* token;
+  AST::Base* ast;
+  size_t pos;
 
   std::vector<Help> helps;
 
   static size_t emitted_count;
-
 };
 
-} // namespace metro
+}  // namespace metro

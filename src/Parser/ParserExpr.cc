@@ -57,6 +57,23 @@ AST::Base* Parser::add() {
   return x;
 }
 
+AST::Base* Parser::shift() {
+  auto x = this->add();
+
+  while (this->check()) {
+    auto tok = this->cur;
+
+    if (this->eat("<<"))
+      x = new AST::Expr(AST::Kind::LShift, x, this->add(), tok);
+    else if (this->eat(">>"))
+      x = new AST::Expr(AST::Kind::RShift, x, this->add(), tok);
+    else
+      break;
+  }
+
+  return x;
+}
+
 AST::Base* Parser::compare() {
   using ItemKind = AST::Compare::Item::Kind;
 

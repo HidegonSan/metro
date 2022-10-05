@@ -11,6 +11,8 @@ enum class Kind : int {
   Value,
   Variable,
 
+  Cast,
+
   Array,
   Tuple,
 
@@ -20,8 +22,13 @@ enum class Kind : int {
 
   Mul,
   Div,
+
   Add,
   Sub,
+
+  LShift,
+  RShift,
+
   Compare,
   Assign,
 
@@ -38,4 +45,4 @@ enum class Kind : int {
   Struct,
 };
 
-} // namespace metro::AST
+}  // namespace metro::AST

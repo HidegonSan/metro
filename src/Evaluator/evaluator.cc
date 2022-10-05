@@ -1,9 +1,14 @@
 #include "MetroDriver/Evaluator.h"
 
 #include "AST.h"
+#include "GC.h"
 #include "MetroDriver/Sema.h"
 
 namespace metro {
+
+Evaluator::ScopeInfo::~ScopeInfo() {
+  // todo: reduce ref_count in varibales
+}
 
 Evaluator::Evaluator() {}
 Evaluator::~Evaluator() {}
@@ -63,9 +68,38 @@ Object* Evaluator::eval(AST::Base* ast) {
       return last;
     }
 
-    default:
-      alertios("kind = " << static_cast<int>(ast->kind));
-      TODO_IMPL;
+    default: {
+      if (!ast->is_expr) {
+        alertios("kind = " << static_cast<int>(ast->kind));
+        TODO_IMPL;
+      }
+
+      auto x = (AST::Expr*)ast;
+
+      auto lhs = this->eval(x->lhs);
+      auto rhs = this->eval(x->rhs);
+
+      auto const& typekind = lhs->type.kind;
+
+      switch (ast->kind) {
+        case ASTKind::Add: {
+          if (lhs->type.arr_depth) {
+            lhs->list.emplace_back(rhs);
+            break;
+          }
+
+          switch (typekind) {
+            case ValueType::Kind::Int:
+              ((MeLong*)lhs)->v_long += ((MeLong*)rhs)->v_long;
+              break;
+          }
+
+          break;
+        }
+      }
+
+      return lhs;
+    }
   }
 
   return Object::none;

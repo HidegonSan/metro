@@ -28,6 +28,25 @@ AST::Base* Parser::atom() {
 }
 
 AST::Base* Parser::factor() {
+  // cast
+  if (this->eat("cast")) {
+    auto tok = this->ate;
+
+    this->expect("<");
+
+    auto type = this->expect_type();
+
+    this->expect(">");
+
+    this->expect("(");
+
+    auto item = this->expr();
+
+    this->expect(")");
+
+    return new AST::Expr(AST::Kind::Cast, type, item, tok);
+  }
+
   // bracket
   if (this->eat("(")) {
     auto tok = ate;

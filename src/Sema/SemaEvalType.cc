@@ -1,11 +1,10 @@
 #include "AST.h"
 #include "Error.h"
-#include "Utils.h"
 #include "MetroDriver/Sema.h"
+#include "Utils.h"
 
 #define _try_eval_r(_ast) \
-  if( auto&& res = this->try_eval_type(_ast); _ast && res.fail() ) \
-    return res;
+  if (auto&& res = this->try_eval_type(_ast); _ast && res.fail()) return res;
 
 namespace metro::semantics {
 
@@ -13,66 +12,55 @@ Sema::EvalResult Sema::try_eval_type(AST::Base* ast) {
   using Cond = EvalResult::Condition;
 
   try {
-    ast_map(
-      ast,
-      [&] (AST::Base* ast) {
-        switch( ast->kind ) {
-          case ASTKind::Variable: {
-            auto x = (AST::Variable*)ast;
+    ast_map(ast, [&](AST::Base* ast) {
+      switch (ast->kind) {
+        case ASTKind::Variable: {
+          auto x = (AST::Variable*)ast;
 
-            if( !this->var_dc_ptr_map[x]->is_deducted ) {
-              throw Cond::Incomplete;
-            }
-
-            break;
+          if (!this->var_dc_ptr_map[x]->is_deducted) {
+            throw Cond::Incomplete;
           }
 
-          case ASTKind::Callfunc: {
-            auto x = (AST::CallFunc*)ast;
+          break;
+        }
 
-            auto func = this->find_func(x->name);
+        case ASTKind::Callfunc: {
+          auto x = (AST::CallFunc*)ast;
 
-            // function not found
-            if( !func ) {
-              Error(ErrorKind::UndefinedFunction,
-                x->token,
-                "undefined function name")
-                  .emit(true);
-            }
+          auto func = this->find_func(x->name);
 
-            // return type is not deducted yet
-            if( !func->dc.is_deducted )
-              throw Cond::Incomplete;
-
-            break;
+          // function not found
+          if (!func) {
+            Error(ErrorKind::UndefinedFunction, x->token,
+                  "undefined function name")
+                .emit(true);
           }
 
-          case ASTKind::Assign: {
-            auto x = (AST::Expr*)ast;
+          // return type is not deducted yet
+          if (!func->dc.is_deducted) throw Cond::Incomplete;
 
-            auto&& rhs = this->try_eval_type(x->rhs);
+          break;
+        }
 
-            if( !is_lvalue(x->lhs) ) {
-              Error(ErrorKind::TypeMismatch, x->lhs, "expected lvalue expression")
+        case ASTKind::Assign: {
+          auto x = (AST::Expr*)ast;
+
+          auto&& rhs = this->try_eval_type(x->rhs);
+
+          if (!is_lvalue(x->lhs)) {
+            Error(ErrorKind::TypeMismatch, x->lhs, "expected lvalue expression")
                 .emit();
-            }
-
-
-
-            break;
           }
 
+          break;
         }
       }
-    );
-  }
-  catch( EvalResult const& res ) {
+    });
+  } catch (EvalResult const& res) {
     return res;
-  }
-  catch( EvalResult::Condition cond ) {
+  } catch (EvalResult::Condition cond) {
     return cond;
-  }
-  catch( ... ) {
+  } catch (...) {
     crash;
   }
 
@@ -80,22 +68,21 @@ Sema::EvalResult Sema::try_eval_type(AST::Base* ast) {
 }
 
 ValueType Sema::eval_type(AST::Base* ast) {
-  if( !ast )
-    return { };
+  if (!ast) return {};
 
   // if( this->caches.contains(ast) )
   //   return this->caches[ast];
 
   auto& ret = this->caches[ast];
 
-  switch( ast->kind ) {
+  switch (ast->kind) {
     case ASTKind::None:
       break;
 
     case ASTKind::Type: {
       auto type = (AST::Type*)ast;
 
-      assert( this->get_type_from_name(ret, type->name) );
+      assert(this->get_type_from_name(ret, type->name));
 
       ret.arr_depth = type->arr_depth;
       ret.have_elements = type->have_elements;
@@ -103,7 +90,7 @@ ValueType Sema::eval_type(AST::Base* ast) {
       ret.is_mutable = type->is_mutable;
       ret.is_reference = type->is_reference;
 
-      for( auto&& sub : type->elems )
+      for (auto&& sub : type->elems)
         ret.elems.emplace_back(this->eval_type(sub));
 
       alertios(ret.to_string());
@@ -120,12 +107,21 @@ ValueType Sema::eval_type(AST::Base* ast) {
     }
 
     case ASTKind::Value: {
-      auto val = (AST::Value*)ast;
+      switch (ast->token->kind) {
+        case TokenKind::Int:
+          return ValueType::Kind::Int;
 
-      val->object = create_obj(ast->token);
+        case TokenKind::Float:
+          return ValueType::Kind::Float;
 
-      ret = val->object->type;
-      break;
+        case TokenKind::Char:
+          return ValueType::Kind::Char;
+
+        case TokenKind::String:
+          return ValueType::Kind::String;
+      }
+
+      TODO_IMPL
     }
 
     case ASTKind::Variable: {
@@ -172,16 +168,16 @@ ValueType Sema::eval_type(AST::Base* ast) {
     case ASTKind::If: {
       auto if_x = (AST::If*)ast;
 
-      if( !this->eval_type(if_x->cond).equals(ValueType::Kind::Bool) )
+      if (!this->eval_type(if_x->cond).equals(ValueType::Kind::Bool))
         Error(ErrorKind::TypeMismatch, if_x->cond, "condition must be boolean")
-          .emit();
+            .emit();
 
       ret = this->eval_type(if_x->if_true);
-    
-      if( if_x->if_false )
-        if( !ret.equals(this->eval_type(if_x->if_false)) )
+
+      if (if_x->if_false)
+        if (!ret.equals(this->eval_type(if_x->if_false)))
           Error(ErrorKind::TypeMismatch, if_x->token, "if-expr type mismatch")
-            .emit();
+              .emit();
 
       break;
     }
@@ -193,8 +189,9 @@ ValueType Sema::eval_type(AST::Base* ast) {
 
       auto&& cond = this->eval_type(x->cond);
 
-      if( !cond.equals(ValueType::Kind::Bool) )
-        Error(ErrorKind::TypeMismatch, x->cond, "condition must be boolean").emit();
+      if (!cond.equals(ValueType::Kind::Bool))
+        Error(ErrorKind::TypeMismatch, x->cond, "condition must be boolean")
+            .emit();
 
       this->eval_type(x->counter);
       this->eval_type(x->code);
@@ -214,8 +211,7 @@ ValueType Sema::eval_type(AST::Base* ast) {
       auto scope = (AST::Scope*)ast;
 
       // 空のスコープ
-      if( scope->elements.empty() )
-        break;
+      if (scope->elements.empty()) break;
 
       auto&& finals = this->get_returnable_expr(scope);
 
@@ -227,14 +223,14 @@ ValueType Sema::eval_type(AST::Base* ast) {
 
       ret = this->eval_type(*scope->elements.rbegin());
 
-/*
-      for( auto it = finals.begin() + 1; it != finals.end(); it++ )
-        if( auto&& t = this->eval_type(*it); !ret.equals(t) )
-          Error(ErrorKind::TypeMismatch, *it,
-            Utils::linkstr( "expected '", ret.to_string(),
-              "' but found '", t.to_string(), "'"))
-              .emit();
-*/
+      /*
+            for( auto it = finals.begin() + 1; it != finals.end(); it++ )
+              if( auto&& t = this->eval_type(*it); !ret.equals(t) )
+                Error(ErrorKind::TypeMismatch, *it,
+                  Utils::linkstr( "expected '", ret.to_string(),
+                    "' but found '", t.to_string(), "'"))
+                    .emit();
+      */
 
       this->leave_scope(scope);
 
@@ -246,7 +242,7 @@ ValueType Sema::eval_type(AST::Base* ast) {
       break;
 
     default: {
-      if( !ast->is_expr ) {
+      if (!ast->is_expr) {
         alertfmt("%d", ast->kind);
         crash;
       }
@@ -256,17 +252,44 @@ ValueType Sema::eval_type(AST::Base* ast) {
       auto lhs = eval_type(expr->lhs);
       auto rhs = eval_type(expr->rhs);
 
-      // TODO: check operator
+      auto errfn = [&](std::string&& s, bool ex = true) {
+        Error(ErrorKind::InvalidOperator, expr,
+              s + " '" + std::string(ast->token->str) + "' for '" +
+                  lhs.to_string() + "' and '" + rhs.to_string() + "'")
+            .emit(ex);
+      };
 
-      ret = lhs;
+      // not equal
+      if (!lhs.equals(rhs))
+        Error(ErrorKind::TypeMismatch, expr, "type mismatch").emit(true);
+
+      // array
+      if (lhs.arr_depth || rhs.arr_depth) {
+        errfn("cannot use operator to array", ast->kind != ASTKind::Add);
+
+        Error(ErrorKind::Suggestion, expr->token,
+              "you can use function 'append' for array appending")
+            .set_warn()
+            .emit(true);
+      }
+
+      // string
+      if (lhs.equals(ValueType::Kind::String) && ast->kind != ASTKind::Add)
+        errfn("operator can be use for string is only addition");
+
+      // shift, but not integer
+      if (ast->kind == ASTKind::LShift || ast->kind == ASTKind::RShift) {
+        if (!lhs.equals(ValueType::Kind::Int)) goto _invalid_op;
+      }
+
       break;
+
+    _invalid_op:;
+      errfn("cannot use operator");
     }
   }
 
   return ret;
 }
 
-
-
-} // namespace metro::semantics
-
+}  // namespace metro::semantics

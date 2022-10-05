@@ -32,6 +32,8 @@ class Evaluator {
     std::vector<Object*> variables;
 
     explicit ScopeInfo(AST::Scope* ast) : ast(ast) {}
+
+    ~ScopeInfo();
   };
 
  public:
