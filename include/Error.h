@@ -67,13 +67,13 @@ class Error {
   struct Help {
     Token* token;
     AST::Base* ast;
-    std::string&& msg;
+    std::string msg;
 
     explicit Help(Token* token, std::string&& msg)
-        : token(token), ast(nullptr), msg(std::forward<std::string>(msg)) {}
+        : token(token), ast(nullptr), msg(std::move(msg)) {}
 
     Help(AST::Base* ast, std::string&& msg)
-        : token(nullptr), ast(ast), msg(std::forward<std::string>(msg)) {}
+        : token(nullptr), ast(ast), msg(std::move(msg)) {}
   };
 
  public:

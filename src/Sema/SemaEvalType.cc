@@ -242,6 +242,8 @@ ValueType Sema::eval_type(AST::Base* ast) {
       break;
 
     default: {
+      using VK = ValueType::Kind;
+
       if (!ast->is_expr) {
         alertfmt("%d", ast->kind);
         crash;
@@ -260,8 +262,26 @@ ValueType Sema::eval_type(AST::Base* ast) {
       };
 
       // not equal
-      if (!lhs.equals(rhs))
-        Error(ErrorKind::TypeMismatch, expr, "type mismatch").emit(true);
+      if (!lhs.equals(rhs)) {
+        auto&& err = Error(ErrorKind::TypeMismatch, expr, "type mismatch");
+
+        switch (ast->kind) {
+          case ASTKind::Add:
+          case ASTKind::Sub:
+          case ASTKind::Mul:
+          case ASTKind::Div:
+            if (auto x = expr->lhs;
+                lhs.equals(VK::Int)
+                    ? rhs.equals(VK::Float)
+                    : (x = expr->rhs,
+                       lhs.equals(VK::Float) && rhs.equals(VK::Int))) {
+              err.add_help(x, "you can convert to float with 'cast'");
+            }
+            break;
+        }
+
+        err.emit(true);
+      }
 
       // array
       if (lhs.arr_depth || rhs.arr_depth) {
@@ -274,12 +294,12 @@ ValueType Sema::eval_type(AST::Base* ast) {
       }
 
       // string
-      if (lhs.equals(ValueType::Kind::String) && ast->kind != ASTKind::Add)
+      if (lhs.equals(VK::String) && ast->kind != ASTKind::Add)
         errfn("operator can be use for string is only addition");
 
       // shift, but not integer
       if (ast->kind == ASTKind::LShift || ast->kind == ASTKind::RShift) {
-        if (!lhs.equals(ValueType::Kind::Int)) goto _invalid_op;
+        if (!lhs.equals(VK::Int)) goto _invalid_op;
       }
 
       break;
