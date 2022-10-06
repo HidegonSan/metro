@@ -4,30 +4,30 @@
 namespace metro::AST {
 
 SourceRange Base::get_range_on_source() const {
-  return { token->pos, token->pos + token->str.length() };
+  return { token, token };
 }
 
 SourceRange Argument::get_range_on_source() const {
-  return { token->pos, type->get_range_on_source().second };
+  return { token, type->get_range_on_source().second };
 }
 
 SourceRange Array::get_range_on_source() const {
-  if( elements.empty() ) {
-    return { token->pos, token->next->endpos };
-  }
+  if( elements.empty() )
+    return { token, token->next };
 
-  return { elements[0]->get_range_on_source().first,
-    (*elements.rbegin())->get_range_on_source().second };
+  return {
+    elements[0]->get_range_on_source().first,
+    (*elements.rbegin())->get_range_on_source().second
+  };
 }
 
 SourceRange CallFunc::get_range_on_source() const {
-  if( args.empty() ) {
-    return { token->pos, token->next->next->endpos };
-  }
+  if( args.empty() )
+    return { token, token->next->next }; /* name, ')' */
 
   return {
-    token->pos,
-    (*args.rbegin())->get_range_on_source().second + 1
+    token,
+    (*args.rbegin())->get_range_on_source().second->next
   };
 }
 
@@ -43,80 +43,78 @@ SourceRange Expr::get_range_on_source() const {
 }
 
 SourceRange For::get_range_on_source() const {
-  return { token->pos, code->get_range_on_source().second };
+  return { token, code->get_range_on_source().second };
 }
 
 SourceRange Function::get_range_on_source() const {
-  return { token->pos, code->get_range_on_source().second };
+  return { token, code->get_range_on_source().second };
 }
 
 SourceRange If::get_range_on_source() const {
-  return { token->pos, (if_false ? if_false : if_true)->get_range_on_source().second };
+  return { token, (if_false ? if_false : if_true)->get_range_on_source().second };
 }
 
 SourceRange Return::get_range_on_source() const {
-  return { token->pos, expr->get_range_on_source().second };
+  return { token, expr->get_range_on_source().second };
 }
 
 SourceRange Scope::get_range_on_source() const {
-  if( elems.empty() ) {
-    return { token->pos, token->next->endpos };
-  }
+  if( elements.empty() )
+    return { token, token->next };
 
-  return { token->pos, (*elems.rbegin())->get_range_on_source().second };
+  return { token, (*elements.rbegin())->get_range_on_source().second->next };
 }
 
 SourceRange Struct::get_range_on_source() const {
-  return { token->pos, members.rbegin()->type->get_range_on_source().second };
+  return { token, members.rbegin()->type->get_range_on_source().second };
 }
 
 SourceRange Type::get_range_on_source() const {
-  auto endtok = token;
+  auto tok = token;
 
   if( !elems.empty() ) {
-    for( int i = 0;; endtok = endtok->next ) {
-      if( endtok->str == "<" ) {
+    tok = tok->next;
+
+    for( int i = 1; i > 0; tok = tok->next ) {
+      if( tok->str == "<" ) {
         i++;
       }
-      else if( endtok->str == ">" ) {
+      else if( tok->str == ">" ) {
         if( --i == 0 ) break;
       }
     }
 
-    endtok = endtok->next;
+    tok = tok->next;
   }
 
-  if( is_mutable ) {
-    endtok = endtok->next;
-  }
+  if( is_mutable )
+    tok = tok->next;
 
-  if( is_reference ) {
-    endtok = endtok->next;
-  }
+  if( is_reference )
+    tok = tok->next;
 
-  return { token->pos, endtok->endpos };
+  return { token, tok };
 }
 
 SourceRange VarDefine::get_range_on_source() const {
-  size_t end = token->next->endpos; // end of name
+  auto end = token->next; // name
 
-  if( init ) {
+  if( init )
     end = init->get_range_on_source().second;
-  }
-  else if( type ) {
+  else if( type )
     end = type->get_range_on_source().second;
-  }
 
-  return { token->pos, end };
+  return { token, end };
 }
 
 SourceRange Tuple::get_range_on_source() const {
-  if( elements.empty() ) {
-    return { token->pos, token->next->endpos };
-  }
+  if( elements.empty() )
+    return { token, token->next };
 
-  return { elements[0]->get_range_on_source().first,
-    (*elements.rbegin())->get_range_on_source().second };
+  return {
+    elements[0]->get_range_on_source().first,
+    (*elements.rbegin())->get_range_on_source().second
+  };
 }
 
 } // namespace metro

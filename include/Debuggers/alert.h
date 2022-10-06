@@ -2,11 +2,25 @@
 
 #include <cstring>
 
+inline char const* __file_ex_fn__(char const* a, char const* b) {
+  size_t const len = strlen(b);
+
+  for( auto p = a;; )
+    if( memcmp(++p, b, len) == 0 )
+      return p;
+
+  return a;
+}
+
 #define  __FILE_EX__ __file_ex_fn__(__FILE__, "src")
 
 // alert
 #define  alert  \
   fprintf(stderr,COL_MAGENTA "\t#alert %s:%d\n" COL_DEFAULT,__FILE_EX__,__LINE__)
+
+// alertphase
+#define  alertphase(s) \
+  fprintf(stderr,"\033[35;1m" s COL_DEFAULT " from %s:%d\n",__FILE_EX__,__LINE__)
 
 // alertmsg
 #define  alertmsg(e...) \
@@ -43,14 +57,4 @@
 #define  alertwhere \
   fprintf(stderr,"\t" COL_MAGENTA "# here is in function " \
   COL_YELLOW "'%s'" COL_MAGENTA " in " COL_GREEN "%s\n" COL_DEFAULT,__func__,__FILE_EX__)
-
-inline char const* __file_ex_fn__(char const* a, char const* b) {
-  size_t const len = strlen(b);
-
-  for( auto p = a;; )
-    if( memcmp(++p, b, len) == 0 )
-      return p;
-
-  return a;
-}
 

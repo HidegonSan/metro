@@ -17,4 +17,4 @@ inline Object* gcnew(Args&&... args) {
   return GC::append(new Object(args...));
 }
 
-}
+} // namespace metro

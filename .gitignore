@@ -8,6 +8,8 @@ __pycache__/
 .temp/
 .removed/
 
+commit_msg.txt
+
 metro
 
 *.lnk

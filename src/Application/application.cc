@@ -37,7 +37,7 @@ namespace metro {
     ctx.argc = argc;
     ctx.argv = argv;
 
-    try {
+    // try {
       for( auto&& script : ctx.scripts ) {
         if( !ctx.no_print_filenames && ctx.scripts.size() > 1 ) {
           std::cout
@@ -46,14 +46,14 @@ namespace metro {
 
         execute_script(script);
       }
-    }
-    catch( ... ) {
-      std::cerr
-        << std::endl
-        << "unhandled exception has been occurred." << std::endl;
+    // }
+    // catch( std::exception e ) {
+    //   std::cerr
+    //     << std::endl
+    //     << "unhandled exception has been occurred: " << e.what() << std::endl;
 
-      return -1;
-    }
+    //   return -1;
+    // }
 
     return 0;
   }

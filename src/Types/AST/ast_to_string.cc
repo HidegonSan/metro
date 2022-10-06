@@ -3,6 +3,10 @@
 
 namespace metro::AST {
 
+std::string ListBase::get_elems_string() const {
+  return Utils::join(", ", elements, [] (auto x) { return x->to_string(); });
+}
+
 std::string Argument::to_string() const {
   return Utils::linkstr("<Argument '", name, "' : ", type->to_string(), ">");
 }
@@ -89,14 +93,17 @@ std::string None::to_string() const {
 }
 
 std::string Return::to_string() const {
+  if( !expr )
+    return "<Return>";
+
   return Utils::linkstr("<Return ", expr->to_string(), ">");
 }
 
 std::string Scope::to_string() const {
-  if( elems.empty() )
+  if( elements.empty() )
     return Utils::format("<Scope %p: (Empty)>", this);
 
-  return Utils::format("<Scope %p: ", this) + Utils::join(", ", elems, [] (auto x) { return x->to_string(); }) + ">";
+  return Utils::format("<Scope %p: ", this) + this->get_elems_string() + ">";
 }
 
 std::string Struct::to_string() const {

@@ -8,4 +8,4 @@
 #define COL_MAGENTA   "\033[35m"
 #define COL_CYAN      "\033[36;5m"
 #define COL_WHITE     "\033[37m"
-#define COL_DEFAULT   "\033[39m"
+#define COL_DEFAULT   "\033[0m"

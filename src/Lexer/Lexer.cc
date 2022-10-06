@@ -1,7 +1,7 @@
 #include <cstring>
 #include "source.h"
 #include "Types/Token.h"
-#include "MetroDriver/lexer.h"
+#include "MetroDriver/Lexer.h"
 #include "Utils.h"
 
 namespace metro {
@@ -15,4 +15,4 @@ Lexer::Lexer(Source const& src)
 {
 }
 
-}
+} // namespace metro

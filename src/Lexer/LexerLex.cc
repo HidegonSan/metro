@@ -1,6 +1,6 @@
 #include <cstring>
 #include "Types/Token.h"
-#include "MetroDriver/lexer.h"
+#include "MetroDriver/Lexer.h"
 #include "Error.h"
 #include "Utils.h"
 
